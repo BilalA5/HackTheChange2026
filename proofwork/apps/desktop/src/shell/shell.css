@@ -1,0 +1,135 @@
+/* Shell titlebar: 44px dark glass, violet accent #7B6CF6 (docs/DESIGN.md). Always dark, whatever the system theme. */
+:root {
+  --bar-h: 44px;
+  --glass: rgba(18, 20, 26, 0.72);
+  --line: rgba(255, 255, 255, 0.08);
+  --ink: #E6E8EE;
+  --muted: #9BA0AA;
+  --accent: #7B6CF6;
+  --xp: #F5C451;
+}
+
+html,
+body {
+  margin: 0;
+  height: var(--bar-h);
+  overflow: hidden;
+  background: #0F1115;
+  color: var(--ink);
+  font: 13px/1 -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+.bar {
+  -webkit-app-region: drag;
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: var(--bar-h);
+  padding: 0 12px 0 0;
+  box-sizing: border-box;
+  background: var(--glass);
+  border-bottom: 1px solid var(--line);
+}
+
+/* Room for the native traffic lights (trafficLightPosition x:16). */
+.traffic-gap {
+  width: 84px;
+  flex: none;
+}
+
+.no-drag {
+  -webkit-app-region: no-drag;
+}
+
+.icon-btn {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-right: 4px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  cursor: default;
+}
+
+.icon-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ink);
+}
+
+.icon-btn:disabled {
+  opacity: 0.35;
+}
+
+.icon-btn svg,
+.pill svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--ink);
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ink);
+  font: 600 12px/1 ui-monospace, Menlo, monospace;
+  letter-spacing: 0.04em;
+  cursor: default;
+}
+
+button.pill:hover {
+  background: rgba(123, 108, 246, 0.18);
+  border-color: rgba(123, 108, 246, 0.4);
+}
+
+.pill.level svg {
+  color: var(--xp);
+  fill: currentColor;
+  stroke: none;
+}
+
+.dot {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 0 2px var(--glass);
+}
+
+.dot[hidden] {
+  display: none;
+}

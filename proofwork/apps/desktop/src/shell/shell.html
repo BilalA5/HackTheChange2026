@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:" />
+  <title>Proofwork</title>
+  <link rel="stylesheet" href="shell.css" />
+</head>
+<body>
+  <header class="bar" id="bar">
+    <div class="traffic-gap" aria-hidden="true"></div>
+    <button class="icon-btn no-drag" id="back" type="button" data-action="back" aria-label="Back" disabled>
+      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
+    </button>
+    <div class="title" id="title">Proofwork</div>
+    <div class="right">
+      <button class="pill credits no-drag" id="credits" type="button" data-action="credits" aria-label="Credits">
+        <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><circle cx="12" cy="12" r="8" /><path d="M9.5 12h5" /></svg>
+        <span id="credits-value">&infin;</span>
+      </button>
+      <div class="pill level no-drag" id="level" aria-label="Level">
+        <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z" /></svg>
+        <span id="level-value">L0</span>
+      </div>
+      <button class="icon-btn no-drag" id="support" type="button" data-action="support" aria-label="Support">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 12a7 7 0 0 1 14 0v4a2 2 0 0 1-2 2h-1v-6h3M5 12v4a2 2 0 0 0 2 2h1v-6H5" /></svg>
+      </button>
+      <button class="icon-btn no-drag" id="notifications" type="button" data-action="notifications" aria-label="Notifications">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20a2 2 0 0 0 4 0" /></svg>
+        <span class="dot" id="bell-dot" hidden></span>
+      </button>
+    </div>
+  </header>
+  <script src="shell.js"></script>
+</body>
+</html>
