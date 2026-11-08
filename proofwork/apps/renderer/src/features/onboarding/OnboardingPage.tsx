@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, MotionConfig, motion, useReducedMotion } from "motion/react";
 import { useNavigate } from "react-router";
-import type { FtuxStep, FtuxTurn, FtuxView } from "@pw/shared";
+import { CUSTOM_CAREER_ID, type FtuxStep, type FtuxTurn, type FtuxView } from "@pw/shared";
 import { ApiError, api } from "@/lib/api";
 import { errorMessage } from "@/lib/errors";
 import { useSession } from "@/stores/session";
@@ -18,6 +18,7 @@ import { RoadmapStep } from "./steps/RoadmapStep";
 import { WhyStep } from "./steps/WhyStep";
 import { ClaimStep } from "./steps/ClaimStep";
 import { FTUX_STEPS, isFtuxView } from "./types";
+import { BuildingPath } from "./BuildingPath";
 
 /** Slim progress strip: Draw · Chat · Match · Roadmap · Why · Claim. Display only, the server owns the step. */
 function StepIndicator({ current }: { current: FtuxStep }) {
@@ -88,6 +89,8 @@ export default function OnboardingPage() {
   const [startError, setStartError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [turnError, setTurnError] = useState<{ message: string; turn: FtuxTurn } | null>(null);
+  /** The turn in flight. Drives the full-screen "Building your path" state. */
+  const [inFlight, setInFlight] = useState<FtuxTurn | null>(null);
   const [finishing, setFinishing] = useState(false);
   const [finishError, setFinishError] = useState<string | null>(null);
 
@@ -137,6 +140,7 @@ export default function OnboardingPage() {
       if (!current || pendingRef.current || finishingRef.current) return;
       pendingRef.current = true;
       setPending(true);
+      setInFlight(turn);
       setTurnError(null);
       try {
         const next = await api("POST /onboarding/session-turn", { body: { sessionId: current.sessionId, turn } });
@@ -151,6 +155,7 @@ export default function OnboardingPage() {
       } finally {
         pendingRef.current = false;
         setPending(false);
+        setInFlight(null);
       }
     },
     [adopt],
@@ -166,6 +171,12 @@ export default function OnboardingPage() {
   useEffect(() => {
     if (view?.step === "done") void finish();
   }, [view, finish]);
+
+  const building = view !== null && inFlight?.kind === "SELECT_CAREER" && inFlight.careerId === CUSTOM_CAREER_ID;
+  const turnErrorText =
+    turnError?.turn.kind === "SELECT_CAREER" && turnError.turn.careerId === CUSTOM_CAREER_ID
+      ? `We could not build your path. ${turnError.message}`
+      : turnError?.message ?? "";
 
   if (finishing || view?.step === "done") {
     return (
@@ -196,6 +207,12 @@ export default function OnboardingPage() {
       <div className="theme-night relative flex h-full min-h-0 w-full flex-col overflow-hidden bg-night text-fg">
         <Backdrop />
 
+        {building && view && (
+          <div className="absolute inset-0 z-30 flex items-center justify-center bg-night/95 backdrop-blur-sm" role="presentation">
+            <BuildingPath industry={view.board?.industry} roleTitle={view.board?.targetRole} />
+          </div>
+        )}
+
         <header className="relative z-10 flex shrink-0 items-center justify-center px-8 pt-5 pb-3">
           {view && <StepIndicator current={view.step} />}
         </header>
@@ -203,7 +220,7 @@ export default function OnboardingPage() {
         <main className="relative z-10 flex min-h-0 flex-1 flex-col px-8 pb-6">
           {turnError && (
             <div className="mb-3 shrink-0">
-              <ErrorNotice message={turnError.message} busy={pending} onRetry={() => void send(turnError.turn)} />
+              <ErrorNotice message={turnErrorText} busy={pending} onRetry={() => void send(turnError.turn)} />
             </div>
           )}
 
