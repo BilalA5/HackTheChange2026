@@ -1,6 +1,5 @@
 import { useId, useState } from 'react';
-import { project, requirements } from './content.js';
-import { ChevronDown, DocIcon, PlayIcon } from './icons.jsx';
+import { ChevronDown, DocIcon } from './icons.jsx';
 
 function Requirement({ item, open, onToggle }) {
   const panelId = useId();
@@ -62,7 +61,13 @@ function ResourceRow({ icon, children, onClick, active = false }) {
   );
 }
 
-export default function Sidebar({ notesOpen, onOpenNotes }) {
+const submitLabels = {
+  idle: 'Submit for review',
+  reviewing: 'Reviewing…',
+  done: 'Reviewed · Submit again',
+};
+
+export default function Sidebar({ scenario, notesOpen, onOpenNotes, reviewStatus = 'idle', onSubmit }) {
   const [openRequirements, setOpenRequirements] = useState(() => new Set([0]));
 
   const toggle = (index) =>
@@ -77,19 +82,19 @@ export default function Sidebar({ notesOpen, onOpenNotes }) {
       <div className="h-[54px] shrink-0" />
       <div className="mt-[7px] flex shrink-0 items-center gap-[11px] pl-[3px]">
         <div className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-full border border-[#3a3a3a] bg-[#252525]">
-          <img src="/assets/workspace/shopify-bag.png" alt="" className="h-[24px] w-[24px]" />
+          <img src={scenario.logo} alt="" className="h-[22px] w-[22px] object-contain" />
         </div>
-        <h1 className="text-[15.5px] font-medium leading-[18.5px] text-[#f1f1f1]">{project.title}</h1>
+        <h1 className="text-[15.5px] font-medium leading-[18.5px] text-[#f1f1f1]">{scenario.title}</h1>
       </div>
 
       <div className="mt-[22px] flex min-h-0 flex-1 flex-col rounded-[17px] border border-[var(--line)]">
         <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-[16px] pt-[15px]">
-          <h2 className="text-[19.5px] font-bold leading-[23.5px] tracking-[-0.025em] text-white">{project.task}</h2>
+          <h2 className="text-[19.5px] font-bold leading-[23.5px] tracking-[-0.025em] text-white">{scenario.task}</h2>
 
           <section className="mt-[17px] border-t border-[var(--line)] pt-[19px]">
             <h3 className="eyebrow leading-[14px]">Requirements</h3>
             <div className="mt-[17px] pb-[17px]">
-              {requirements.map((item, i) => (
+              {scenario.requirements.map((item, i) => (
                 <Requirement key={item.title} item={item} open={openRequirements.has(i)} onToggle={() => toggle(i)} />
               ))}
             </div>
@@ -101,22 +106,25 @@ export default function Sidebar({ notesOpen, onOpenNotes }) {
             </ResourceRow>
           </ResourceSection>
           <ResourceSection label="Task resources">
-            <ResourceRow icon={<DocIcon />}>Pricing Pilot Merchant Feedback</ResourceRow>
-          </ResourceSection>
-          <ResourceSection label="Shared in chat">
-            <ResourceRow icon={<PlayIcon />}>Watch: {project.task}</ResourceRow>
+            {scenario.resources.map((resource) => (
+              <ResourceRow key={resource} icon={<DocIcon />}>
+                {resource}
+              </ResourceRow>
+            ))}
           </ResourceSection>
         </div>
       </div>
 
-      <button
-        type="button"
-        className="flex h-[84px] shrink-0 items-center gap-[9px] pl-[4px] pr-[4px] text-[#8f8f8f] hover:text-[#cfcfcf]"
-      >
-        <ChevronDown size={13} />
-        <span className="eyebrow flex-1 text-left text-inherit">Workflows</span>
-        <span className="font-mono-ui text-[12px] font-medium text-[#a8a5a0]">5</span>
-      </button>
+      <div className="shrink-0 py-[18px]">
+        <button
+          type="button"
+          onClick={onSubmit}
+          disabled={reviewStatus === 'reviewing'}
+          className="h-[46px] w-full rounded-full bg-white text-[15px] font-semibold text-[#141414] transition hover:scale-[1.02] active:scale-[.99] disabled:opacity-60"
+        >
+          {submitLabels[reviewStatus]}
+        </button>
+      </div>
     </aside>
   );
 }
