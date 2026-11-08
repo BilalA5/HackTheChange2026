@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { roles, sections } from '@/data/roles.js';
+import { play } from '@/shared/sound.js';
 import { CheckIcon } from '../components/icons.jsx';
 import Question from '../components/Question.jsx';
 import { useTour } from '../tour.js';
@@ -43,7 +44,10 @@ export default function ChooseRole() {
   const shown = roles.filter((role) => (section === 'popular' ? role.popular : role.section === section));
   const custom = answers.customRole ?? '';
 
-  const pick = (roleId) => setAnswers({ roleId, customRole: '' });
+  const pick = (roleId) => {
+    play('tick');
+    setAnswers({ roleId, customRole: '' });
+  };
   const type = (event) => setAnswers({ roleId: null, customRole: event.target.value });
 
   return (
@@ -61,7 +65,10 @@ export default function ChooseRole() {
           <button
             key={id}
             type="button"
-            onClick={() => setSection(id)}
+            onClick={() => {
+              play('tick', { volume: 0.6 });
+              setSection(id);
+            }}
             aria-pressed={section === id}
             className={`h-9 shrink-0 rounded-full px-4 text-[14px] transition ${
               section === id ? 'bg-tx text-onink' : 'bg-field text-tx-2 hover:text-tx'

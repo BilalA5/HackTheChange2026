@@ -1,3 +1,5 @@
+import SoundToggle from '@/shared/SoundToggle.jsx';
+import { play } from '@/shared/sound.js';
 import { useTour } from '../tour.js';
 import { Avatar, WordmarkChip } from './brand.jsx';
 import { ContinueButton } from './controls.jsx';
@@ -47,6 +49,7 @@ export default function Question({ step, title, hint, canContinue, onContinue, c
         </button>
       )}
       <ContinueButton disabled={!canContinue} onClick={onContinue ?? next} />
+      <SoundToggle className="absolute right-[22px] top-[22px] h-10 w-10 bg-card text-tx-2 hover:text-tx" />
     </div>
   );
 }
@@ -55,7 +58,10 @@ export function Choice({ selected, onSelect, className = '', children }) {
   return (
     <button
       type="button"
-      onClick={onSelect}
+      onClick={() => {
+        play('tick');
+        onSelect();
+      }}
       aria-pressed={selected}
       className={`text-left transition duration-200 ease-tour hover:-translate-y-0.5 ${
         selected ? 'key-light text-onink' : 'key-dark text-tx'

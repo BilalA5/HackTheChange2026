@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/features/auth/auth-context.js';
 import { buildPlan, sameAnswers, withArticle } from '@/features/plan/buildPlan.js';
 import { planStore, savePlan, tailorPlan } from '@/services/plans.js';
+import SoundToggle from '@/shared/SoundToggle.jsx';
+import { play } from '@/shared/sound.js';
 import { Avatar, WordmarkChip } from '../components/brand.jsx';
 import { CheckIcon, ChevronLeftIcon, ChevronRightIcon } from '../components/icons.jsx';
 import { useTour } from '../tour.js';
@@ -17,7 +19,10 @@ const BUILD_MS = 2200;
 function Building({ roleTitle }) {
   const [done, setDone] = useState(0);
   useEffect(() => {
-    const timer = setInterval(() => setDone((count) => count + 1), BUILD_MS / buildingSteps.length);
+    const timer = setInterval(() => {
+      setDone((count) => count + 1);
+      play('hop', { rate: 1.1 });
+    }, BUILD_MS / buildingSteps.length);
     return () => clearInterval(timer);
   }, []);
 
@@ -116,7 +121,10 @@ export default function YourPlan() {
   const [building, setBuilding] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setBuilding(false), BUILD_MS + 300);
+    const timer = setTimeout(() => {
+      setBuilding(false);
+      play('reveal');
+    }, BUILD_MS + 300);
     return () => clearTimeout(timer);
   }, []);
 
@@ -132,6 +140,7 @@ export default function YourPlan() {
   return (
     <div className="absolute inset-0 bg-page">
       <WordmarkChip />
+      <SoundToggle className="absolute right-[22px] top-[22px] h-10 w-10 bg-card text-tx-2 hover:text-tx" />
 
       <section className="animate-rise absolute left-[96px] top-[86px] h-[640px] w-[520px] overflow-hidden rounded-[30px] bg-card">
         <img src={plan.poster} alt="" className="absolute inset-0 h-full w-full object-cover object-top" />
@@ -177,7 +186,10 @@ export default function YourPlan() {
       </button>
       <button
         type="button"
-        onClick={() => finish('/app')}
+        onClick={() => {
+          play('land');
+          finish('/app');
+        }}
         className="key-light absolute bottom-[20px] right-[22px] z-30 flex h-11 items-center gap-2 rounded-full pl-5 pr-4 text-[14px] font-medium text-onink transition hover:-translate-y-0.5"
       >
         Start my plan
