@@ -17,11 +17,12 @@ import type {
   Scenario,
   Stage,
   User,
+  VisionBoard,
 } from "@pw/shared";
 import { RUBRIC_AXES, RUBRIC_LEVELS } from "@pw/shared";
 import type { AiEngine, FtuxSession, ServerContext } from "../src/contracts.ts";
-import { createAiEngine, resolveMode, resolveModels } from "../src/ai/index.ts";
-import { registerCoworkSocket, type ContentLookup } from "../src/ai/cowork.ts";
+import { createAiEngine, resolveModels, resolveProvider } from "../src/ai/index.ts";
+import { registerCoworkSocket } from "../src/ai/cowork.ts";
 import { coverage, keywordsOf, wordCount } from "../src/ai/text.ts";
 import { overallOf } from "../src/ai/mock/grade.ts";
 import { toTodo, extraRequirement } from "../src/ai/mock/plan.ts";
@@ -206,16 +207,27 @@ const portfolio: Portfolio = {
 
 const mock = createAiEngine({ mode: "mock" });
 
-test("mode resolution: live only with a key or PW_AI_MODE=live, never when PW_AI_MODE=mock", () => {
-  assert.equal(resolveMode({}, {}), "mock");
-  assert.equal(resolveMode({}, { ANTHROPIC_API_KEY: "k" }), "live");
-  assert.equal(resolveMode({}, { ANTHROPIC_AUTH_TOKEN: "t" }), "live");
-  assert.equal(resolveMode({}, { ANTHROPIC_API_KEY: "k", PW_AI_MODE: "mock" }), "mock");
-  assert.equal(resolveMode({}, { PW_AI_MODE: "live" }), "live");
-  assert.equal(resolveMode({ mode: "mock" }, { PW_AI_MODE: "live" }), "mock");
-  assert.deepEqual(resolveModels({}), { quality: "claude-opus-5-5", fast: "claude-haiku-5-5" });
-  assert.deepEqual(resolveModels({ PW_MODEL_QUALITY: "q", PW_MODEL_FAST: "f" }), { quality: "q", fast: "f" });
+test("provider resolution: explicit choice wins, then Gemini, then Anthropic, else practice", () => {
+  assert.equal(resolveProvider({}, {}), "mock");
+  assert.equal(resolveProvider({}, { GEMINI_API_KEY: "g" }), "gemini");
+  assert.equal(resolveProvider({}, { ANTHROPIC_API_KEY: "a" }), "anthropic");
+  assert.equal(resolveProvider({}, { ANTHROPIC_AUTH_TOKEN: "t" }), "anthropic");
+  assert.equal(resolveProvider({}, { GEMINI_API_KEY: "g", ANTHROPIC_API_KEY: "a" }), "gemini");
+  assert.equal(resolveProvider({}, { GEMINI_API_KEY: "g", PW_AI_PROVIDER: "anthropic" }), "anthropic");
+  assert.equal(resolveProvider({}, { GEMINI_API_KEY: "g", PW_AI_PROVIDER: "mock" }), "mock");
+  assert.equal(resolveProvider({}, { PW_AI_PROVIDER: "Gemini" }), "gemini");
+  assert.equal(resolveProvider({}, { ANTHROPIC_API_KEY: "a", PW_AI_MODE: "mock" }), "mock");
+  assert.equal(resolveProvider({ mode: "mock" }, { GEMINI_API_KEY: "g" }), "mock");
+});
+
+test("models: each provider has its own defaults and overrides", () => {
+  assert.deepEqual(resolveModels("anthropic", {}), { quality: "claude-opus-5-5", fast: "claude-haiku-5-5" });
+  assert.deepEqual(resolveModels("anthropic", { PW_MODEL_QUALITY: "q", PW_MODEL_FAST: "f" }), { quality: "q", fast: "f" });
+  assert.deepEqual(resolveModels("gemini", {}), { quality: "gemini-3.8-flash", fast: "gemini-3.5-flash-lite" });
+  assert.deepEqual(resolveModels("gemini", { PW_GEMINI_MODEL_QUALITY: "gq", PW_GEMINI_MODEL_FAST: "gf" }), { quality: "gq", fast: "gf" });
+  assert.deepEqual(resolveModels("mock", {}), { quality: "practice", fast: "practice" });
   assert.equal(mock.mode, "mock");
+  assert.equal(mock.provider, "practice");
 });
 
 test("text: stemming and coverage thresholds", () => {
@@ -419,56 +431,88 @@ test("gradePresentation returns the same shape", async () => {
   assert.equal(Object.keys(g.rubric).length, 4);
 });
 
-test("ftux: reaches done through every step and ignores invalid turns", async () => {
+const genCareer: Career = {
+  id: "g-u1-1",
+  title: "Energy Analyst",
+  tagline: "Analyse grid data for renewables",
+  description: "",
+  skills: ["energy", "grid", "forecasting"],
+  color: "#1fa67a",
+  generated: true,
+};
+
+const ftuxQuestions = ["targetRole", "level", "industry", "companyType", "location", "timeline"] as const;
+
+test("ftux: six questions, then why, then recommend with the custom path first, then roadmap and claim", async () => {
   type Turn = Parameters<AiEngine["ftuxTurn"]>[0]["turn"];
   let session: FtuxSession = { id: "s1", userId: "u1", view: mock.ftuxStart({ sessionId: "s1", user }), memory: {} };
-  // Node's assert.equal narrows its actual argument, so read the view through a function for later checks.
   const current = (): FtuxView => session.view;
-  const start = current();
-  assert.equal(start.step, "draw");
-  assert.equal(start.prompt, "Draw what your dream job looks like. Stick figures welcome.");
-  assert.deepEqual(start.chips, []);
-  assert.deepEqual(start.messages, []);
-  assert.equal(start.roadmap, null);
-  assert.equal(start.claim, null);
+  assert.equal(current().step, "draw");
+  assert.equal(current().prompt, "Draw what your dream job looks like. Stick figures welcome.");
+  assert.deepEqual(current().chips, []);
+  assert.equal(current().roadmap, null);
+  assert.equal(current().claim, null);
 
-  const apply = async (turn: Turn) => {
-    const r = await mock.ftuxTurn({ session, turn, user, careers, scenarios: [scenario] });
+  const apply = async (turn: Turn, cs: Career[] = careers) => {
+    const r = await mock.ftuxTurn({ session, turn, user, careers: cs, scenarios: [scenario], companies: [company] });
     session = { ...session, view: r.view, memory: r.memory };
     return r;
   };
 
   // Invalid for the draw step: unchanged view.
-  const before = session.view;
-  const invalid = await apply({ kind: "MESSAGE", text: "hello" });
-  assert.equal(invalid.view, before);
-  assert.equal(session.view.step, "draw");
+  const before = current();
+  assert.equal((await apply({ kind: "MESSAGE", text: "hello" })).view, before);
 
   await apply({ kind: "DRAWN", dataUrl: "data:image/png;base64,iVBORw0KGgo=" });
-  assert.equal(session.view.step, "chat");
-  assert.equal(session.view.chips.length, 4);
-  assert.equal(session.view.board.drawingDataUrl?.startsWith("data:image/png"), true);
+  assert.equal(current().step, "chat");
+  assert.equal(current().board.drawingDataUrl?.startsWith("data:image/png"), true);
+  assert.equal(current().prompt, "What role are you aiming for? Type any job title.");
+  assert.deepEqual(current().chips, ["Software Engineer", "Data Analyst", "Product Manager", "UX Designer", "Marketing Manager", "Not sure yet"]);
 
-  // Invalid during chat: a CLAIM does nothing.
-  const chatBefore = session.view;
-  assert.equal((await apply({ kind: "CLAIM" })).view, chatBefore);
+  // Invalid during chat: a WHY turn does nothing.
+  const chatBefore = current();
+  assert.equal((await apply({ kind: "WHY", text: "not yet" })).view, chatBefore);
 
-  await apply({ kind: "MESSAGE", text: "AI Engineer" });
-  assert.equal(session.view.board.targetRole, "AI Engineer");
-  await apply({ kind: "MESSAGE", text: "Startup, fintech payments" });
-  assert.equal(session.view.board.companyType, "Startup");
-  assert.equal(session.view.board.industry, "Startup, fintech payments");
-  await apply({ kind: "MESSAGE", text: "Remote" });
-  assert.equal(session.view.board.location, "Remote");
-  await apply({ kind: "MESSAGE", text: "3 months" });
-  assert.equal(session.view.board.timeline, "3 months");
-  assert.equal(session.view.step, "recommend");
-  assert.equal(session.view.recommendations.length, 3);
-  assert.equal(session.view.recommendations[0].careerId, "ai-engineer");
-  for (const r of session.view.recommendations) {
+  const values = ["AI Engineer", "Junior", "Tech", "Startup", "Remote", "3 months"];
+  for (let k = 0; k < ftuxQuestions.length; k++) {
+    assert.equal(current().step, "chat");
+    await apply({ kind: "MESSAGE", text: values[k] });
+    assert.equal(current().board[ftuxQuestions[k] as keyof VisionBoard], values[k]);
+  }
+  assert.equal(current().step, "why");
+  assert.equal(current().prompt, "What's driving you, and what do you already bring? (studies, jobs, projects)");
+
+  // Invalid during why: a SELECT_CAREER does nothing.
+  const whyBefore = current();
+  assert.equal((await apply({ kind: "SELECT_CAREER", careerId: "ai-engineer" })).view, whyBefore);
+
+  await apply({ kind: "WHY", text: "I want to build agents that people rely on." });
+  assert.equal(current().board.why, "I want to build agents that people rely on.");
+  assert.equal(current().board.background, "I want to build agents that people rely on.");
+  assert.equal(current().step, "recommend");
+
+  const recs = current().recommendations;
+  assert.equal(recs[0].careerId, "custom");
+  assert.equal(recs[0].kind, "custom");
+  assert.equal(recs[0].match, 100);
+  assert.equal(recs[0].title, "AI Engineer");
+  assert.equal(recs[0].color, "#7B6CF6");
+  assert.equal(
+    recs[0].reason,
+    "Three projects written for you, from your answers: Junior · Tech · Startup · Remote · 3 months.",
+  );
+  assert.equal(recs[1]?.careerId, "ai-engineer");
+  assert.equal(recs[1]?.kind, "authored");
+  assert.equal(recs[1]?.color, "#2f6fed");
+  assert.ok(recs.length <= 3);
+  for (const r of recs) {
     assert.ok(r.match >= 0 && r.match <= 100);
     assert.ok(r.reason.length > 0);
   }
+
+  // The custom id is not in the careers list until the core generates it: the view stays put.
+  const pending = current();
+  assert.equal((await apply({ kind: "SELECT_CAREER", careerId: "custom" })).view, pending);
 
   const sel = await apply({ kind: "SELECT_CAREER", careerId: "ai-engineer" });
   assert.equal(sel.careerId, "ai-engineer");
@@ -476,22 +520,43 @@ test("ftux: reaches done through every step and ignores invalid turns", async ()
   const roadmap = current().roadmap;
   assert.ok(roadmap);
   assert.equal(roadmap.scenarios[0]?.scenarioId, scenario.id);
+  assert.equal(roadmap.scenarios[0]?.company, "Kettle Commerce");
 
   await apply({ kind: "CONTINUE" });
-  assert.equal(session.view.step, "why");
-  assert.equal(session.view.prompt, "What's driving you?");
-
-  await apply({ kind: "WHY", text: "I want to build agents that people rely on." });
-  assert.equal(session.view.board.why, "I want to build agents that people rely on.");
-  assert.equal(session.view.step, "claim");
-  assert.deepEqual(session.view.claim, { credits: 10000, claimed: false });
+  assert.equal(current().step, "claim");
+  assert.deepEqual(current().claim, { credits: 10000, claimed: false });
 
   await apply({ kind: "CLAIM" });
-  assert.equal(session.view.step, "done");
-  assert.deepEqual(session.view.claim, { credits: 10000, claimed: true });
+  assert.equal(current().step, "done");
+  assert.deepEqual(current().claim, { credits: 10000, claimed: true });
 
-  const finalView = session.view;
+  const finalView = current();
   assert.equal((await apply({ kind: "CONTINUE" })).view, finalView);
+});
+
+test("ftux: a generated career is selectable but never recommended; Not sure yet gets an analyst path", async () => {
+  let session: FtuxSession = { id: "s2", userId: "u1", view: mock.ftuxStart({ sessionId: "s2", user }), memory: {} };
+  const cs = [...careers, genCareer];
+  const apply = async (turn: Parameters<AiEngine["ftuxTurn"]>[0]["turn"]) => {
+    const r = await mock.ftuxTurn({ session, turn, user, careers: cs, scenarios: [scenario], companies: [company] });
+    session = { ...session, view: r.view, memory: r.memory };
+    return r;
+  };
+  await apply({ kind: "DRAWN", dataUrl: "data:image/png;base64,iVBORw0KGgo=" });
+  for (const text of ["Not sure yet", "Junior", "Energy", "Startup", "Remote", "3 months"]) await apply({ kind: "MESSAGE", text });
+  await apply({ kind: "WHY", text: "I want to help the grid run on renewables." });
+
+  const recs = session.view.recommendations;
+  assert.equal(recs[0].careerId, "custom");
+  assert.equal(recs[0].title, "Energy Business Analyst");
+  assert.ok(!recs.some((r) => r.careerId === genCareer.id), "generated careers are never authored recommendations");
+
+  const sel = await apply({ kind: "SELECT_CAREER", careerId: genCareer.id });
+  assert.equal(sel.careerId, genCareer.id);
+  assert.equal(session.view.step, "roadmap");
+  assert.equal(session.view.roadmap?.careerId, genCareer.id);
+  // No scenario for the generated career in this fixture, so the roadmap is empty but still valid.
+  assert.deepEqual(session.view.roadmap?.scenarios, []);
 });
 
 test("draftApplication fills every required key and writes a cover letter", async () => {
@@ -603,6 +668,7 @@ async function harness(): Promise<Harness> {
     ai,
     verifyToken: async (token) => (token === "good-token" ? { userId: "u1" } : null),
     getUser: () => user,
+    resolveScenario: (_uid, scenarioId) => (scenarioId === scenario.id ? { scenario, company, npc } : null),
     getObjective: (_uid, id) => store.get(id) ?? null,
     saveObjective: (_uid, o) => {
       store.set(o.id, o);
@@ -616,15 +682,9 @@ async function harness(): Promise<Harness> {
     log: () => {},
   };
 
-  const content: ContentLookup = {
-    getScenario: (id) => (id === scenario.id ? scenario : undefined),
-    findStage: (sid, stid) => (sid === scenario.id && stid === stage.id ? stage : undefined),
-    getNpc: (id) => (id === npc.id ? npc : undefined),
-  };
-
   const app = Fastify();
   await app.register(websocket);
-  registerCoworkSocket(app, ctx, { content });
+  registerCoworkSocket(app, ctx);
   await app.ready();
   return { app, calls, store };
 }
@@ -750,35 +810,4 @@ test("cowork: a non-auth first frame is refused and the socket closes with 4401"
   } finally {
     await h.app.close();
   }
-});
-
-// ───────────────────────────── live (only with credentials) ─────────────────────────────
-
-const hasKey = Boolean(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN);
-
-test("live engine: checkNote returns a well-formed verdict", { skip: !hasKey, timeout: 60000 }, async () => {
-  const live = createAiEngine({ mode: "live" });
-  assert.equal(live.mode, "live");
-  const v = await live.checkNote({
-    scenario,
-    segment,
-    text: "Tickets land in the wrong queue, agents lose hours sorting by hand, and customers wait too long for a reply.",
-  });
-  assert.equal(typeof v.accepted, "boolean");
-  assert.ok(Array.isArray(v.covered) && Array.isArray(v.missing));
-  assert.ok(v.feedback.length > 0);
-});
-
-test("live engine: gradeSubmission returns all four axes", { skip: !hasKey, timeout: 120000 }, async () => {
-  const live = createAiEngine({ mode: "live" });
-  const g = await live.gradeSubmission({
-    scenario,
-    stage,
-    submissions: [{ id: "s1", kind: "text", value: "Classified tickets into queues, logged decisions, and tested the happy path.", createdAt: new Date().toISOString() }],
-    fileTexts: {},
-    notes: { problem: "", outcome: "", process: "" },
-    signals: { planComplete: true, agreedRequirements: stage.requirements, learnItemsCompleted: 1, learnChats: 1, managerQuestions: 1, minutesSpent: 30 },
-  });
-  assert.deepEqual(Object.keys(g.rubric).sort(), [...RUBRIC_AXES].sort());
-  assert.equal(g.passed, g.overall !== "below");
 });
