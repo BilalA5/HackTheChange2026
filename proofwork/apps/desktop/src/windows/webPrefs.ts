@@ -10,5 +10,7 @@ export function webPreferencesFor(): NonNullable<BrowserWindowConstructorOptions
     nodeIntegration: false,
     webSecurity: true,
     spellcheck: false,
+    // The co-worker island and kickoff narration speak without a click in that window.
+    autoplayPolicy: "no-user-gesture-required",
   };
 }
