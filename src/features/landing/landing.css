@@ -1,7 +1,3 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @font-face {
   font-family: 'Google Sans Flex';
   src: url('/assets/fonts/GoogleSansFlex-wght-ROND.woff2') format('woff2');
@@ -9,7 +5,7 @@
   font-display: swap;
 }
 
-:root {
+:root[data-app='landing'] {
   --page: #f8f9fb;
   --ink: #0b0b0b;
   --ink-soft: #1b1d1c;
@@ -23,29 +19,19 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-html {
+[data-app='landing'],
+[data-app='landing'] body {
   background: var(--page);
 }
 
-body {
-  margin: 0;
-  background: var(--page);
+[data-app='landing'] body {
   color: var(--ink);
   font-family: var(--sans);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   overflow-x: clip;
 }
 
 .tight {
   letter-spacing: -0.045em;
-}
-
-.no-scrollbar {
-  scrollbar-width: none;
-}
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
 }
 
 /* Fixed dock: a dark Start key, then menu and help keys, on a frosted tray. */
@@ -195,17 +181,15 @@ body {
   backface-visibility: hidden;
 }
 
-button:focus-visible,
-a:focus-visible,
-input:focus-visible {
+[data-app='landing'] :is(button, a, input):focus-visible {
   outline: 2px solid #3fe8a4;
   outline-offset: 3px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  [data-app='landing'] *,
+  [data-app='landing'] *::before,
+  [data-app='landing'] *::after {
     animation: none !important;
     transition-duration: 0.01ms !important;
   }
