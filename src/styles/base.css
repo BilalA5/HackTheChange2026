@@ -18,3 +18,8 @@ body {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+[data-app='auth'],
+[data-app='auth'] body {
+  background: #0e0e10;
+}

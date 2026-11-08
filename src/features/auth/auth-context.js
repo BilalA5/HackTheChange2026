@@ -7,3 +7,7 @@ export function useAuth() {
   if (!auth) throw new Error('useAuth must be used inside AuthProvider');
   return auth;
 }
+
+export function homePathFor(user) {
+  return user.onboarded ? '/app' : '/onboarding';
+}
