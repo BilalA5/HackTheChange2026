@@ -53,18 +53,36 @@ function AskFlint({ open, onClose }) {
       <div className="flex items-center gap-2.5 px-5 pb-3 pt-4">
         <Mark className="h-6 w-6" />
         <span className="flex-1 text-[15px] font-medium tracking-[-0.01em]">Ask Flint</span>
-        <button type="button" onClick={onClose} aria-label="Close" className="grid h-8 w-8 place-items-center rounded-full text-[#555] hover:bg-black/5">
-          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close"
+          className="grid h-8 w-8 place-items-center rounded-full text-[#555] hover:bg-black/5"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            className="h-4 w-4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          >
             <path d="M6 6l12 12M18 6L6 18" />
           </svg>
         </button>
       </div>
-      <div ref={logRef} className="no-scrollbar min-h-[120px] flex-1 space-y-2.5 overflow-y-auto px-5 pb-3" aria-live="polite">
+      <div
+        ref={logRef}
+        className="no-scrollbar min-h-[120px] flex-1 space-y-2.5 overflow-y-auto px-5 pb-3"
+        aria-live="polite"
+      >
         {log.map((m, i) => (
           <p
             key={i}
             className={`max-w-[88%] rounded-[16px] px-3.5 py-2.5 text-[14px] leading-[1.4] ${
-              m.from === 'you' ? 'ml-auto bg-[#111] text-white' : 'bg-white text-[#1b1d1c] shadow-[0_0_0_0.5px_rgba(0,0,0,0.08)]'
+              m.from === 'you'
+                ? 'ml-auto bg-[#111] text-white'
+                : 'bg-white text-[#1b1d1c] shadow-[0_0_0_0.5px_rgba(0,0,0,0.08)]'
             }`}
           >
             {m.text}
@@ -99,8 +117,20 @@ function AskFlint({ open, onClose }) {
           aria-label="Ask anything about Flint"
           className="min-w-0 flex-1 bg-transparent text-[14px] outline-none placeholder:text-[#9a9a9a] focus-visible:outline-none"
         />
-        <button type="submit" aria-label="Send" className="grid h-9 w-9 place-items-center rounded-[12px] bg-[#111] text-white">
-          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <button
+          type="submit"
+          aria-label="Send"
+          className="grid h-9 w-9 place-items-center rounded-[12px] bg-[#111] text-white"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            className="h-4 w-4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M12 19V5M5.5 11.5L12 5l6.5 6.5" />
           </svg>
         </button>
@@ -182,8 +212,12 @@ export default function Dock() {
           aria-label="Menu"
           className="soft-key grid h-[55px] w-[55px] place-content-center gap-[5px] rounded-[15px]"
         >
-          <i className={`block h-[2px] w-[17px] rounded bg-[#111] transition-transform ${panel === 'menu' ? 'translate-y-[3.5px] rotate-45' : ''}`} />
-          <i className={`block h-[2px] w-[17px] rounded bg-[#111] transition-transform ${panel === 'menu' ? '-translate-y-[3.5px] -rotate-45' : ''}`} />
+          <i
+            className={`block h-[2px] w-[17px] rounded bg-[#111] transition-transform ${panel === 'menu' ? 'translate-y-[3.5px] rotate-45' : ''}`}
+          />
+          <i
+            className={`block h-[2px] w-[17px] rounded bg-[#111] transition-transform ${panel === 'menu' ? '-translate-y-[3.5px] -rotate-45' : ''}`}
+          />
         </button>
         <button
           type="button"

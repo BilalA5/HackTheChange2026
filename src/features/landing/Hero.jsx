@@ -1,17 +1,51 @@
 import { ease, range, useStickyProgress } from './hooks.js';
 import { Logo, Mark, Narrator } from './ui.jsx';
 
-const rowA = ['google', 'openai', 'airbnb', 'stripe', 'netflix', 'spotify', 'notion', 'shopify', 'slack', 'figma', 'uber', 'meta'];
-const rowB = ['microsoft', 'amazon', 'apple', 'nike', 'adobe', 'anthropic', 'samsung', 'ibm', 'paypal', 'zoom', 'duolingo', 'hubspot'];
+const rowA = [
+  'google',
+  'openai',
+  'airbnb',
+  'stripe',
+  'netflix',
+  'spotify',
+  'notion',
+  'shopify',
+  'slack',
+  'figma',
+  'uber',
+  'meta',
+];
+const rowB = [
+  'microsoft',
+  'amazon',
+  'apple',
+  'nike',
+  'adobe',
+  'anthropic',
+  'samsung',
+  'ibm',
+  'paypal',
+  'zoom',
+  'duolingo',
+  'hubspot',
+];
 
 function LogoRow({ names, direction }) {
   // Two copies side by side so the drift loops without a seam.
   const items = [...names, ...names];
   return (
     <div className="overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_14%,#000_86%,transparent)]">
-      <div className={`flex w-max items-center gap-[clamp(40px,5vw,84px)] ${direction === 'left' ? 'drift-left' : 'drift-right'}`}>
+      <div
+        className={`flex w-max items-center gap-[clamp(40px,5vw,84px)] ${direction === 'left' ? 'drift-left' : 'drift-right'}`}
+      >
         {items.map((n, i) => (
-          <Logo key={i} name={n} dark className="h-[clamp(18px,1.8vw,28px)] w-auto opacity-55" alt={i < names.length ? n : ''} />
+          <Logo
+            key={i}
+            name={n}
+            dark
+            className="h-[clamp(18px,1.8vw,28px)] w-auto opacity-55"
+            alt={i < names.length ? n : ''}
+          />
         ))}
       </div>
     </div>
@@ -30,8 +64,17 @@ export default function Hero() {
   return (
     <section id="top" ref={ref} className="relative h-[330vh]" aria-labelledby="hero-title">
       <div className="sticky top-0 h-[100svh] overflow-hidden bg-[var(--page)]">
-        <div className="absolute inset-0" aria-hidden="true" style={{ transform: `scale(${1 + zoom * 1.1})`, transformOrigin: '50% 59%' }}>
-          <img src="/assets/shots/world-pale.webp" alt="" className="h-full w-full object-cover object-[50%_60%]" draggable="false" />
+        <div
+          className="absolute inset-0"
+          aria-hidden="true"
+          style={{ transform: `scale(${1 + zoom * 1.1})`, transformOrigin: '50% 59%' }}
+        >
+          <img
+            src="/assets/shots/world-pale.webp"
+            alt=""
+            className="h-full w-full object-cover object-[50%_60%]"
+            draggable="false"
+          />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,var(--page)_0%,var(--page)_22%,rgba(248,249,251,0.75)_34%,rgba(248,249,251,0.25)_55%,rgba(248,249,251,0.12)_100%)]" />
         </div>
 
@@ -39,7 +82,10 @@ export default function Hero() {
           className="absolute inset-x-0 top-[17svh] z-10 px-6 text-center"
           style={{ opacity: 1 - copyOut, transform: `translateY(${-copyOut * 60}px)` }}
         >
-          <h1 id="hero-title" className="text-[clamp(2.5rem,1.2rem+3.4vw,4.5rem)] font-normal leading-[0.99] tracking-[-0.052em] text-[var(--ink)]">
+          <h1
+            id="hero-title"
+            className="text-[clamp(2.5rem,1.2rem+3.4vw,4.5rem)] font-normal leading-[0.99] tracking-[-0.052em] text-[var(--ink)]"
+          >
             Get hired with{' '}
             <span className="whitespace-nowrap">
               no experience.
@@ -52,9 +98,16 @@ export default function Hero() {
           <Mark className="h-full w-full will-change-transform" style={{ transform: `scale(${markScale})` }} />
         </div>
 
-        <div className="absolute inset-0 z-20 bg-[var(--night)]" style={{ opacity: black, pointerEvents: black > 0.5 ? 'auto' : 'none' }}>
+        <div
+          className="absolute inset-0 z-20 bg-[var(--night)]"
+          style={{ opacity: black, pointerEvents: black > 0.5 ? 'auto' : 'none' }}
+        >
           <div className="flex h-full flex-col items-center justify-center px-6 pb-[18svh] text-center text-white">
-            <h2 id="network" className="font-normal" style={{ opacity: net, transform: `translateY(${(1 - net) * 40}px)` }}>
+            <h2
+              id="network"
+              className="font-normal"
+              style={{ opacity: net, transform: `translateY(${(1 - net) * 40}px)` }}
+            >
               <span className="block text-[clamp(4.5rem,2rem+9vw,11rem)] leading-[0.9] tracking-[-0.07em]">5,000+</span>
               <span className="mt-[0.34em] block text-[clamp(1.6rem,1rem+1.6vw,2.7rem)] leading-[1.05] tracking-[-0.045em] text-white/70">
                 companies hiring in our talent network.
@@ -77,7 +130,14 @@ export default function Hero() {
           style={{ opacity: p < 0.01 ? 1 : 0 }}
           aria-hidden="true"
         >
-          <svg viewBox="0 0 24 24" className="h-4 w-4 animate-bounce" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <svg
+            viewBox="0 0 24 24"
+            className="h-4 w-4 animate-bounce"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          >
             <path d="M12 5v14M6 13l6 6 6-6" />
           </svg>
           Scroll down

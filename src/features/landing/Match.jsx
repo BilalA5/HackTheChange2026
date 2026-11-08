@@ -23,9 +23,17 @@ function Odometer({ value }) {
   return (
     <span className="inline-flex overflow-hidden tabular-nums" style={{ height: '1.1em' }} aria-hidden="true">
       {digits.map((d, i) => (
-        <span key={i} className="inline-block transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" style={{ transform: `translateY(${d === ' ' ? 0 : -Number(d) * 1.1}em)` }}>
+        <span
+          key={i}
+          className="inline-block transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          style={{ transform: `translateY(${d === ' ' ? 0 : -Number(d) * 1.1}em)` }}
+        >
           {Array.from({ length: 10 }, (_, n) => (
-            <span key={n} className="block h-[1.1em] leading-[1.1em]" style={{ visibility: d === ' ' ? 'hidden' : 'visible' }}>
+            <span
+              key={n}
+              className="block h-[1.1em] leading-[1.1em]"
+              style={{ visibility: d === ' ' ? 'hidden' : 'visible' }}
+            >
               {n}
             </span>
           ))}
@@ -45,11 +53,16 @@ export default function Match() {
     <section ref={ref} id="match" aria-labelledby="match-title" className="relative h-[280vh]">
       <div className="sticky top-0 flex h-[100svh] flex-col items-center justify-center overflow-hidden px-6 pb-[8svh]">
         <div className="text-center" style={{ opacity: 0.25 + head * 0.75 }}>
-          <h2 id="match-title" className="text-[clamp(1.9rem,1.1rem+1.9vw,3.1rem)] font-normal leading-[1.06] tracking-[-0.045em]">
+          <h2
+            id="match-title"
+            className="text-[clamp(1.9rem,1.1rem+1.9vw,3.1rem)] font-normal leading-[1.06] tracking-[-0.045em]"
+          >
             You learn. We match.
             <Narrator clip="match" size={42} className="ml-2 -translate-y-[0.3em]" />
           </h2>
-          <p className="mt-2 text-[17px] leading-[1.3] tracking-[-0.012em] text-[var(--muted)]">We’ll connect you into our talent network.</p>
+          <p className="mt-2 text-[17px] leading-[1.3] tracking-[-0.012em] text-[var(--muted)]">
+            We’ll connect you into our talent network.
+          </p>
         </div>
 
         <div className="relative mt-[4svh] aspect-[1100/520] w-[min(1100px,100%)]">
@@ -79,7 +92,12 @@ export default function Match() {
 
           <figure
             className="window absolute overflow-hidden"
-            style={{ left: `${((PF.x - PF.w / 2) / 1100) * 100}%`, top: `${((PF.y - PF.h / 2) / 520) * 100}%`, width: `${(PF.w / 1100) * 100}%`, height: `${(PF.h / 520) * 100}%` }}
+            style={{
+              left: `${((PF.x - PF.w / 2) / 1100) * 100}%`,
+              top: `${((PF.y - PF.h / 2) / 520) * 100}%`,
+              width: `${(PF.w / 1100) * 100}%`,
+              height: `${(PF.h / 520) * 100}%`,
+            }}
           >
             <img src="/assets/protos/portfolio-2x.webp" alt="A Flint portfolio" className="w-full" loading="lazy" />
             <p className="absolute right-4 top-3 flex items-center gap-[0.26em] rounded-full bg-white/90 px-3 py-1 text-[clamp(14px,1.4vw,22px)] tracking-[-0.02em] text-[#1b1d1c] shadow-sm backdrop-blur">

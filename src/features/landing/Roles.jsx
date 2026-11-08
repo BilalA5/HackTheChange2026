@@ -20,7 +20,11 @@ function ToolIcon({ tool }) {
       {tool.tint ? (
         <i
           className="block h-[15px] w-[15px]"
-          style={{ background: tool.tint, WebkitMask: `url(${tool.src}) center/contain no-repeat`, mask: `url(${tool.src}) center/contain no-repeat` }}
+          style={{
+            background: tool.tint,
+            WebkitMask: `url(${tool.src}) center/contain no-repeat`,
+            mask: `url(${tool.src}) center/contain no-repeat`,
+          }}
         />
       ) : (
         <img src={tool.src} alt="" className="h-[15px] w-[15px] object-contain" />
@@ -45,7 +49,12 @@ function RoleCard({ role }) {
   };
 
   return (
-    <li className="w-[clamp(250px,21.2vw,360px)] shrink-0 [perspective:1400px]" onMouseEnter={play} onMouseLeave={stop} onFocus={play}>
+    <li
+      className="w-[clamp(250px,21.2vw,360px)] shrink-0 [perspective:1400px]"
+      onMouseEnter={play}
+      onMouseLeave={stop}
+      onFocus={play}
+    >
       <div className={`card-flip relative aspect-[360/427] ${flipped ? '[transform:rotateY(180deg)]' : ''}`}>
         <div className="card-face group absolute inset-0 overflow-hidden rounded-[18px] bg-[#1a1a1a]">
           {role.film ? (
@@ -88,7 +97,9 @@ function RoleCard({ role }) {
             className="absolute inset-x-0 bottom-0 z-[5] px-5 pb-5 pt-16 text-left"
             aria-label={`${role.title}: see what you ship`}
           >
-            <span className="block text-[clamp(20px,1.55vw,26px)] leading-[1.05] tracking-[-0.045em] text-white">{role.title}</span>
+            <span className="block text-[clamp(20px,1.55vw,26px)] leading-[1.05] tracking-[-0.045em] text-white">
+              {role.title}
+            </span>
             <span className="mt-3 flex gap-[6px]">
               {role.tools.map((t) => (
                 <ToolIcon key={t.src} tool={t} />
@@ -106,7 +117,14 @@ function RoleCard({ role }) {
               aria-label="Turn the card back"
               className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-black/[0.06] hover:bg-black/10"
             >
-              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <svg
+                viewBox="0 0 24 24"
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
                 <path d="M6 6l12 12M18 6L6 18" />
               </svg>
             </button>
@@ -164,11 +182,18 @@ export default function Roles() {
     <section id="roles" aria-labelledby="roles-title" className="relative text-white">
       <div ref={ref} className="bg-[var(--night)]" style={{ height: `calc(100svh + ${run}px)` }}>
         <div className="sticky top-0 flex h-[100svh] flex-col justify-center overflow-hidden pb-[9svh]">
-          <h2 id="roles-title" className="mx-auto max-w-[16em] px-6 text-center text-[length:var(--h2)] font-normal leading-[1.05] tracking-[-0.045em]">
+          <h2
+            id="roles-title"
+            className="mx-auto max-w-[16em] px-6 text-center text-[length:var(--h2)] font-normal leading-[1.05] tracking-[-0.045em]"
+          >
             We train you for <span className="whitespace-nowrap">the hottest roles.</span>
             <Narrator clip="roles" size={50} dark className="ml-2 -translate-y-[0.45em]" />
           </h2>
-          <div className="no-scrollbar mx-auto mt-[clamp(20px,3svh,34px)] flex max-w-full gap-[clamp(14px,1.6vw,27px)] overflow-x-auto px-6" role="group" aria-label="Fields">
+          <div
+            className="no-scrollbar mx-auto mt-[clamp(20px,3svh,34px)] flex max-w-full gap-[clamp(14px,1.6vw,27px)] overflow-x-auto px-6"
+            role="group"
+            aria-label="Fields"
+          >
             {sections.map((s) => (
               <button
                 key={s.id}
@@ -176,7 +201,9 @@ export default function Roles() {
                 onClick={() => setField(s.id)}
                 aria-pressed={field === s.id}
                 className={`shrink-0 border-b-2 pb-1.5 text-[14px] tracking-[-0.005em] transition-colors ${
-                  field === s.id ? 'border-white font-semibold text-white' : 'border-transparent text-white/65 hover:text-white'
+                  field === s.id
+                    ? 'border-white font-semibold text-white'
+                    : 'border-transparent text-white/65 hover:text-white'
                 }`}
               >
                 {s.label}
@@ -194,7 +221,12 @@ export default function Roles() {
           </ul>
         </div>
       </div>
-      <svg viewBox="0 0 1700 90" preserveAspectRatio="none" className="block h-[clamp(40px,5.3vw,90px)] w-full" aria-hidden="true">
+      <svg
+        viewBox="0 0 1700 90"
+        preserveAspectRatio="none"
+        className="block h-[clamp(40px,5.3vw,90px)] w-full"
+        aria-hidden="true"
+      >
         <path d="M0 0H1700V48Q850 128 0 48Z" fill="var(--night)" />
       </svg>
     </section>

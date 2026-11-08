@@ -62,8 +62,25 @@ function PortfolioWindow() {
 
 const steps = [
   { lead: 'Build projects in our simulated', last: 'world.', clip: 'world', body: <WorldWindow /> },
-  { lead: 'Work with your', last: 'team.', clip: 'team', body: <ShotWindow src="/assets/protos/team.webp" alt="The team workspace: a manager's brief, the team and the ask" /> },
-  { lead: 'Get coached along the', last: 'way.', clip: 'coach', body: <ShotWindow src="/assets/protos/coach.webp" alt="Choosing a coach: Jessica, finds the pattern behind the problem" /> },
+  {
+    lead: 'Work with your',
+    last: 'team.',
+    clip: 'team',
+    body: (
+      <ShotWindow src="/assets/protos/team.webp" alt="The team workspace: a manager's brief, the team and the ask" />
+    ),
+  },
+  {
+    lead: 'Get coached along the',
+    last: 'way.',
+    clip: 'coach',
+    body: (
+      <ShotWindow
+        src="/assets/protos/coach.webp"
+        alt="Choosing a coach: Jessica, finds the pattern behind the problem"
+      />
+    ),
+  },
   { lead: 'Build your', last: 'portfolio.', clip: 'portfolio', body: <PortfolioWindow />, wave: true },
 ];
 
@@ -79,12 +96,35 @@ function Thread({ box, nodes, progress }) {
   }, [d]);
   const drawn = len * progress;
   return (
-    <svg className="pointer-events-none absolute left-0 top-0 hidden overflow-visible lg:block" width={box.w} height={box.h} aria-hidden="true">
+    <svg
+      className="pointer-events-none absolute left-0 top-0 hidden overflow-visible lg:block"
+      width={box.w}
+      height={box.h}
+      aria-hidden="true"
+    >
       <path d={d} fill="none" stroke="#d9dad6" strokeWidth="1.2" />
-      <path ref={path} d={d} fill="none" stroke="#1b1d1c" strokeWidth="1.4" strokeDasharray={`${len} ${len}`} strokeDashoffset={len - drawn} />
+      <path
+        ref={path}
+        d={d}
+        fill="none"
+        stroke="#1b1d1c"
+        strokeWidth="1.4"
+        strokeDasharray={`${len} ${len}`}
+        strokeDashoffset={len - drawn}
+      />
       {nodes.map((y, i) => {
         const reached = drawn >= len - (last - y) - 1;
-        return <circle key={i} cx={rail} cy={y} r="5.5" fill="var(--page)" stroke={reached ? '#1b1d1c' : '#c9cbc7'} strokeWidth="1.4" />;
+        return (
+          <circle
+            key={i}
+            cx={rail}
+            cy={y}
+            r="5.5"
+            fill="var(--page)"
+            stroke={reached ? '#1b1d1c' : '#c9cbc7'}
+            strokeWidth="1.4"
+          />
+        );
       })}
     </svg>
   );
@@ -135,7 +175,10 @@ export default function Learn() {
 
   return (
     <section id="work" aria-labelledby="learn-title" className="relative pb-[12svh] pt-[22svh]">
-      <div ref={headRef} className="sticky top-0 z-20 bg-[linear-gradient(180deg,var(--page)_72%,rgba(248,249,251,0))] pb-[64px] pt-[44px] text-center">
+      <div
+        ref={headRef}
+        className="sticky top-0 z-20 bg-[linear-gradient(180deg,var(--page)_72%,rgba(248,249,251,0))] pb-[64px] pt-[44px] text-center"
+      >
         <h2 id="learn-title" className="px-6 text-[length:var(--h2)] font-normal leading-[1.08] tracking-[-0.045em]">
           <WaveLine progress={headP}>Learn the job by doing it.</WaveLine>
           <Narrator clip="learn" size={46} className="ml-2 -translate-y-[0.35em]" />
@@ -146,7 +189,10 @@ export default function Learn() {
         <Thread box={box} nodes={nodes} progress={through} />
         <ol className="space-y-[clamp(80px,12svh,208px)] pt-[clamp(80px,14svh,180px)]">
           {steps.map((s, i) => (
-            <li key={s.clip} className="grid items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,831px)] lg:gap-[clamp(36px,5vw,100px)]">
+            <li
+              key={s.clip}
+              className="grid items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,831px)] lg:gap-[clamp(36px,5vw,100px)]"
+            >
               <h3
                 ref={(el) => {
                   titles.current[i] = el;
