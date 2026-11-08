@@ -15,9 +15,11 @@
     "@fastify/multipart": "^10.1.8",
     "@fastify/static": "^10.1.10",
     "@fastify/websocket": "^11.3.7",
+    "@huggingface/transformers": "3.8.1",
     "@pw/content": "*",
     "@pw/shared": "*",
     "fastify": "^5.12.8",
-    "jose": "^6.2.15"
+    "jose": "^6.2.15",
+    "kokoro-js": "1.2.1"
   }
 }
