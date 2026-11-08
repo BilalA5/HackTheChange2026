@@ -27,10 +27,7 @@ export default function OnboardingPage() {
   const index = screens.findIndex((screen) => screen.slug === step);
   const isLast = index === screens.length - 1;
 
-  const next = useCallback(
-    () => navigate(isLast ? '/workspace' : pathFor(index + 1)),
-    [navigate, index, isLast],
-  );
+  const next = useCallback(() => navigate(isLast ? '/workspace' : pathFor(index + 1)), [navigate, index, isLast]);
   const prev = useCallback(() => index > 0 && navigate(pathFor(index - 1)), [navigate, index]);
   const exit = useCallback(() => navigate('/'), [navigate]);
   const tour = useMemo(() => ({ index, total: screens.length, next, prev, exit }), [index, next, prev, exit]);

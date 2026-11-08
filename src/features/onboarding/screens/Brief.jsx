@@ -150,11 +150,7 @@ function ScenarioCard({ onStart }) {
           light
         />
         <Fact label="Manager" value={guide.name} icon={<Avatar size={32} ring={false} />} />
-        <Fact
-          label="Project type"
-          value={caseStudy.category}
-          icon={<BriefcaseIcon className="h-4 w-4 text-tx-2" />}
-        />
+        <Fact label="Project type" value={caseStudy.category} icon={<BriefcaseIcon className="h-4 w-4 text-tx-2" />} />
       </dl>
       <button
         type="button"

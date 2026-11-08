@@ -32,7 +32,10 @@ function Toolbar() {
   return (
     <div className="flex h-[44px] items-center gap-[4px] border-b border-[#efefed] px-[8px] text-[11px] text-[#55555b]">
       {filters.map((filter, i) => (
-        <span key={filter} className={`rounded-[7px] px-[10px] py-[6px] ${i === 0 ? 'bg-[#F1F1EF] text-[#141416]' : ''}`}>
+        <span
+          key={filter}
+          className={`rounded-[7px] px-[10px] py-[6px] ${i === 0 ? 'bg-[#F1F1EF] text-[#141416]' : ''}`}
+        >
           {filter}
         </span>
       ))}
@@ -116,12 +119,7 @@ export default function GetHired() {
             <span />
           </div>
           {jobs.map((job) => (
-            <JobRow
-              key={job.title}
-              job={job}
-              liked={liked.has(job.title)}
-              onToggleLike={() => toggleLike(job.title)}
-            />
+            <JobRow key={job.title} job={job} liked={liked.has(job.title)} onToggleLike={() => toggleLike(job.title)} />
           ))}
         </div>
       </AppShell>
