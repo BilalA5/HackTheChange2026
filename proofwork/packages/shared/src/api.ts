@@ -4,6 +4,8 @@
 // Errors: non-2xx responses carry `ApiError`.
 import type {
   Career,
+  CareerPathSummary,
+  PathRequest,
   ChatMessage,
   CreditsSummary,
   Evaluation,
@@ -68,7 +70,9 @@ export interface BugReportInput {
 export interface ApiRoutes {
   // ── health / auth ──
   /** PUBLIC */
-  "GET /health": { res: { ok: true; aiMode: "live" | "mock"; models: { quality: string; fast: string }; version: string } };
+  "GET /health": {
+    res: { ok: true; aiMode: "live" | "mock"; provider: "gemini" | "anthropic" | "practice"; models: { quality: string; fast: string }; version: string };
+  };
   /** PUBLIC. Local auth: email + display name, no password (dev product). Creates the user on first login. */
   "POST /auth/login": { body: { email: string; name?: string }; res: AuthResponse };
   /** PUBLIC. Begins the browser → deep-link login. Returns the URL the desktop opens in the system browser. */
@@ -84,8 +88,16 @@ export interface ApiRoutes {
   };
   "DELETE /me": { res: { ok: true } };
   "GET /me/export": { res: Record<string, unknown> };
+  /** The learner's current generated path (null when they are on an authored career). */
+  "GET /me/path": { res: { path: CareerPathSummary | null } };
+  /**
+   * Generates a new personal path from the request and makes it the learner's career.
+   * Debits CREDIT_COSTS.path_generation (402 if insufficient). Old objectives stay readable.
+   */
+  "POST /me/path": { body: PathRequest; res: { path: CareerPathSummary; career: Career; scenarios: ScenarioCard[] } };
 
   // ── catalog ──
+  /** Authored careers plus the learner's own generated path(s). */
   "GET /careers": { res: Career[] };
   /** Cards for the learner's career (or ?careerId=), merged with learner status. */
   "GET /scenarios": { query?: { careerId?: string }; res: ScenarioCard[] };
@@ -96,7 +108,7 @@ export interface ApiRoutes {
   "DELETE /me/trainings/:id": { res: { library: string[] } };
   "POST /me/trainings/:id/progress": { body: { lessonIndex: number; completed: boolean }; res: TrainingProgress };
 
-  // ── onboarding (FTUX v4 step machine: draw → chat → recommend → roadmap → why → claim → done) ──
+  // ── onboarding (FTUX step machine: draw → chat → why → recommend → roadmap → claim → done) ──
   /** Resumes the user's open session if one exists. */
   "POST /onboarding/session-start": { res: FtuxView };
   /** 409 response body is the authoritative FtuxView (resume / double submit). */

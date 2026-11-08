@@ -100,6 +100,8 @@ export const CREDIT_COSTS = {
   cowork_turn: { amount: 10, category: "ai_manager" },
   coach_chat: { amount: 8, category: "coaching" },
   application_draft: { amount: 12, category: "other" },
+  /** Regenerating a personal path from Settings (the first one, during onboarding, is free). */
+  path_generation: { amount: 60, category: "other" },
 } as const satisfies Record<string, { amount: number; category: CreditCategory }>;
 export type CreditAction = keyof typeof CREDIT_COSTS;
 
@@ -118,6 +120,9 @@ export const RUBRIC_AXIS_LABEL: Record<RubricAxis, string> = {
   communication: "Communication",
   independence: "Independence",
 };
+
+/** careerId used in onboarding for "the path generated from my answers" before it exists. */
+export const CUSTOM_CAREER_ID = "custom";
 
 /** XP for accepted kickoff notes per section. Held until the Proof of Understanding is passed. */
 export const NOTE_XP = { problem: 100, outcome: 200, process: 100 } as const;

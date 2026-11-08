@@ -14,13 +14,15 @@ export type IsoDate = string;
 // ───────────────────────────── Authored content ─────────────────────────────
 
 export interface Career {
-  id: Id; // e.g. "ai-engineer"
+  id: Id; // e.g. "ai-engineer", or "g-<user>-<n>" for a generated path
   title: string; // "AI Engineer"
   tagline: string;
   description: string;
   skills: string[];
   /** Accent colour (hex) used for this career's cards. */
   color: string;
+  /** True for a path generated for one learner (not part of the authored library). */
+  generated?: boolean;
 }
 
 /** Fictional companies only — never real brands. */
@@ -206,6 +208,8 @@ export interface VisionBoard {
   location: string;
   timeline: string; // "3 months"
   why?: string;
+  /** What the learner already knows: studies, current job, skills (free text). */
+  background?: string;
   /** PNG data URL of the FTUX drawing. */
   drawingDataUrl?: string;
 }
@@ -477,7 +481,11 @@ export interface FtuxView {
   messages: ChatMessage[];
   /** Vision board filled in so far. */
   board: Partial<VisionBoard>;
-  recommendations: { careerId: Id; title: string; reason: string; match: number }[];
+  /**
+   * Career options. kind "custom" = a path generated for this learner from their answers
+   * (careerId is CUSTOM_CAREER_ID until chosen); "authored" = a ready-made path from the library.
+   */
+  recommendations: { careerId: Id; title: string; reason: string; match: number; kind?: "custom" | "authored"; color?: string }[];
   roadmap: { careerId: Id; scenarios: { scenarioId: Id; title: string; company: string; estMinutes: number }[] } | null;
   claim: { credits: number; claimed: boolean } | null;
 }
@@ -497,4 +505,39 @@ export interface OtaInfo {
   /** Download URL, or null when there is nothing newer. */
   url: string | null;
   publishedAt: IsoDate;
+}
+
+// ───────────────────────────── Personal career paths ─────────────────────────────
+
+/** Everything that makes up one career path: authored (packages/content) or generated for one learner. */
+export interface CareerPack {
+  career: Career;
+  companies: Company[];
+  npcs: Npc[];
+  /** Exactly 3 scenarios, order 1..3, increasing difficulty. */
+  scenarios: Scenario[];
+}
+
+/** What a learner asked for when their personal path was generated. Only targetRole is required. */
+export interface PathRequest {
+  targetRole: string;
+  level?: string;
+  industry?: string;
+  companyType?: string;
+  location?: string;
+  timeline?: string;
+  why?: string;
+  background?: string;
+}
+
+/** A learner's generated path, as shown in Settings → Career. */
+export interface CareerPathSummary {
+  careerId: Id;
+  title: string;
+  /** "live" = written by the configured model; "practice" = the offline template generator. */
+  engine: "live" | "practice";
+  provider: string;
+  request: PathRequest;
+  scenarioTitles: string[];
+  createdAt: IsoDate;
 }
