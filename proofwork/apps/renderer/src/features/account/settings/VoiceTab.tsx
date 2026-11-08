@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import type { UserSettings } from "@pw/shared";
 import { Button } from "@/components/ui/Button";
 import { Slider, Switch } from "@/components/ui/Fields";
+import { useApi } from "@/lib/api";
 import { cancel, speak } from "@/lib/voice/tts";
 import { FieldRow, Segmented, SettingsGroup, SettingsSection, useDraftValue } from "../ui";
 import { useSettingsSaver } from "./saver";
@@ -17,7 +18,16 @@ export function VoiceTab() {
   const { settings, save } = useSettingsSaver();
   const commitRate = useCallback((rate: number) => void save({ voice: { ttsRate: rate } }), [save]);
   const [shownRate, onRateDraft] = useDraftValue(settings?.voice.ttsRate ?? 1, commitRate);
+  const health = useApi("GET /health", {}, []);
   if (!settings) return null;
+
+  // Sessions saved before natural voices existed have no value yet: that means on, the default.
+  const natural = settings.voice.ttsNatural !== false;
+  const engines = health.data?.tts.engines ?? [];
+  const engineText =
+    engines.length === 0
+      ? "No voice model is set up on the server, so the system voice is used."
+      : `Spoken by ${engines.map((e) => (e === "gemini" ? "Gemini TTS" : "Kokoro, a voice model running on this Mac")).join(", falling back to ")}.`;
 
   const speechAvailable = typeof window !== "undefined" && "speechSynthesis" in window;
 
@@ -47,6 +57,16 @@ export function VoiceTab() {
             label="Speak replies aloud"
             description={speechAvailable ? undefined : "Speech synthesis is not available in this window."}
           />
+          <Switch
+            checked={natural}
+            disabled={!settings.voice.ttsEnabled}
+            onCheckedChange={(on) => {
+              cancel();
+              void save({ voice: { ttsNatural: on } });
+            }}
+            label="Natural voices"
+            description={natural ? engineText : "Off: your Mac's built-in system voice is used."}
+          />
           <Slider
             label="Speaking rate"
             value={Math.round(shownRate * 10) / 10}
@@ -61,8 +81,11 @@ export function VoiceTab() {
             <Button
               variant="glass"
               size="sm"
-              disabled={!settings.voice.ttsEnabled || !speechAvailable}
-              onClick={() => speak(PREVIEW_LINE)}
+              disabled={!settings.voice.ttsEnabled}
+              onClick={() => {
+                cancel();
+                speak(PREVIEW_LINE, { voice: { style: "feminine" }, speaker: "preview" });
+              }}
             >
               Preview voice
             </Button>

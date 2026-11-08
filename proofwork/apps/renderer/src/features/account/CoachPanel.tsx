@@ -19,6 +19,8 @@ const SUGGESTIONS = ["What should I focus on this week?", "How do I prepare for 
 /** Right-hand sheet with the career coach. Replies are Markdown and each one costs credits. */
 export default function CoachPanel({ onClose }: PanelProps) {
   const history = useApi("GET /coach/history", {}, []);
+  const health = useApi("GET /health", {}, []);
+  const degraded = health.data?.degraded ?? null;
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,6 +49,7 @@ export default function CoachPanel({ onClose }: PanelProps) {
     try {
       const res = await api("POST /coach/chat", { body: { message: body } });
       history.mutate(res.history);
+      health.reload();
     } catch (e) {
       history.mutate((prev) => (prev ?? []).filter((m) => m.id !== pendingId));
       setText((current) => current || body);
@@ -117,6 +120,12 @@ export default function CoachPanel({ onClose }: PanelProps) {
             {sending && <p className="text-[12px] text-fg-muted">Ada is typing...</p>}
           </div>
         </div>
+
+        {degraded && (
+          <div role="status" className="rounded-card border border-warning/40 bg-warning/10 p-3 text-[13px] leading-relaxed text-fg">
+            <span className="font-medium">Ada is using offline replies.</span> {degraded.message}
+          </div>
+        )}
 
         {outOfCredits && (
           <div role="alert" className="flex items-center justify-between gap-3 rounded-card border border-warning/40 bg-warning/10 p-3 text-[13px] text-fg">
