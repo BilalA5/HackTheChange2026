@@ -4,7 +4,6 @@ import { usePlan } from '@/features/plan/usePlan.js';
 import InitialsAvatar from '@/shared/InitialsAvatar.jsx';
 import Wordmark from '@/shared/Wordmark.jsx';
 import AccountMenu from './AccountMenu.jsx';
-import CityBackdrop from './board/CityBackdrop.jsx';
 import { glass } from './board/glass.js';
 import { useProgress } from './useProgress.js';
 
@@ -82,7 +81,7 @@ export default function PortfolioPage() {
 
   return (
     <>
-      <CityBackdrop dim />
+      <div className="board-room fixed inset-0" aria-hidden="true" />
       <div className="relative z-10 mx-auto flex max-w-[1100px] flex-col gap-8 px-4 py-6 sm:px-8 sm:py-8">
         <title>Portfolio · Flint</title>
         <nav className="flex items-center justify-between gap-4">

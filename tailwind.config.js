@@ -12,6 +12,7 @@ export default {
         tx: { DEFAULT: '#F4F4F3', 2: '#A6A6AC', 3: '#77777E', 4: '#4A4A51' },
         onink: '#131315',
         spark: { DEFAULT: '#49BA61', deep: '#2E9A48', ink: '#06210f' },
+        ink: { DEFAULT: '#1D1B17', 3: '#6E675B' },
       },
       fontFamily: {
         sans: ['"Google Sans Flex"', '"Google Sans"', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
