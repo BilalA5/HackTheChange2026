@@ -1,6 +1,7 @@
 // Deterministic offline engine. Used for practice mode and as the fallback for every live call.
 import type { AiEngine } from "../../contracts.ts";
 import type { Models } from "../llm.ts";
+import { generatePathPractice } from "./pathgen/index.ts";
 import { answerKickoffMock, checkNoteMock, judgePouMock } from "./kickoff.ts";
 import { learnChatMock, planTurnMock } from "./plan.ts";
 import { gradePresentationMock, gradeSubmissionMock } from "./grade.ts";
@@ -11,7 +12,12 @@ import { coworkTurnMock } from "./cowork.ts";
 export function createMockEngine(models: Models): AiEngine {
   return {
     mode: "mock",
+    provider: "practice",
     models,
+
+    async generatePath(i) {
+      return { ...generatePathPractice(i), engine: "practice" };
+    },
 
     async checkNote(i) {
       return checkNoteMock(i.segment, i.text);
