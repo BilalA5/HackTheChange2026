@@ -3,6 +3,7 @@ import { guide, lines } from '../content.js';
 import { useTour } from '../tour.js';
 import { Avatar } from '../components/brand.jsx';
 import { GuideCursor } from '../components/hints.jsx';
+import MonoLabel from '../components/MonoLabel.jsx';
 import { BrainIcon, CaretDownIcon, MicIcon, PauseIcon, PlayIcon } from '../components/icons.jsx';
 import Player from '../components/Player.jsx';
 
@@ -23,10 +24,6 @@ const sayBack = [
   { text: '10 percent', key: true },
   { text: '.' },
 ];
-
-function MonoLabel({ children, className = '' }) {
-  return <div className={`font-mono text-[10px] uppercase tracking-[.16em] ${className}`}>{children}</div>;
-}
 
 function VoiceNote({ playing = false, time }) {
   return (
