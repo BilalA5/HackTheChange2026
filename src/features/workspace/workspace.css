@@ -1,9 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Colours sampled from the screenshot. */
-:root {
+:root[data-app='workspace'] {
   --page: #1e1e1e;
   --line: #2f2f2f;
   --bubble: #282828;
@@ -19,19 +14,16 @@
   --mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-html,
-body,
-#root {
+[data-app='workspace'],
+[data-app='workspace'] body,
+[data-app='workspace'] #root {
   height: 100%;
 }
 
-body {
-  margin: 0;
+[data-app='workspace'] body {
   background: var(--page);
   color: #f2f2f2;
   font-family: var(--sans);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 .font-mono-ui {
@@ -47,25 +39,16 @@ body {
   color: #a8a5a0;
 }
 
-.no-scrollbar {
-  scrollbar-width: none;
-}
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
 .thin-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: #3a3a3a transparent;
 }
 
-/* The chat fades out under the header and above the reply options. */
 .chat-fade {
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 34px, #000 calc(100% - 36px), transparent 100%);
   mask-image: linear-gradient(to bottom, transparent 0, #000 34px, #000 calc(100% - 36px), transparent 100%);
 }
 
-/* The document page darkens as it slides under the zoom bar. */
 .doc-fade {
   -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 16px), rgba(0, 0, 0, 0.35) 100%);
   mask-image: linear-gradient(to bottom, #000 calc(100% - 16px), rgba(0, 0, 0, 0.35) 100%);
@@ -105,14 +88,13 @@ body {
   background: #5f5d59;
 }
 
-button:focus-visible,
-a:focus-visible {
+[data-app='workspace'] :is(button, a):focus-visible {
   outline: 2px solid #8ab4f8;
   outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  * {
+  [data-app='workspace'] * {
     transition: none !important;
     scroll-behavior: auto !important;
   }

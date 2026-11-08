@@ -178,7 +178,7 @@ function TopBar() {
             <ProgressBadge key={b.glyph} {...b} />
           ))}
           <img
-            src="/images/avatar-user.png"
+            src="/assets/workspace/avatar-user.png"
             alt="Your profile"
             className="ml-[3px] h-[34px] w-[34px] rounded-full object-cover"
           />
@@ -288,7 +288,7 @@ function Sidebar({ notesOpen, onOpenNotes }) {
       <div className="h-[54px] shrink-0" />
       <div className="mt-[7px] flex shrink-0 items-center gap-[11px] pl-[3px]">
         <div className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-full border border-[#3a3a3a] bg-[#252525]">
-          <img src="/images/shopify-bag.png" alt="" className="h-[24px] w-[24px]" />
+          <img src="/assets/workspace/shopify-bag.png" alt="" className="h-[24px] w-[24px]" />
         </div>
         <h1 className="text-[15.5px] font-medium leading-[18.5px] text-[#f1f1f1]">
           Building a Black Friday Price Recommender at Shopify
@@ -380,7 +380,7 @@ function Chat() {
   return (
     <section className="mx-auto flex h-full min-h-0 w-full max-w-[459px] flex-col xl:translate-x-2" aria-label="Chat with Erik Vogt">
       <header className="flex h-[100px] shrink-0 items-start gap-[12px] pl-[24px] pt-[61px]">
-        <img src="/images/avatar-erik.png" alt="" className="h-[35px] w-[35px] rounded-full" />
+        <img src="/assets/workspace/avatar-erik.png" alt="" className="h-[35px] w-[35px] rounded-full" />
         <div className="-mt-[1px]">
           <p className="text-[15.5px] font-medium leading-[19px] text-white">Erik Vogt</p>
           <p className="text-[12.5px] leading-[19px] text-[#8c8c8c]">Manager</p>
