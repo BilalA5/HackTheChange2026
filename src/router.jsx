@@ -15,6 +15,14 @@ export const router = createBrowserRouter([
         Component: RequireAuth,
         children: [
           { path: '/onboarding/:step?', lazy: page(() => import('./features/onboarding/OnboardingPage.jsx')) },
+          {
+            path: '/app',
+            lazy: page(() => import('./features/app/AppLayout.jsx')),
+            children: [
+              { index: true, lazy: page(() => import('./features/app/HomePage.jsx')) },
+              { path: 'portfolio', lazy: page(() => import('./features/app/PortfolioPage.jsx')) },
+            ],
+          },
           { path: '/app/scenarios/:scenarioId', lazy: page(() => import('./features/workspace/ScenarioPage.jsx')) },
           { path: '/workspace', element: <Navigate to="/app/scenarios/shopify-price-recommender" replace /> },
         ],

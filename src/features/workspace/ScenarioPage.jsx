@@ -46,12 +46,7 @@ function ScenarioWorkspace({ scenario }) {
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
       <link rel="stylesheet" href={FONTS} precedence="default" />
       <div className="absolute inset-x-0 top-0 h-[2px] bg-black" aria-hidden="true" />
-      <TopBar
-        onBack={() => navigate('/app')}
-        level={progress.level}
-        scores={finished?.scores}
-        userName={user.name}
-      />
+      <TopBar onBack={() => navigate('/app')} level={progress.level} scores={finished?.scores} userName={user.name} />
       <main
         className={`grid gap-y-8 px-4 pb-6 xl:h-full xl:gap-y-0 xl:pb-0 xl:pl-[17px] xl:pr-[14px] ${
           notesOpen ? 'xl:grid-cols-[278px_minmax(0,1fr)_minmax(0,600px)]' : 'xl:grid-cols-[278px_minmax(0,1fr)]'
