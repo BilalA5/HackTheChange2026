@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Colours sampled from the screenshot. */
+:root {
+  --page: #1e1e1e;
+  --line: #2f2f2f;
+  --bubble: #282828;
+  --bubble-line: #333333;
+  --raised: #262626;
+  --raised-line: #363636;
+  --chip: #181818;
+  --muted: #a5a29c;
+  --dim: #8a8a8a;
+  --accent: #67b775;
+  --ring: #e3a94f;
+  --sans: 'Google Sans', 'DM Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: #f2f2f2;
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-mono-ui {
+  font-family: var(--mono);
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: #a8a5a0;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.thin-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #3a3a3a transparent;
+}
+
+/* The chat fades out under the header and above the reply options. */
+.chat-fade {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 34px, #000 calc(100% - 36px), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 34px, #000 calc(100% - 36px), transparent 100%);
+}
+
+/* The document page darkens as it slides under the zoom bar. */
+.doc-fade {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 16px), rgba(0, 0, 0, 0.35) 100%);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 16px), rgba(0, 0, 0, 0.35) 100%);
+}
+
+.badge-face {
+  background: radial-gradient(circle at 50% 55%, #343434 0%, #383838 45%, #4a4a4a 80%, #5c5c5c 100%);
+}
+
+.doc-list li {
+  position: relative;
+  padding-left: 19px;
+}
+.doc-list li::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 0.68em;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: #c4c4c4;
+}
+
+.task-list li {
+  position: relative;
+  padding-left: 18px;
+}
+.task-list li::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 0.62em;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: #5f5d59;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #8ab4f8;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
