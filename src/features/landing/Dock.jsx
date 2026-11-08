@@ -1,9 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router';
 import { faq } from './faq.js';
 import { useScrolled } from './hooks.js';
 import { Mark, Play } from './ui.jsx';
-
-const APP_URL = 'https://learnwithzero.com';
 
 function answer(text) {
   const q = text.toLowerCase().replace(/[^a-z0-9$' ]/g, ' ');
@@ -16,9 +15,7 @@ function answer(text) {
       score = s;
     }
   }
-  return best
-    ? best.a
-    : "I don't know that one yet. Write to team@zero.university and the team will help.";
+  return best?.a ?? "I don't know that one yet. Try one of the questions below, or hit Start to take the tour.";
 }
 
 function AskFlint({ open, onClose }) {
@@ -174,15 +171,13 @@ export default function Dock() {
           shown || panel ? '-translate-x-1/2 translate-y-0' : '-translate-x-1/2 translate-y-[170%]'
         }`}
       >
-        <a
-          href={APP_URL}
-          target="_blank"
-          rel="noreferrer"
+        <Link
+          to="/onboarding"
           className="start-key flex h-[57px] w-[min(254px,44vw)] items-center justify-center gap-2.5 rounded-[15px] text-[17px] font-medium text-white transition-transform hover:scale-[1.015] active:scale-[0.985]"
         >
           <Play className="h-3 w-3" />
           Start
-        </a>
+        </Link>
         <button
           type="button"
           onClick={() => toggle('menu')}
