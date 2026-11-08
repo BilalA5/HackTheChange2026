@@ -26,7 +26,7 @@ function Pin({ scenario, status, selected, onSelect }) {
             Ready
           </span>
         )}
-        {locked && <span>{scenario.comingSoon ? `Level ${scenario.unlockLevel}` : 'Locked'}</span>}
+        {locked && <span>{scenario.comingSoon ? 'Soon' : `Level ${scenario.unlockLevel}`}</span>}
       </span>
     </button>
   );

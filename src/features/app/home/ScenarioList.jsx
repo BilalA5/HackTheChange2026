@@ -32,7 +32,7 @@ export default function ScenarioList({ scenarios, progress, selectedId, onSelect
                 <span className="block truncate text-[12.5px] text-tx-3">{scenario.company}</span>
               </span>
               <span className={`rounded-full px-[10px] py-[3px] text-[12px] ${badge[status].className}`}>
-                {badge[status].label}
+                {scenario.comingSoon ? 'Soon' : badge[status].label}
               </span>
             </button>
           </li>

@@ -25,7 +25,9 @@ export default function ScenarioDetail({ scenario, status, review }) {
         <h2 className="mt-4 text-[22px] font-medium tracking-[-0.02em] text-tx">{scenario.shortTitle}</h2>
         <p className="mt-2 text-[14.5px] leading-[1.5] text-tx-2">{scenario.summary}</p>
         <p className="mt-6 rounded-[12px] bg-white/[0.04] px-4 py-3 text-[13.5px] text-tx-2">
-          Unlocks at level {scenario.unlockLevel}. Finish ready scenarios to level up.
+          {scenario.comingSoon
+            ? `Coming soon. It opens to learners at level ${scenario.unlockLevel}.`
+            : `Unlocks at level ${scenario.unlockLevel}. Finish ready scenarios to level up.`}
         </p>
       </section>
     );
