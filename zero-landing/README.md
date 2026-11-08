@@ -1,6 +1,7 @@
-# Zero landing page: React recreation
+# Flint landing page
 
-A React + Tailwind recreation of the learnwithzero.com landing page, built from
+The Flint landing page, in React + Tailwind. It started as a recreation of the
+learnwithzero.com landing page, built from
 the full-page capture in `reference/` (3400x23922 at 2x, so 1700px wide).
 
 ## Run
@@ -30,7 +31,7 @@ So the artwork, copy and data come from the live site at learnwithzero.com.
 
 - **Artwork and media:** images, the font, role posters, the films of the 7
   popular roles, and Navid's voice lines.
-- **Text and data:** the role list, fields, tool icons and the Ask Zero answers,
+- **Text and data:** the role list, fields, tool icons and the Ask Flint answers,
   parsed as text from the site's script and never run.
 
 The team and coach windows are screenshots of the live prototypes
@@ -46,7 +47,7 @@ Helper scripts are in `~/Desktop/screen2code/.runtime/`:
 
 ## What it does
 
-- **Hero:** the pale city with the zero mark. Scrolling zooms into the mark
+- **Hero:** the pale city with the Flint mark. Scrolling zooms into the mark
   until its black fills the screen. Then "5,000+ companies hiring in our talent
   network." appears, over two rows of company wordmarks drifting in opposite
   directions.
@@ -65,17 +66,19 @@ Helper scripts are in `~/Desktop/screen2code/.runtime/`:
   joined to it by lines, while a Level counter rolls from 1 to 10.
 - **Built to get you hired.:** the same colour wave, with an offer letter that
   opens between "you" and "hired." and is signed at the end.
-- **Footer:** Zero World. Colour spreads out from the centre as it scrolls in.
+- **Footer:** Flint World. Colour spreads out from the centre as it scrolls in.
 - **Dock:** fixed at the bottom of the screen.
   - Start opens learnwithzero.com.
-  - The menu has Home, Letters and Why Zero.
-  - "?" opens Ask Zero, which answers typed questions from the site's FAQ by
+  - The menu has Home, Letters and Why Flint.
+  - "?" opens Ask Flint, which answers typed questions from the site's FAQ by
     keyword.
 - **Narration:** every round avatar plays Navid's voice line for that section.
   Only one plays at a time.
 
 ## Differences from the live site
 
+- The name is Flint, and the mark is an original Flint stone with a spark
+  (`public/assets/brand/flint-mark.svg`). Zero's mark is not used.
 - The live site draws the hero pulse and the footer colour spread with WebGL.
   Here they are CSS: a zoom with a black fade, and a growing radial mask.
 - The live team and coach windows are running prototype pages. Here they are

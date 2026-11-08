@@ -1,4 +1,4 @@
-// Ask Zero answers, copied from the live site's FAQ data.
+// Ask Flint answers, copied from the live site's FAQ data.
 export const faq = [
   {
     "chip": true,
@@ -17,7 +17,7 @@ export const faq = [
       "subscription",
       "fee"
     ],
-    "a": "Start free, then only $99 a month. You also earn credits as you use Zero, and the more credits you earn, the more you use Zero for free."
+    "a": "Start free, then only $99 a month. You also earn credits as you use Flint, and the more credits you earn, the more you use Flint for free."
   },
   {
     "chip": true,
@@ -57,7 +57,7 @@ export const faq = [
       "interviews",
       "get hired"
     ],
-    "a": "Your projects become evidence of your skills. We combine that evidence with your profile and connect you through the Zero talent network. Hiring decisions stay with each employer."
+    "a": "Your projects become evidence of your skills. We combine that evidence with your profile and connect you through the Flint talent network. Hiring decisions stay with each employer."
   },
   {
     "chip": true,
@@ -97,25 +97,25 @@ export const faq = [
   },
   {
     "chip": false,
-    "q": "What is Zero?",
+    "q": "What is Flint?",
     "k": [
-      "what is zero",
-      "whats zero",
+      "what is flint",
+      "whats flint",
       "what is this",
       "whats this",
-      "about zero",
-      "what does zero do",
+      "about flint",
+      "what does flint do",
       "what do you do",
       "tell me about"
     ],
-    "a": "Zero is a place to learn a job by doing it. You take on real kinds of work inside a simulated world, with a manager, a team and a coach, and you leave with work you can show."
+    "a": "Flint is a place to learn a job by doing it. You take on real kinds of work inside a simulated world, with a manager, a team and a coach, and you leave with work you can show."
   },
   {
     "chip": false,
     "q": "How does it work?",
     "k": [
       "how does it work",
-      "how does zero work",
+      "how does flint work",
       "how it works",
       "step",
       "steps",
@@ -139,7 +139,7 @@ export const faq = [
       "enroll",
       "apply"
     ],
-    "a": "Hit Start at the bottom of the screen. It opens Zero, and you can start free."
+    "a": "Hit Start at the bottom of the screen. It opens Flint, and you can start free."
   },
   {
     "chip": false,
@@ -149,7 +149,7 @@ export const faq = [
       "projects",
       "simulation",
       "simulated",
-      "zero world",
+      "flint world",
       "task",
       "tasks",
       "assignment",
@@ -175,7 +175,7 @@ export const faq = [
   },
   {
     "chip": false,
-    "q": "Which companies hire through Zero?",
+    "q": "Which companies hire through Flint?",
     "k": [
       "talent network",
       "network",
@@ -232,7 +232,7 @@ export const faq = [
       "colleagues",
       "alone"
     ],
-    "a": "Yes. Inside Zero you work with a manager and a team, the way you would on the job. They are run by AI and built for practice."
+    "a": "Yes. Inside Flint you work with a manager and a team, the way you would on the job. They are run by AI and built for practice."
   },
   {
     "chip": false,
@@ -248,7 +248,7 @@ export const faq = [
       "real person",
       "chatbot"
     ],
-    "a": "The companies, managers, teammates and coaches you meet inside Zero World are simulations. They are run by AI and built for practice."
+    "a": "The companies, managers, teammates and coaches you meet inside Flint World are simulations. They are run by AI and built for practice."
   },
   {
     "chip": false,
@@ -266,7 +266,7 @@ export const faq = [
       "certificate",
       "certification"
     ],
-    "a": "Every project you finish becomes part of your portfolio, verified by Zero. It is evidence of your skills that employers can see."
+    "a": "Every project you finish becomes part of your portfolio, verified by Flint. It is evidence of your skills that employers can see."
   },
   {
     "chip": false,
@@ -301,7 +301,7 @@ export const faq = [
       "gdpr",
       "information"
     ],
-    "a": "We collect what we need to run Zero for you, and you can ask to see it or have it deleted. Write to team@zero.university. The full policy is under Privacy at the foot of the page."
+    "a": "We collect what we need to run Flint for you, and you can ask to see it or have it deleted. Write to team@zero.university. The full policy is under Privacy at the foot of the page."
   },
   {
     "chip": false,
@@ -321,7 +321,7 @@ export const faq = [
   },
   {
     "chip": false,
-    "q": "Who is behind Zero?",
+    "q": "Who is behind Flint?",
     "k": [
       "founder",
       "founders",
@@ -333,11 +333,11 @@ export const faq = [
       "navid",
       "ceo"
     ],
-    "a": "Zero was founded by Navid. Tap the voice dots beside the titles on this page to hear him talk you through it."
+    "a": "Tap the voice dots beside the titles on this page to hear Navid talk you through it."
   },
   {
     "chip": false,
-    "q": "Where can I follow Zero?",
+    "q": "Where can I follow Flint?",
     "k": [
       "linkedin",
       "instagram",
@@ -359,7 +359,7 @@ export const faq = [
       "sup",
       "hiya"
     ],
-    "a": "Hi. Ask me anything about Zero, or tap one of the questions below."
+    "a": "Hi. Ask me anything about Flint, or tap one of the questions below."
   },
   {
     "chip": false,

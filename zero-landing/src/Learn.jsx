@@ -26,7 +26,7 @@ function WorldWindow() {
       <div className="h-full w-full origin-[66%_46%] scale-[1.9]">
         <img
           src="/assets/shots/city@2x.webp"
-          alt="Zero World: a city of company buildings"
+          alt="Flint World: a city of company buildings"
           className="slow-pan h-full w-full object-cover object-[64%_38%]"
           loading="lazy"
         />
@@ -51,7 +51,7 @@ function PortfolioWindow() {
     <div className="h-full overflow-hidden rounded-[16px] bg-white">
       <img
         src="/assets/protos/portfolio-2x.webp"
-        alt="A Zero portfolio: Maya Reyes, GTM AI Engineer, with her projects"
+        alt="A Flint portfolio: Maya Reyes, GTM AI Engineer, with her projects"
         className="portfolio-tour w-full"
         style={{ '--tour': '-42%' }}
         loading="lazy"

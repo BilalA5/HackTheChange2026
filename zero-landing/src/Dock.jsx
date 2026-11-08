@@ -3,7 +3,7 @@ import { faq } from './faq.js';
 import { useScrolled } from './hooks.js';
 import { Mark, Play } from './ui.jsx';
 
-const ZERO_APP = 'https://learnwithzero.com';
+const APP_URL = 'https://learnwithzero.com';
 
 function answer(text) {
   const q = text.toLowerCase().replace(/[^a-z0-9$' ]/g, ' ');
@@ -21,9 +21,9 @@ function answer(text) {
     : "I don't know that one yet. Write to team@zero.university and the team will help.";
 }
 
-function AskZero({ open, onClose }) {
+function AskFlint({ open, onClose }) {
   const [log, setLog] = useState([
-    { from: 'zero', text: 'Hi. Ask me anything about Zero, or tap one of the questions below.' },
+    { from: 'flint', text: 'Hi. Ask me anything about Flint, or tap one of the questions below.' },
   ]);
   const [draft, setDraft] = useState('');
   const logRef = useRef(null);
@@ -39,14 +39,14 @@ function AskZero({ open, onClose }) {
   const ask = (text) => {
     const t = text.trim();
     if (!t) return;
-    setLog((l) => [...l, { from: 'you', text: t }, { from: 'zero', text: answer(t) }]);
+    setLog((l) => [...l, { from: 'you', text: t }, { from: 'flint', text: answer(t) }]);
     setDraft('');
   };
 
   return (
     <div
       role="dialog"
-      aria-label="Ask Zero"
+      aria-label="Ask Flint"
       aria-hidden={!open}
       inert={open ? undefined : ''}
       className={`glass-panel fixed bottom-[96px] left-1/2 z-50 flex max-h-[min(560px,calc(100svh-140px))] w-[min(400px,calc(100vw-32px))] -translate-x-1/2 flex-col overflow-hidden rounded-[24px] transition-all duration-500 ${
@@ -55,7 +55,7 @@ function AskZero({ open, onClose }) {
     >
       <div className="flex items-center gap-2.5 px-5 pb-3 pt-4">
         <Mark className="h-6 w-6" />
-        <span className="flex-1 text-[15px] font-medium tracking-[-0.01em]">Ask Zero</span>
+        <span className="flex-1 text-[15px] font-medium tracking-[-0.01em]">Ask Flint</span>
         <button type="button" onClick={onClose} aria-label="Close" className="grid h-8 w-8 place-items-center rounded-full text-[#555] hover:bg-black/5">
           <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <path d="M6 6l12 12M18 6L6 18" />
@@ -100,8 +100,8 @@ function AskZero({ open, onClose }) {
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           maxLength={160}
-          placeholder="Ask anything about Zero"
-          aria-label="Ask anything about Zero"
+          placeholder="Ask anything about Flint"
+          aria-label="Ask anything about Flint"
           className="min-w-0 flex-1 bg-transparent text-[14px] outline-none placeholder:text-[#9a9a9a] focus-visible:outline-none"
         />
         <button type="submit" aria-label="Send" className="grid h-9 w-9 place-items-center rounded-[12px] bg-[#111] text-white">
@@ -118,7 +118,7 @@ function Menu({ open, onClose }) {
   const links = [
     { label: 'Home', href: '#top', internal: true },
     { label: 'Letters', href: 'https://learnwithzero.com/letters.html' },
-    { label: 'Why Zero', href: 'https://why.zero.university/' },
+    { label: 'Why Flint', href: 'https://why.zero.university/' },
   ];
   return (
     <div
@@ -152,7 +152,7 @@ function Menu({ open, onClose }) {
   );
 }
 
-/** The only navigation: Start, a menu and a question mark that opens Ask Zero. */
+/** The only navigation: Start, a menu and a question mark that opens Ask Flint. */
 export default function Dock() {
   const shown = useScrolled(160);
   const [panel, setPanel] = useState(null);
@@ -167,15 +167,15 @@ export default function Dock() {
   return (
     <>
       <Menu open={panel === 'menu'} onClose={() => setPanel(null)} />
-      <AskZero open={panel === 'help'} onClose={() => setPanel(null)} />
+      <AskFlint open={panel === 'help'} onClose={() => setPanel(null)} />
       <nav
-        aria-label="Zero"
+        aria-label="Flint"
         className={`dock-tray fixed bottom-[max(16px,env(safe-area-inset-bottom))] left-1/2 z-50 flex items-center gap-[6px] rounded-[20px] p-[5px] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
           shown || panel ? '-translate-x-1/2 translate-y-0' : '-translate-x-1/2 translate-y-[170%]'
         }`}
       >
         <a
-          href={ZERO_APP}
+          href={APP_URL}
           target="_blank"
           rel="noreferrer"
           className="start-key flex h-[57px] w-[min(254px,44vw)] items-center justify-center gap-2.5 rounded-[15px] text-[17px] font-medium text-white transition-transform hover:scale-[1.015] active:scale-[0.985]"
@@ -197,7 +197,7 @@ export default function Dock() {
           type="button"
           onClick={() => toggle('help')}
           aria-expanded={panel === 'help'}
-          aria-label="Ask Zero a question"
+          aria-label="Ask Flint a question"
           className="soft-key grid h-[55px] w-[55px] place-items-center rounded-[15px] text-[24px] leading-none text-[#111]"
           style={{ fontFamily: 'var(--serif)' }}
         >

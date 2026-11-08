@@ -84,7 +84,7 @@ export default function Match() {
             className="window absolute overflow-hidden"
             style={{ left: `${((PF.x - PF.w / 2) / 1100) * 100}%`, top: `${((PF.y - PF.h / 2) / 520) * 100}%`, width: `${(PF.w / 1100) * 100}%`, height: `${(PF.h / 520) * 100}%` }}
           >
-            <img src="/assets/protos/portfolio-2x.webp" alt="A Zero portfolio" className="w-full" loading="lazy" />
+            <img src="/assets/protos/portfolio-2x.webp" alt="A Flint portfolio" className="w-full" loading="lazy" />
             <p className="absolute right-4 top-3 flex items-center gap-[0.26em] rounded-full bg-white/90 px-3 py-1 text-[clamp(14px,1.4vw,22px)] tracking-[-0.02em] text-[#1b1d1c] shadow-sm backdrop-blur">
               <span className="text-[#8a8b87]">Level</span>
               <Odometer value={level} />

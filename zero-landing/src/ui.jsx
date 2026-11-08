@@ -42,8 +42,8 @@ export function Narrator({ clip, size = 52, dark = false, className = '' }) {
       type="button"
       onClick={() => playClip(clip)}
       aria-pressed={on}
-      aria-label={on ? 'Stop Navid' : 'Hear Navid, founder of Zero'}
-      title="Navid, founder of Zero"
+      aria-label={on ? 'Stop Navid' : 'Hear Navid'}
+      title="Navid"
       className={`relative inline-flex shrink-0 align-middle transition-transform duration-300 hover:scale-105 ${className}`}
       style={{ width: size, height: size }}
     >

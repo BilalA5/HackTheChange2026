@@ -3,7 +3,7 @@ import { roles, sections } from './data.js';
 import { useStickyProgress } from './hooks.js';
 import { Flame, Narrator, SpeakerIcon, TrendUp } from './ui.jsx';
 
-const ZERO_APP = 'https://learnwithzero.com';
+const APP_URL = 'https://learnwithzero.com';
 
 function Tag({ tag }) {
   if (!tag) return null;
@@ -130,7 +130,7 @@ function RoleCard({ role }) {
             ))}
           </div>
           <a
-            href={ZERO_APP}
+            href={APP_URL}
             target="_blank"
             rel="noreferrer"
             className="mt-4 flex h-11 items-center justify-center rounded-[13px] bg-[#111] text-[15px] text-white hover:bg-black"

@@ -74,7 +74,7 @@ const social = [
   { name: 'X', href: 'https://x.com/', d: 'M17.8 3h3.1l-6.8 7.8L22 21h-6.2l-4.9-6.4L5.3 21H2.2l7.3-8.3L2 3h6.4l4.4 5.8L17.8 3Zm-1.1 16.2h1.7L7.4 4.7H5.6l11.1 14.5Z' },
 ];
 
-/** The foot of the page: Zero World. Colour spreads out from Zero's dome as it comes into view. */
+/** The foot of the page: Flint World. Colour spreads out from Flint's dome as it comes into view. */
 export function Footer() {
   const [ref, p] = useViewProgress(1, 0.05);
   const spread = ease(range(p, 0.25, 1));
@@ -82,13 +82,13 @@ export function Footer() {
   const r = spread * 95; // % of the larger side
 
   return (
-    <footer ref={ref} id="gate" aria-label="Zero World" className="relative h-[max(100svh,620px)] overflow-hidden">
+    <footer ref={ref} id="gate" aria-label="Flint World" className="relative h-[max(100svh,620px)] overflow-hidden">
       <div className="absolute inset-0 [perspective:1400px]">
         <div className="absolute inset-[-6%] origin-bottom" style={{ transform: `rotateX(${tilt}deg)` }}>
           <img src="/assets/shots/world-pale.webp" alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
           <img
             src="/assets/shots/city@2x.webp"
-            alt="Zero World, the city of companies where you work"
+            alt="Flint World, the city of companies where you work"
             className="absolute inset-0 h-full w-full object-cover"
             style={{
               WebkitMaskImage: `radial-gradient(circle at 50% 52%, #000 ${r}%, rgba(0,0,0,0.35) ${r + 6}%, transparent ${r + 14}%)`,
@@ -109,7 +109,7 @@ export function Footer() {
           className="relative flex items-center gap-2.5 rounded-full bg-white/85 py-2.5 pl-3 pr-5 text-[16px] tracking-[-0.01em] text-[#111] shadow-[0_14px_34px_-14px_rgba(0,0,0,0.5)] backdrop-blur transition-transform hover:scale-[1.03]"
         >
           <Mark className="h-7 w-7" />
-          Enter Zero
+          Enter Flint
         </a>
       </div>
 
@@ -121,11 +121,11 @@ export function Footer() {
           <a href="https://learnwithzero.com/privacy.html" className="hover:underline">
             Privacy
           </a>
-          <span className="text-white/70">© 2026 Zero</span>
+          <span className="text-white/70">© 2026 Flint</span>
         </nav>
-        <nav aria-label="Zero on social" className="flex h-[43px] items-center gap-[14px] rounded-full bg-[rgba(52,52,52,0.78)] px-[16px] text-white backdrop-blur">
+        <nav aria-label="Flint on social" className="flex h-[43px] items-center gap-[14px] rounded-full bg-[rgba(52,52,52,0.78)] px-[16px] text-white backdrop-blur">
           {social.map((s) => (
-            <a key={s.name} href={s.href} target="_blank" rel="noreferrer" aria-label={`Zero on ${s.name}`} className="opacity-90 hover:opacity-100">
+            <a key={s.name} href={s.href} target="_blank" rel="noreferrer" aria-label={`Flint on ${s.name}`} className="opacity-90 hover:opacity-100">
               <svg viewBox="0 0 24 24" className="h-[16px] w-[16px]" fill="currentColor" aria-hidden="true">
                 <path d={s.d} />
               </svg>
