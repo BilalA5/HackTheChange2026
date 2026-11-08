@@ -10,7 +10,7 @@ pnpm install
 pnpm dev
 ```
 
-Open http://127.0.0.1:5182. Build for production with `pnpm build`.
+Open http://127.0.0.1:30000. Build for production with `pnpm build`.
 `~/Desktop/screen2code/start-all.sh` also starts it, along with the other projects.
 
 ## How it was made
