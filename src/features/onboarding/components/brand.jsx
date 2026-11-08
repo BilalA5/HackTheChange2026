@@ -35,3 +35,11 @@ export function Avatar({ src = guide.photo, size = 56, ring = true, className = 
     </span>
   );
 }
+
+export function WordmarkChip() {
+  return (
+    <div className="absolute left-[22px] top-[22px] grid h-10 place-items-center rounded-full bg-card px-4">
+      <Wordmark size={16} />
+    </div>
+  );
+}
