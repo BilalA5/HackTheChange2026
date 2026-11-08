@@ -1,10 +1,12 @@
-import { useState } from 'react';
-import { Navigate, useNavigate, useParams } from 'react-router';
-import { getScenario } from '@/data/scenarios/index.js';
+import { useMemo, useState } from 'react';
+import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router';
 import { useAuth } from '@/features/auth/auth-context.js';
 import { useProgress } from '@/features/app/useProgress.js';
+import { progressOf } from '@/features/plan/progressOf.js';
+import { scenarioFromStop } from '@/features/plan/scenarioFromStop.js';
+import { usePlan } from '@/features/plan/usePlan.js';
 import { requestReview } from '@/services/chat.js';
-import { completeScenario } from '@/services/progress.js';
+import { completeStop } from '@/services/progress.js';
 import { useAppTheme } from '@/shared/useAppTheme.js';
 import ChatPanel from './ChatPanel.jsx';
 import NotesViewer from './NotesViewer.jsx';
@@ -16,8 +18,9 @@ import './workspace.css';
 const FONTS =
   'https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=Geist+Mono:wght@400;500;600&display=swap';
 
-function ScenarioWorkspace({ scenario }) {
+function ScenarioWorkspace({ scenario, next }) {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
   const { user } = useAuth();
   const progress = useProgress();
   const finished = progress.completed[scenario.id];
@@ -26,18 +29,25 @@ function ScenarioWorkspace({ scenario }) {
     manager: useConversation({ scenario, persona: 'manager', userId: user.id }),
     coach: useConversation({ scenario, persona: 'coach', userId: user.id }),
   };
-  const [active, setActive] = useState('manager');
+  const [active, setActive] = useState(params.get('with') === 'coach' ? 'coach' : 'manager');
   const [notesOpen, setNotesOpen] = useState(true);
   const [reviewStatus, setReviewStatus] = useState(finished ? 'done' : 'idle');
 
   const submitForReview = async () => {
     setActive('manager');
     setReviewStatus('reviewing');
+    const history = [...conversations.manager.messages, ...conversations.coach.messages].sort((a, b) => a.at - b.at);
     conversations.manager.post('Thanks, reviewing your submission now.');
-    const review = await requestReview({ scenarioId: scenario.id });
-    await completeScenario(user.id, scenario.id, review);
-    conversations.manager.post(review.summary, { kind: 'review', review });
-    setReviewStatus('done');
+    try {
+      const review = await requestReview({ scenario, history });
+      await completeStop(user.id, scenario.stop, review);
+      conversations.manager.post(review.summary, { kind: 'review', review });
+      setReviewStatus('done');
+    } catch (error) {
+      console.error(error);
+      conversations.manager.post('Something went wrong on my side while reviewing. Give it another go in a minute.');
+      setReviewStatus(finished ? 'done' : 'idle');
+    }
   };
 
   return (
@@ -59,6 +69,8 @@ function ScenarioWorkspace({ scenario }) {
             onOpenNotes={() => setNotesOpen(true)}
             reviewStatus={reviewStatus}
             onSubmit={submitForReview}
+            next={next}
+            onNext={() => navigate(next ? `/app/scenarios/${encodeURIComponent(next.id)}` : '/app')}
           />
         </div>
         <div className="h-[760px] min-h-0 xl:h-full">
@@ -77,8 +89,16 @@ function ScenarioWorkspace({ scenario }) {
 export default function ScenarioPage() {
   useAppTheme('workspace');
   const { scenarioId } = useParams();
-  const scenario = getScenario(scenarioId);
+  const { plan, ready } = usePlan();
+  const progress = useProgress();
+  const stop = plan?.stops.find((candidate) => candidate.id === scenarioId);
+  const scenario = useMemo(() => stop && scenarioFromStop(stop), [stop]);
 
+  if (!ready || !progress.ready) return null;
   if (!scenario) return <Navigate to="/app" replace />;
-  return <ScenarioWorkspace key={scenario.id} scenario={scenario} />;
+
+  const standing = progressOf(plan, progress);
+  if (standing.statusOf(stop) === 'locked') return <Navigate to="/app" replace />;
+
+  return <ScenarioWorkspace key={scenario.id} scenario={scenario} next={standing.nextOf(stop)} />;
 }

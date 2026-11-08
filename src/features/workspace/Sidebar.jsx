@@ -67,7 +67,7 @@ const submitLabels = {
   done: 'Reviewed · Submit again',
 };
 
-export default function Sidebar({ scenario, notesOpen, onOpenNotes, reviewStatus = 'idle', onSubmit }) {
+export default function Sidebar({ scenario, notesOpen, onOpenNotes, reviewStatus = 'idle', onSubmit, next, onNext }) {
   const [openRequirements, setOpenRequirements] = useState(() => new Set([0]));
 
   const toggle = (index) =>
@@ -115,7 +115,16 @@ export default function Sidebar({ scenario, notesOpen, onOpenNotes, reviewStatus
         </div>
       </div>
 
-      <div className="shrink-0 py-[18px]">
+      <div className="flex shrink-0 flex-col gap-[10px] py-[18px]">
+        {reviewStatus === 'done' && (
+          <button
+            type="button"
+            onClick={onNext}
+            className="h-[46px] w-full truncate rounded-full bg-[var(--accent)] px-4 text-[15px] font-semibold text-[#06210f] transition hover:scale-[1.02] active:scale-[.99]"
+          >
+            {next ? `Next: ${next.shortTitle}` : 'Back to the board'}
+          </button>
+        )}
         <button
           type="button"
           onClick={onSubmit}

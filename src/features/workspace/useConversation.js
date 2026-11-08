@@ -9,15 +9,29 @@ const openingFor = (persona) => persona.opening.map((text) => message('them', te
 export function useConversation({ scenario, persona: personaKey, userId }) {
   const persona = scenario[personaKey];
   const thread = useMemo(
-    () => ({ userId, scenarioId: scenario.id, persona: personaKey }),
+    () => ({ userId, stopId: scenario.id, persona: personaKey }),
     [userId, scenario.id, personaKey],
   );
-  const [messages, setMessages] = useState(() => loadConversation(thread) ?? openingFor(persona));
+  const [messages, setMessages] = useState(() => openingFor(persona));
+  const [loaded, setLoaded] = useState(false);
   const [typing, setTyping] = useState(false);
   const latest = useRef(messages);
   latest.current = messages;
 
-  useEffect(() => saveConversation(thread, messages), [thread, messages]);
+  useEffect(() => {
+    let active = true;
+    loadConversation(thread)
+      .then((saved) => active && saved?.length && setMessages(saved))
+      .catch(console.error)
+      .finally(() => active && setLoaded(true));
+    return () => {
+      active = false;
+    };
+  }, [thread]);
+
+  useEffect(() => {
+    if (loaded) saveConversation(thread, messages).catch(console.error);
+  }, [loaded, thread, messages]);
 
   const post = useCallback((text, extra) => setMessages((current) => [...current, message('them', text, extra)]), []);
 
@@ -29,22 +43,21 @@ export function useConversation({ scenario, persona: personaKey, userId }) {
       setMessages((current) => [...current, message('me', trimmed)]);
       setTyping(true);
       try {
-        const reply = await requestReply({ scenarioId: scenario.id, persona: personaKey, text: trimmed, history });
-        post(reply);
+        post(await requestReply({ scenario, persona: personaKey, text: trimmed, history }));
       } finally {
         setTyping(false);
       }
     },
-    [scenario.id, personaKey, post],
+    [scenario, personaKey, post],
   );
 
   const reset = useCallback(() => {
-    clearConversation(thread);
+    clearConversation(thread).catch(console.error);
     setMessages(openingFor(persona));
   }, [thread, persona]);
 
   const said = new Set(messages.filter((m) => m.from === 'me').map((m) => m.text));
   const suggestions = persona.script.map((line) => line.say).filter((line) => !said.has(line));
 
-  return { persona, messages, typing, send, post, reset, suggestions };
+  return { persona, messages, typing, send, post, reset, suggestions, loaded };
 }
