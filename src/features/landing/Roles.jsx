@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
-import { roles, sections } from './data.js';
+import { roles, sections } from '@/data/roles.js';
 import { useStickyProgress } from './hooks.js';
 import { Flame, Narrator, SpeakerIcon, TrendUp } from './ui.jsx';
 
