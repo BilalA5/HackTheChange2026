@@ -1,9 +1,12 @@
 // End-to-end walk through the whole learning loop against a running server, using the real content.
 // Usage: PW_SERVER_URL=http://127.0.0.1:8787 npx tsx scripts/e2e-api.ts
-import { getScenario } from "@pw/content";
-import type { Objective, FtuxView, ScenarioCard } from "@pw/shared";
+//        PW_E2E_PATH=custom … walks a personal path generated from the onboarding answers instead.
+// The scripted answers are written to pass the practice graders. Live graders (rightly) fail a stage submission
+// that only restates the requirements, so against a live server the walk is expected to stop at a stage.
+import type { Objective, FtuxView, ScenarioCard, ScenarioDetail } from "@pw/shared";
 
 const BASE = (process.env.PW_SERVER_URL ?? "http://127.0.0.1:8787") + "/api";
+const CUSTOM = process.env.PW_E2E_PATH === "custom";
 let token = "";
 const log = (...a: unknown[]) => console.log("•", ...a);
 
@@ -26,18 +29,27 @@ token = login.token;
 // Onboarding
 let view = await call<FtuxView>("POST", "/onboarding/session-start");
 const turn = (t: unknown) => call<FtuxView>("POST", "/onboarding/session-turn", { sessionId: view.sessionId, turn: t });
+// draw (skipped) → chat (6 answers) → why → recommend → roadmap → claim. By default this picks the authored
+// AI Engineer path; with PW_E2E_PATH=custom it builds a personal Registered Nurse path instead.
 view = await turn({ kind: "CONTINUE" });
-for (const answer of ["AI Engineer", "Startup", "Remote", "3 months"]) view = await turn({ kind: "MESSAGE", text: answer });
+const answers = CUSTOM
+  ? ["Registered Nurse", "New grad", "Pediatric hospitals", "Large public hospital", "Calgary", "6 months"]
+  : ["AI Engineer", "Junior", "Software", "Startup", "Remote", "3 months"];
+for (const answer of answers) view = await turn({ kind: "MESSAGE", text: answer });
 log("ftux step after chat:", view.step, "board:", JSON.stringify(view.board));
-view = await turn({ kind: "SELECT_CAREER", careerId: "ai-engineer" });
-view = await turn({ kind: "CONTINUE" });
 view = await turn({ kind: "WHY", text: "I want to ship real AI products." });
+log("recommendations:", view.recommendations.map((r) => `${r.kind ?? "authored"}:${r.title}`).join(", "));
+const started = Date.now();
+view = await turn({ kind: "SELECT_CAREER", careerId: CUSTOM ? "custom" : "ai-engineer" });
+log(`career selected in ${((Date.now() - started) / 1000).toFixed(1)}s, roadmap:`, view.roadmap?.scenarios.map((r) => r.title).join(" / "));
+view = await turn({ kind: "CONTINUE" });
 view = await turn({ kind: "CLAIM" });
 log("ftux final step:", view.step);
 
 const cards = await call<ScenarioCard[]>("GET", "/scenarios");
 log("cards:", cards.map((c) => `${c.order}:${c.status}`).join(" "));
-const scenario = getScenario(cards[0].id)!;
+const scenario = await call<ScenarioDetail>("GET", `/scenarios/${cards[0].id}`);
+log("first project:", scenario.title, "at", scenario.company.name, "with", scenario.npc.name);
 let obj = await call<Objective>("POST", "/objectives", { scenarioId: scenario.id });
 
 // Kickoff: write notes from the rubric points
