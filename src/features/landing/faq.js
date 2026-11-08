@@ -101,7 +101,8 @@ export const faq = [
   },
   {
     question: 'How do I start?',
-    answer: 'Hit Start at the bottom of the screen to take the tour.',
+    answer:
+      'Hit Start at the bottom of the screen, log in with your name and email, and the tour walks you through it.',
     keywords: [
       'start',
       'started',

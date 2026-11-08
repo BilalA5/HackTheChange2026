@@ -103,7 +103,7 @@ export function Footer() {
           aria-hidden="true"
         />
         <Link
-          to="/onboarding"
+          to="/login"
           className="relative flex items-center gap-2.5 rounded-full bg-white/85 py-2.5 pl-3 pr-5 text-[16px] tracking-[-0.01em] text-[#111] shadow-[0_14px_34px_-14px_rgba(0,0,0,0.5)] backdrop-blur transition-transform hover:scale-[1.03]"
         >
           <Mark className="h-7 w-7" />

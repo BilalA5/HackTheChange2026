@@ -146,7 +146,7 @@ function RoleCard({ role }) {
             ))}
           </div>
           <Link
-            to="/onboarding"
+            to="/login"
             className="mt-4 flex h-11 items-center justify-center rounded-[13px] bg-[#111] text-[15px] text-white hover:bg-black"
           >
             Start as {role.title}

@@ -4,7 +4,7 @@ import { faq } from './faq.js';
 import { useScrolled } from './hooks.js';
 import { Mark, Play } from './ui.jsx';
 
-const FALLBACK_ANSWER = "I don't know that one yet. Try one of the questions below, or hit Start to take the tour.";
+const FALLBACK_ANSWER = "I don't know that one yet. Try one of the questions below, or hit Start to begin.";
 
 function answer(text) {
   const query = text.toLowerCase().replace(/[^a-z0-9$' ]/g, ' ');
@@ -140,8 +140,8 @@ function AskFlint({ open, onClose }) {
 }
 
 const menuLinks = [
-  { label: 'How Flint works', to: '/onboarding' },
-  { label: 'Workspace', to: '/workspace' },
+  { label: 'Log in', to: '/login' },
+  { label: 'Open Flint', to: '/app' },
 ];
 
 const menuItemClass =
@@ -199,7 +199,7 @@ export default function Dock() {
         }`}
       >
         <Link
-          to="/onboarding"
+          to="/login"
           className="start-key flex h-[57px] w-[min(254px,44vw)] items-center justify-center gap-2.5 rounded-[15px] text-[17px] font-medium text-white transition-transform hover:scale-[1.015] active:scale-[0.985]"
         >
           <Play className="h-3 w-3" />
