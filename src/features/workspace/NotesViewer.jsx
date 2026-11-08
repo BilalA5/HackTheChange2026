@@ -1,29 +1,28 @@
 import { useRef, useState } from 'react';
-import { notes, project } from './content.js';
 import { ChevronLeft, DownloadIcon, ResetIcon } from './icons.jsx';
 
 const ZOOM = { min: 50, max: 200, step: 10, initial: 100 };
 
 const clampZoom = (value) => Math.min(ZOOM.max, Math.max(ZOOM.min, value));
 
-function notesToMarkdown() {
+function notesToMarkdown({ title, notes }) {
   const sections = notes.flatMap(({ heading, items }) => [`### ${heading}`, ...items.map((item) => `- ${item}`), '']);
-  return [`# ${project.title}`, '', '## Meeting notes', '', ...sections].join('\n');
+  return [`# ${title}`, '', '## Meeting notes', '', ...sections].join('\n');
 }
 
-function downloadNotes() {
-  const url = URL.createObjectURL(new Blob([notesToMarkdown()], { type: 'text/markdown' }));
+function downloadNotes(scenario) {
+  const url = URL.createObjectURL(new Blob([notesToMarkdown(scenario)], { type: 'text/markdown' }));
   const link = Object.assign(document.createElement('a'), { href: url, download: 'meeting-notes.md' });
   link.click();
   setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
-function NotesDocument() {
+function NotesDocument({ title, notes }) {
   return (
     <div className="rounded-t-[12px] bg-white px-[33px] pb-[96px] pt-[33px] text-[#363636]">
       <div className="flex items-start gap-[29px]">
         <h2 className="min-w-0 flex-1 text-[19.5px] font-bold leading-[30px] text-[#151515] xl:max-w-[430px]">
-          {project.title}
+          {title}
         </h2>
         <p className="mt-[5px] w-[64px] shrink-0 text-[9.5px] font-bold uppercase leading-[15px] tracking-[0.2em] text-[#8a8a8a]">
           Meeting notes
@@ -62,7 +61,7 @@ function ToolbarButton({ label, onClick, className = '', children }) {
   );
 }
 
-export default function NotesViewer({ onClose }) {
+export default function NotesViewer({ scenario, onClose }) {
   const [zoom, setZoom] = useState(ZOOM.initial);
   const scroller = useRef(null);
 
@@ -86,7 +85,7 @@ export default function NotesViewer({ onClose }) {
         </p>
         <ToolbarButton
           label="Download meeting notes"
-          onClick={downloadNotes}
+          onClick={() => downloadNotes(scenario)}
           className="h-[24px] w-[24px] text-[#a9a9a9]"
         >
           <DownloadIcon />
@@ -98,7 +97,7 @@ export default function NotesViewer({ onClose }) {
         className="doc-fade thin-scrollbar mb-[2px] ml-[28px] mr-[7px] mt-[12px] min-h-0 flex-1 overflow-y-auto pr-[27px]"
       >
         <div style={{ zoom: zoom / 100 }}>
-          <NotesDocument />
+          <NotesDocument title={scenario.title} notes={scenario.notes} />
         </div>
       </div>
 
