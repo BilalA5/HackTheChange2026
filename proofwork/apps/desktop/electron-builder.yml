@@ -1,0 +1,36 @@
+appId: com.proofwork.desktop
+productName: Proofwork
+copyright: Proofwork
+electronVersion: 45.2.3
+asar: true
+directories:
+  output: release
+  buildResources: build
+files:
+  - dist/**
+  - package.json
+extraResources:
+  - from: ../renderer/dist
+    to: renderer
+  - from: ../../native/stt-helper/build/STTStreamHelper.app
+    to: stt-stream-helper/STTStreamHelper.app
+    filter:
+      - "**/*"
+protocols:
+  - name: Proofwork
+    schemes:
+      - proofwork
+mac:
+  category: public.app-category.productivity
+  target:
+    - dir
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+  identity: null
+  extendInfo:
+    NSMicrophoneUsageDescription: Proofwork uses the microphone so you can talk to your AI manager.
+    NSCameraUsageDescription: Proofwork uses the camera for presentation practice and framing.
+    NSSpeechRecognitionUsageDescription: Proofwork transcribes your speech on this Mac so the AI manager can hear you.
+    NSScreenCaptureUsageDescription: Proofwork looks at your screen when you ask the AI co-worker for help.
