@@ -1,5 +1,6 @@
 // Live engine: same method signatures as the practice engine. Every call that fails or is refused logs a
 // short warning and falls back to the deterministic practice engine, so the app never breaks.
+import type { AiDegraded } from "@pw/shared";
 import type { AiEngine, GeneratedPath, GeneratePathInput } from "../../contracts.ts";
 import { describeError, type LlmClient } from "../llm.ts";
 import { createMockEngine } from "../mock/index.ts";
@@ -11,22 +12,52 @@ import { coachReplyLive, supportReplyLive, draftApplicationLive, portfolioBioLiv
 import { coworkTurnLive } from "./cowork.ts";
 import { generatePathLive } from "./pathgen.ts";
 
-async function attempt<T>(name: string, live: () => Promise<T>, fallback: () => T | Promise<T>): Promise<T> {
-  try {
-    return await live();
-  } catch (err) {
-    console.warn(`[ai] live ${name} failed, using practice: ${describeError(err)}`);
-    return await fallback();
-  }
+/** After a billing, auth or rate-limit error, live calls are skipped for this long, then tried again. */
+export const LIVE_COOLDOWN_MS = 2 * 60_000;
+
+/** Classifies a provider error for the degraded status. */
+export function degradedReason(err: unknown): AiDegraded["reason"] {
+  const status = (err as { status?: unknown } | null)?.status;
+  if (status === 402) return "billing";
+  if (status === 401 || status === 403) return "auth";
+  if (status === 429) return "rate_limit";
+  return "error";
 }
 
-export function createLiveEngine(llm: LlmClient): AiEngine {
+const REASON_TEXT: Record<AiDegraded["reason"], string> = {
+  billing: "The AI provider's credits have run out. Top up the account to get live replies back.",
+  auth: "The AI provider rejected the API key. Check the key in .env.",
+  rate_limit: "The AI provider is rate limiting requests. Live replies resume shortly.",
+  error: "Live AI calls are failing right now.",
+};
+
+export function createLiveEngine(llm: LlmClient, opts: { now?: () => number } = {}): AiEngine {
   const mock = createMockEngine({ quality: "practice", fast: "practice" });
+  const now = opts.now ?? Date.now;
+  let degraded: AiDegraded | null = null;
+  let skipUntil = 0;
+
+  /** Runs the live call, or the practice fallback while the provider is known to be unavailable. */
+  async function attempt<T>(name: string, live: () => Promise<T>, fallback: () => T | Promise<T>): Promise<T> {
+    if (now() < skipUntil) return fallback();
+    try {
+      const result = await live();
+      degraded = null;
+      return result;
+    } catch (err) {
+      const reason = degradedReason(err);
+      console.warn(`[ai] live ${name} failed, using practice: ${describeError(err)}`);
+      if (reason !== "error") skipUntil = now() + LIVE_COOLDOWN_MS;
+      degraded = { reason, message: REASON_TEXT[reason], since: degraded?.since ?? new Date(now()).toISOString() };
+      return fallback();
+    }
+  }
 
   return {
     mode: "live",
     provider: llm.provider,
     models: llm.models,
+    status: () => degraded,
 
     generatePath: (i: GeneratePathInput): Promise<GeneratedPath> =>
       attempt(

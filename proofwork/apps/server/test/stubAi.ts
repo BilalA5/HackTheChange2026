@@ -236,6 +236,7 @@ export function createStubAi(): { ai: AiEngine; state: StubState } {
   const ai: AiEngine = {
     mode: "mock",
     provider: "practice",
+    status: () => null,
     models: { quality: "stub-quality", fast: "stub-fast" },
     async generatePath(input) {
       return generatedPath(input, state);

@@ -13,6 +13,7 @@ export function createMockEngine(models: Models): AiEngine {
   return {
     mode: "mock",
     provider: "practice",
+    status: () => null,
     models,
 
     async generatePath(i) {

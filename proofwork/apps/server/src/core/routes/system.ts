@@ -11,6 +11,8 @@ export function registerSystemRoutes(api: FastifyInstance, core: Core): void {
     aiMode: core.ai.mode,
     provider: core.ai.provider,
     models: core.ai.models,
+    degraded: core.ai.status(),
+    tts: { engines: core.tts.engines() },
     version: SERVER_VERSION,
   }));
 

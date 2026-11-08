@@ -27,6 +27,7 @@ import type {
   PathRequest,
   Training,
   VisionBoard,
+  AiDegraded,
 } from "@pw/shared";
 
 export type ModelTier = "quality" | "fast";
@@ -51,6 +52,19 @@ export interface FtuxSession {
 }
 
 /** Input for generating a learner's personal career path. */
+/** Where the learner is, for the career coach. */
+export interface CoachContext {
+  careerTitle: string | null;
+  project: { title: string; company: string; manager: string } | null;
+  /** What the learner should do next in that project, in plain words. */
+  nextStep: string | null;
+  completedProjects: number;
+  totalProjects: number;
+  level: number;
+  xp: number;
+  streak: number;
+}
+
 export interface GeneratePathInput {
   request: PathRequest;
   user: User;
@@ -81,6 +95,8 @@ export interface AiEngine {
   /** Which provider serves live calls. "practice" when mode is "mock". */
   readonly provider: "gemini" | "anthropic" | "practice";
   readonly models: { quality: string; fast: string };
+  /** Non-null while live calls are failing and replies come from the practice engine. */
+  status(): AiDegraded | null;
 
   /** Builds a personal career path (3 projects, companies, managers, jobs) tailored to the request. Never throws. */
   generatePath(i: GeneratePathInput): Promise<GeneratedPath>;
@@ -141,7 +157,7 @@ export interface AiEngine {
   }): Promise<{ view: FtuxView; memory: Record<string, unknown>; board: Partial<VisionBoard>; careerId?: string }>;
   ftuxStart(i: { sessionId: string; user: User }): FtuxView;
 
-  coachReply(i: { user: User; history: ChatMessage[]; message: string; progressSummary: string }): Promise<string>;
+  coachReply(i: { user: User; history: ChatMessage[]; message: string; progressSummary: string; context?: CoachContext }): Promise<string>;
   supportReply(i: { user: User; history: ChatMessage[]; message: string }): Promise<string>;
   draftApplication(i: { job: Job; user: User; portfolio: Portfolio }): Promise<{ answers: Record<string, string>; guessed: string[]; coverLetter: string }>;
   portfolioBio(i: { user: User; projects: Portfolio["projects"] }): Promise<{ headline: string; bio: string }>;
