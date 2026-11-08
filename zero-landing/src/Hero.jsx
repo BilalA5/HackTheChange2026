@@ -20,7 +20,7 @@ function LogoRow({ names, direction }) {
 }
 
 /**
- * The first screen, held while you scroll: the pale city with the zero mark on it. Scrolling zooms into the
+ * The first screen, held while you scroll: the pale city with the Flint mark on it. Scrolling zooms into the
  * mark until its black is the whole screen, and on that black screen the talent network appears.
  */
 export default function Hero() {
@@ -47,8 +47,7 @@ export default function Hero() {
           <h1 id="hero-title" className="text-[clamp(2.5rem,1.2rem+3.4vw,4.5rem)] font-normal leading-[0.99] tracking-[-0.052em] text-[var(--ink)]">
             Get hired with{' '}
             <span className="whitespace-nowrap">
-              <Mark className="inline-block h-[0.82em] w-[0.82em] -translate-y-[0.04em] align-baseline" />
-              <span className="sr-only">zero</span> experience.
+              zero experience.
               <Narrator clip="hero" size={44} className="ml-3 -translate-y-[0.35em]" />
             </span>
           </h1>

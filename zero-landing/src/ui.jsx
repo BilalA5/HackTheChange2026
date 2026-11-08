@@ -78,7 +78,7 @@ export function Narrator({ clip, size = 52, dark = false, className = '' }) {
 /* ---------------------------------------------------------------- marks */
 
 export function Mark({ className = '', style }) {
-  return <img src="/assets/brand/mark-solid.svg" alt="" aria-hidden="true" className={className} style={style} draggable="false" />;
+  return <img src="/assets/brand/flint-mark.svg" alt="" aria-hidden="true" className={className} style={style} draggable="false" />;
 }
 
 export function Logo({ name, dark = false, className = '', style, alt }) {
