@@ -1,4 +1,4 @@
-import { readJSON, removeKey, writeJSON } from './storage.js';
+import { readJSON, removeKey, removeKeysStartingWith, writeJSON } from './storage.js';
 
 const keyFor = ({ userId, scenarioId, persona }) => `chat.${userId}.${scenarioId}.${persona}`;
 
@@ -12,4 +12,8 @@ export function saveConversation(thread, messages) {
 
 export function clearConversation(thread) {
   removeKey(keyFor(thread));
+}
+
+export function clearAllConversations(userId) {
+  removeKeysStartingWith(`chat.${userId}.`);
 }

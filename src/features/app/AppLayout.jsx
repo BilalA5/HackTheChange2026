@@ -1,6 +1,7 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router';
 import { useAuth } from '@/features/auth/auth-context.js';
-import { XP_PER_LEVEL } from '@/services/progress.js';
+import { clearAllConversations } from '@/services/conversations.js';
+import { XP_PER_LEVEL, resetProgress } from '@/services/progress.js';
 import InitialsAvatar from '@/shared/InitialsAvatar.jsx';
 import { useAppTheme } from '@/shared/useAppTheme.js';
 import Wordmark from '@/shared/Wordmark.jsx';
@@ -59,6 +60,12 @@ export default function AppLayout() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
+  const resetDemo = async () => {
+    clearAllConversations(user.id);
+    await resetProgress(user.id);
+    navigate('/app', { replace: true });
+  };
+
   const leave = async () => {
     await signOut();
     navigate('/', { replace: true });
@@ -99,6 +106,13 @@ export default function AppLayout() {
               <div className="truncate text-[12.5px] text-tx-3">{user.email}</div>
             </div>
           </div>
+          <button
+            type="button"
+            onClick={resetDemo}
+            className="rounded-[10px] px-3 py-2 text-[13px] text-tx-3 ring-1 ring-white/10 hover:text-tx"
+          >
+            Reset demo
+          </button>
           <div className="flex gap-2 text-[13px]">
             <Link
               to="/onboarding"

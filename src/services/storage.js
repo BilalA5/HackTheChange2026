@@ -24,3 +24,12 @@ export function removeKey(key) {
     // See writeJSON.
   }
 }
+
+export function removeKeysStartingWith(prefix) {
+  try {
+    const keys = Object.keys(window.localStorage).filter((key) => key.startsWith(PREFIX + prefix));
+    keys.forEach((key) => window.localStorage.removeItem(key));
+  } catch {
+    // See writeJSON.
+  }
+}
