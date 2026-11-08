@@ -206,7 +206,13 @@ export const reply = action({
 
     const voice = (personaVoice[persona.kind] ?? personaVoice.coach)(persona.name, b.company);
     const opening = history
-      .slice(0, Math.max(0, history.findIndex((m) => m.from === 'me')))
+      .slice(
+        0,
+        Math.max(
+          0,
+          history.findIndex((m) => m.from === 'me'),
+        ),
+      )
       .map((m) => m.text);
 
     const message = await anthropic.beta.messages.create({

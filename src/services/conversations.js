@@ -1,19 +1,20 @@
+import { api, call } from './backend.js';
 import { readJSON, removeKey, removeKeysStartingWith, writeJSON } from './storage.js';
 
-const keyFor = ({ userId, scenarioId, persona }) => `chat.${userId}.${scenarioId}.${persona}`;
+const keyFor = ({ userId, stopId, persona }) => `chat.${userId}.${stopId}.${persona}`;
 
 export function loadConversation(thread) {
-  return readJSON(keyFor(thread));
+  return call('query', api.conversations.get, thread, () => readJSON(keyFor(thread)));
 }
 
 export function saveConversation(thread, messages) {
-  writeJSON(keyFor(thread), messages);
+  return call('mutation', api.conversations.save, { ...thread, messages }, () => writeJSON(keyFor(thread), messages));
 }
 
 export function clearConversation(thread) {
-  removeKey(keyFor(thread));
+  return call('mutation', api.conversations.clear, thread, () => removeKey(keyFor(thread)));
 }
 
 export function clearAllConversations(userId) {
-  removeKeysStartingWith(`chat.${userId}.`);
+  return call('mutation', api.conversations.clearAll, { userId }, () => removeKeysStartingWith(`chat.${userId}.`));
 }

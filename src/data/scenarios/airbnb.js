@@ -12,8 +12,6 @@ export default {
   role: 'Product Analyst',
   skills: ['Root cause analysis', 'Trend analysis', 'Financial modelling', 'Presenting to a team'],
   tools: ['Claude', 'Google Sheets', 'ChatGPT'],
-  unlockLevel: 1,
-  map: { x: 58.6, y: 65.6 },
 
   manager: {
     name: 'Rowan',

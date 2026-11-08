@@ -10,10 +10,9 @@ export default {
   category: 'Machine learning',
   duration: '2 hr 30 min',
   role: 'Data Scientist',
+  fits: ['ai', 'data', 'technology'],
   skills: ['Demand modelling', 'Spec writing', 'Model evaluation', 'Explaining trade-offs'],
   tools: ['Claude Code', 'Python', 'XGBoost', 'Streamlit'],
-  unlockLevel: 1,
-  map: { x: 43, y: 88 },
 
   manager: {
     name: 'Erik Vogt',
