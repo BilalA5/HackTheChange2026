@@ -97,7 +97,7 @@ export default function Learn() {
   const [box, setBox] = useState({ w: 0, h: 0 });
   const [nodes, setNodes] = useState([]);
   const [through, setThrough] = useState(0);
-  const [lastP, lastRef] = useLastStepProgress();
+  const [lastRef, lastP] = useViewProgress(0.75, 0.45);
 
   useLayoutEffect(() => {
     const el = wrap.current;
@@ -167,9 +167,4 @@ export default function Learn() {
       </div>
     </section>
   );
-}
-
-function useLastStepProgress() {
-  const [ref, p] = useViewProgress(0.75, 0.45);
-  return [p, ref];
 }
