@@ -21,6 +21,7 @@ export const USER_OWNED_TABLES = [
   "bug_reports",
   "uploads",
   "portfolios",
+  "generated_paths",
 ] as const;
 
 const MIGRATIONS: string[] = [
@@ -150,6 +151,19 @@ const MIGRATIONS: string[] = [
     mime TEXT NOT NULL,
     created_at TEXT NOT NULL
   );
+  `,
+  `
+  CREATE TABLE generated_paths (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    career_id TEXT NOT NULL UNIQUE,
+    engine TEXT NOT NULL,
+    provider TEXT NOT NULL,
+    request TEXT NOT NULL,
+    data TEXT NOT NULL,
+    created_at TEXT NOT NULL
+  );
+  CREATE INDEX generated_paths_user_idx ON generated_paths (user_id, created_at);
   `,
 ];
 
