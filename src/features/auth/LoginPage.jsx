@@ -30,15 +30,20 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [error, submit, pending] = useActionState(async (_previous, form) => {
-    try {
-      const signedIn = await signIn({ name: form.get('name'), email: form.get('email') });
-      navigate(signedIn.onboarded ? (location.state?.from ?? '/app') : '/onboarding', { replace: true });
-      return null;
-    } catch (failure) {
-      return failure.message;
-    }
-  }, null);
+  const [state, submit, pending] = useActionState(
+    async (_previous, form) => {
+      const values = { name: form.get('name'), email: form.get('email') };
+      try {
+        const signedIn = await signIn(values);
+        navigate(signedIn.onboarded ? (location.state?.from ?? '/app') : '/onboarding', { replace: true });
+        return { error: null, values };
+      } catch (failure) {
+        return { error: failure.message, values };
+      }
+    },
+    { error: null, values: { name: '', email: '' } },
+  );
+  const { error, values } = state;
 
   if (ready && user && !pending) return <Navigate to={homePathFor(user)} replace />;
 
@@ -70,8 +75,23 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <Field label="Your name" name="name" autoComplete="name" placeholder="Sanjay Chauhan" required />
-        <Field label="Email" name="email" type="email" autoComplete="email" placeholder="you@example.com" required />
+        <Field
+          label="Your name"
+          name="name"
+          autoComplete="name"
+          placeholder="Sanjay Chauhan"
+          defaultValue={values.name}
+          required
+        />
+        <Field
+          label="Email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          placeholder="you@example.com"
+          defaultValue={values.email}
+          required
+        />
 
         {error && (
           <p role="alert" className="m-0 rounded-[12px] bg-[#EC4B3F]/15 px-4 py-3 text-[14px] text-[#ffb4ad]">
