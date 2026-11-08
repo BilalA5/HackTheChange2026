@@ -1,11 +1,13 @@
 // FTUX onboarding: a server-side step machine persisted per session. Completing it sets user.onboardingComplete.
-import type { FtuxTurn, FtuxView, VisionBoard } from "@pw/shared";
+import { CUSTOM_CAREER_ID, type FtuxTurn, type FtuxView, type PathRequest, type User, type VisionBoard } from "@pw/shared";
 import type { FtuxSession } from "../../contracts.ts";
 import { one, run } from "../db.ts";
 import { badRequest, notFound } from "../errors.ts";
 import type { Core } from "../types.ts";
+import { contentFor, hasGeneratedPath } from "../user-content.ts";
 import { nowIso, uid, withLock } from "../util.ts";
 import { asObject, optStr, reqEnum, reqStr } from "../validate.ts";
+import { createPath, parsePathRequest } from "./paths.ts";
 import { addRecommendedTrainings } from "./trainings.ts";
 import { emptyVision, requireUser, saveUser } from "./users.ts";
 
@@ -75,6 +77,38 @@ export function startSession(core: Core, userId: string): FtuxView {
   return view;
 }
 
+/** Builds the path request from what the learner said during onboarding (the view's board and custom card). */
+export function pathRequestFromView(view: FtuxView): PathRequest {
+  const board = view.board ?? {};
+  const custom = view.recommendations.find((r) => r.kind === "custom");
+  const pick = (...values: (string | undefined)[]) => values.map((v) => v?.trim()).find((v) => v) ?? "";
+  const targetRole = pick(custom?.title, board.targetRole, "Business Analyst").slice(0, 80);
+  return parsePathRequest({
+    targetRole: targetRole.length >= 2 ? targetRole : "Business Analyst",
+    level: board.level,
+    industry: board.industry,
+    companyType: board.companyType,
+    location: board.location,
+    timeline: board.timeline,
+    why: board.why?.slice(0, 200),
+    background: board.background?.slice(0, 200),
+  });
+}
+
+/**
+ * The custom card: generates the learner's path the first time and reuses it afterwards (retries and double
+ * clicks). The generated id is saved in the session memory before the engine runs, so a failed turn can resume.
+ */
+async function customCareer(core: Core, user: User, session: FtuxSession): Promise<string> {
+  const existing = typeof session.memory.generatedCareerId === "string" ? session.memory.generatedCareerId : null;
+  if (existing && hasGeneratedPath(core.db, user.id, existing)) return existing;
+
+  const summary = await createPath(core, user, pathRequestFromView(session.view), { charge: false });
+  session.memory = { ...session.memory, generatedCareerId: summary.careerId };
+  saveSession(core, { id: session.id, userId: user.id, view: session.view, memory: session.memory });
+  return summary.careerId;
+}
+
 export async function sessionTurn(
   core: Core,
   userId: string,
@@ -82,7 +116,7 @@ export async function sessionTurn(
 ): Promise<{ status: 200 | 409; view: FtuxView }> {
   const o = asObject(body);
   const sessionId = reqStr(o, "sessionId", { max: 128 });
-  const turn = parseTurn(o.turn);
+  const parsed = parseTurn(o.turn);
   return withLock(`ftux:${sessionId}`, async () => {
     const row = one<SessionRow>(core.db, "SELECT id, user_id, view, memory, done FROM ftux_sessions WHERE id = ?", [sessionId]);
     if (!row || row.user_id !== userId) throw notFound("Onboarding session not found.");
@@ -91,16 +125,31 @@ export async function sessionTurn(
 
     const user = requireUser(core.db, userId);
     const session: FtuxSession = { id: row.id, userId, view: current, memory: JSON.parse(row.memory) as Record<string, unknown> };
-    const result = await core.ai.ftuxTurn({ session, turn, user, careers: core.content.careers, scenarios: core.content.scenarios });
+    const turn: FtuxTurn =
+      parsed.kind === "SELECT_CAREER" && parsed.careerId === CUSTOM_CAREER_ID
+        ? { kind: "SELECT_CAREER", careerId: await customCareer(core, user, session) }
+        : parsed;
+
+    const content = contentFor(core, userId);
+    const result = await core.ai.ftuxTurn({
+      session,
+      turn,
+      user,
+      careers: content.careers,
+      scenarios: content.scenarios,
+      companies: content.companies,
+    });
 
     user.vision = { ...(user.vision ?? emptyVision()), ...result.board } as VisionBoard;
-    if (result.careerId && core.content.getCareer(result.careerId)) {
+    if (result.careerId && content.getCareer(result.careerId)) {
       user.careerId = result.careerId;
       addRecommendedTrainings(core, userId, result.careerId);
     }
     if (result.view.step === "done") user.onboardingComplete = true;
     saveUser(core.db, user);
-    saveSession(core, { id: row.id, userId, view: result.view, memory: result.memory });
+    // Keep the generated path id across turns; the engine's memory replaces everything else.
+    const memory = { ...result.memory, ...(session.memory.generatedCareerId ? { generatedCareerId: session.memory.generatedCareerId } : {}) };
+    saveSession(core, { id: row.id, userId, view: result.view, memory });
     return { status: 200 as const, view: result.view };
   });
 }
