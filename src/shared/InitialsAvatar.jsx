@@ -1,4 +1,4 @@
-export function initialsOf(name = '') {
+function initialsOf(name = '') {
   return name
     .trim()
     .split(/\s+/)
