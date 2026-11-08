@@ -1,7 +1,9 @@
-// Thin wrapper over the Anthropic SDK. Owns model selection, structured JSON output, refusals and
-// streaming with tools. Never sends temperature/top_p/top_k, thinking config or assistant prefill.
-import Anthropic from "@anthropic-ai/sdk";
+// Provider-neutral LLM interface. Concrete clients live in ./providers (Gemini, Anthropic); nothing outside
+// those two files knows which provider is serving a call. Owns the shared request/response types, JSON
+// parsing and log-safe error descriptions.
 import type { ModelTier } from "../contracts.ts";
+
+export type { ModelTier };
 
 export interface Models {
   quality: string;
@@ -9,16 +11,23 @@ export interface Models {
 }
 
 export type JsonSchema = Record<string, unknown>;
-export type Content = string | ContentBlock[];
+
 export type ContentBlock =
   | { type: "text"; text: string }
   | { type: "image"; source: { type: "base64"; media_type: "image/jpeg" | "image/png"; data: string } };
 
+export type Content = string | ContentBlock[];
+
+export interface ChatTurn {
+  role: "user" | "assistant";
+  content: Content;
+}
+
+/** A callable tool. `parameters` is a plain JSON Schema object. */
 export interface ToolDef {
   name: string;
   description: string;
-  input_schema: { type: "object"; properties: Record<string, unknown>; required?: string[]; additionalProperties?: boolean };
-  eager_input_streaming: true;
+  parameters: JsonSchema;
 }
 
 export interface ToolUse {
@@ -26,124 +35,69 @@ export interface ToolUse {
   input: unknown;
 }
 
-const FALLBACK_BETA = "server-side-fallback-2026-07-01";
-
-interface RawResponse {
-  stop_reason: string | null;
-  content: { type: string; text?: string; name?: string; input?: unknown }[];
+export interface CompleteOpts {
+  tier: ModelTier;
+  system: string;
+  content: Content;
+  maxTokens?: number;
+  /** When set, the model is constrained to this JSON Schema and must answer JSON only. */
+  schema?: JsonSchema;
+  /** Request timeout. Providers apply their own default when omitted (90 s). */
+  timeoutMs?: number;
+  /** "low" trades reasoning depth for latency on long generation calls. Providers without the setting ignore it. */
+  thinking?: "low";
 }
 
-interface StreamLike extends AsyncIterable<{ type: string; delta?: { type: string; text?: string } }> {
-  finalMessage(): Promise<RawResponse>;
+export interface JsonOpts<T> extends CompleteOpts {
+  schema: JsonSchema;
+  /** Checks and narrows the parsed JSON. Throws when the shape is unusable. */
+  validate: (value: unknown) => T;
 }
 
-/** Short, log-safe description of an error: status and message only. */
+export interface StreamOpts {
+  tier: ModelTier;
+  system: string;
+  messages: ChatTurn[];
+  tools: ToolDef[];
+  maxTokens?: number;
+  timeoutMs?: number;
+  onDelta: (delta: string) => void;
+}
+
+export interface StreamResult {
+  text: string;
+  toolUses: ToolUse[];
+}
+
+export interface LlmClient {
+  readonly provider: "gemini" | "anthropic";
+  readonly models: Models;
+  /** One request, returns the text of the reply. */
+  complete(o: CompleteOpts): Promise<string>;
+  /** Structured JSON constrained to `schema`, parsed and then validated by the caller. */
+  json<T>(o: JsonOpts<T>): Promise<T>;
+  /** Streams text through onDelta and returns the tool calls of the final message. One-shot. */
+  stream(o: StreamOpts): Promise<StreamResult>;
+}
+
+/** Parse model JSON. Tolerates a fenced ```json block in case a provider wraps its answer. */
+export function parseJsonText(text: string): unknown {
+  try {
+    return JSON.parse(text);
+  } catch {
+    const fenced = text.trim().match(/^```(?:json)?\s*([\s\S]*?)\s*```$/);
+    if (fenced) return JSON.parse(fenced[1]);
+    throw new Error("model did not return valid JSON");
+  }
+}
+
+/** Short, log-safe description of an error: status (when present) and message only. */
 export function describeError(err: unknown): string {
-  if (err instanceof Anthropic.APIError) return `status ${err.status ?? "n/a"}: ${err.message}`;
-  if (err instanceof Error) return err.message;
+  if (err instanceof Error) {
+    const status = (err as { status?: unknown }).status;
+    return typeof status === "number" ? `status ${status}: ${err.message}` : err.message;
+  }
   return String(err);
-}
-
-export class Llm {
-  readonly client: Anthropic;
-
-  constructor(readonly models: Models) {
-    this.client = new Anthropic();
-  }
-
-  modelFor(tier: ModelTier): string {
-    return tier === "quality" ? this.models.quality : this.models.fast;
-  }
-
-  /**
-   * One request. Quality tier goes through the beta client with the server-side refusal fallback;
-   * fast tier uses the plain Messages API.
-   */
-  async complete(opts: {
-    tier: ModelTier;
-    system: string;
-    content: Content;
-    maxTokens?: number;
-    schema?: JsonSchema;
-  }): Promise<string> {
-    const output_config = opts.schema
-      ? { effort: "low" as const, format: { type: "json_schema" as const, schema: opts.schema } }
-      : { effort: "low" as const };
-    const args = {
-      model: this.modelFor(opts.tier),
-      max_tokens: opts.maxTokens ?? 2000,
-      system: opts.system,
-      messages: [{ role: "user" as const, content: opts.content }],
-      output_config,
-    };
-    const res = (
-      opts.tier === "quality"
-        ? await this.client.beta.messages.create({ betas: [FALLBACK_BETA], fallbacks: "default", ...args })
-        : await this.client.messages.create(args)
-    ) as unknown as RawResponse;
-
-    if (res.stop_reason === "refusal") throw new Error("model refusal");
-    const block = res.content.find((b) => b.type === "text");
-    if (!block || typeof block.text !== "string") throw new Error("no text block in response");
-    return block.text;
-  }
-
-  /** Structured JSON: the model is constrained to `schema`; the caller validates the parsed shape. */
-  async json<T>(opts: {
-    tier: ModelTier;
-    system: string;
-    content: Content;
-    schema: JsonSchema;
-    maxTokens?: number;
-    validate: (value: unknown) => T;
-  }): Promise<T> {
-    const text = await this.complete(opts);
-    return opts.validate(JSON.parse(text));
-  }
-
-  /**
-   * Streams text through onDelta and returns the tool_use blocks of the final message.
-   * One-shot: tool results are never sent back.
-   */
-  async stream(opts: {
-    tier: ModelTier;
-    system: string;
-    messages: { role: "user" | "assistant"; content: Content }[];
-    tools: ToolDef[];
-    maxTokens?: number;
-    onDelta: (delta: string) => void;
-  }): Promise<{ text: string; toolUses: ToolUse[] }> {
-    const args = {
-      model: this.modelFor(opts.tier),
-      max_tokens: opts.maxTokens ?? 2000,
-      system: opts.system,
-      messages: opts.messages,
-      tools: opts.tools,
-      tool_choice: { type: "auto" as const },
-      output_config: { effort: "low" as const },
-    };
-    const stream = (
-      opts.tier === "quality"
-        ? this.client.beta.messages.stream({ betas: [FALLBACK_BETA], fallbacks: "default", ...args })
-        : this.client.messages.stream(args)
-    ) as unknown as StreamLike;
-
-    for await (const ev of stream) {
-      if (ev.type === "content_block_delta" && ev.delta?.type === "text_delta" && typeof ev.delta.text === "string") {
-        opts.onDelta(ev.delta.text);
-      }
-    }
-    const final = await stream.finalMessage();
-    if (final.stop_reason === "refusal") throw new Error("model refusal");
-    const text = final.content
-      .filter((b) => b.type === "text")
-      .map((b) => b.text ?? "")
-      .join("");
-    const toolUses = final.content
-      .filter((b) => b.type === "tool_use" && typeof b.name === "string")
-      .map((b) => ({ name: b.name as string, input: b.input }));
-    return { text, toolUses };
-  }
 }
 
 /** Parse a data URL into a base64 image block, or null when it is not a jpeg/png data URL. */
