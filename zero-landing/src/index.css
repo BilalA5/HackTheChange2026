@@ -1,0 +1,212 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Google Sans Flex';
+  src: url('/assets/fonts/GoogleSansFlex-wght-ROND.woff2') format('woff2');
+  font-weight: 100 1000;
+  font-display: swap;
+}
+
+:root {
+  --page: #f8f9fb;
+  --ink: #0b0b0b;
+  --ink-soft: #1b1d1c;
+  --night: #0b0b0c;
+  --grey-word: #d4d3ce;
+  --wave: #3fe8a4;
+  --muted: #6f716e;
+  --sans: 'Google Sans Flex', 'Google Sans', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  --serif: 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  --h2: clamp(2.3rem, 1.4rem + 2.3vw, 3.85rem);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  background: var(--page);
+}
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+
+.tight {
+  letter-spacing: -0.045em;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Fixed dock: a dark Start key, then menu and help keys, on a frosted tray. */
+.dock-tray {
+  background: rgba(255, 255, 255, 0.55);
+  -webkit-backdrop-filter: blur(14px) saturate(1.6);
+  backdrop-filter: blur(14px) saturate(1.6);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.45),
+    0 0 0 0.5px rgba(15, 15, 15, 0.08),
+    0 18px 30px -18px rgba(15, 15, 15, 0.35);
+}
+.start-key {
+  background: linear-gradient(180deg, #2c2d2d 0%, #151616 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.5),
+    0 10px 22px -10px rgba(0, 0, 0, 0.6);
+}
+.soft-key {
+  background: linear-gradient(180deg, #ffffff 0%, #f4f4f4 100%);
+  box-shadow:
+    inset 0 -2px 0 rgba(0, 0, 0, 0.06),
+    0 6px 14px -8px rgba(0, 0, 0, 0.35),
+    0 0 0 0.5px rgba(0, 0, 0, 0.06);
+}
+.glass-panel {
+  background: rgba(255, 255, 255, 0.82);
+  -webkit-backdrop-filter: blur(22px) saturate(1.6);
+  backdrop-filter: blur(22px) saturate(1.6);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 0 0 0.5px rgba(15, 15, 15, 0.1),
+    0 30px 60px -28px rgba(15, 15, 15, 0.45);
+}
+
+/* Narrator button: Navid's face with a speaker badge and a ring while he talks. */
+@keyframes nv-ring {
+  from {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  to {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+}
+.nv-ring {
+  animation: nv-ring 1.4s var(--ease-out) infinite;
+}
+
+/* Company wordmarks drifting on the black screen. */
+@keyframes drift-left {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes drift-right {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+.drift-left {
+  animation: drift-left 70s linear infinite;
+}
+.drift-right {
+  animation: drift-right 80s linear infinite;
+}
+
+/* The portfolio in its window scrolls itself, slowly, up and back. */
+@keyframes portfolio-tour {
+  0%,
+  12% {
+    transform: translateY(0);
+  }
+  50%,
+  62% {
+    transform: translateY(var(--tour, -40%));
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+.portfolio-tour {
+  animation: portfolio-tour 16s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@keyframes pan {
+  from {
+    transform: scale(1.02) translate(0, 0);
+  }
+  to {
+    transform: scale(1.08) translate(-1.5%, 1%);
+  }
+}
+.slow-pan {
+  animation: pan 18s ease-in-out infinite alternate;
+}
+
+@keyframes pin-ping {
+  from {
+    transform: translate(-50%, -50%) scale(0.6);
+    opacity: 0.8;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(2.4);
+    opacity: 0;
+  }
+}
+.pin-ping {
+  animation: pin-ping 2.2s var(--ease-out) infinite;
+}
+
+@keyframes dome-ripple {
+  from {
+    transform: translate(-50%, -50%) scale(0.4);
+    opacity: 0.7;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1.8);
+    opacity: 0;
+  }
+}
+.dome-ripple {
+  animation: dome-ripple 2.8s var(--ease-out) infinite;
+}
+
+.window {
+  border-radius: 16px;
+  background: #fff;
+  box-shadow:
+    0 0 0 6px rgba(255, 255, 255, 0.72),
+    0 0 0 7px rgba(27, 29, 28, 0.06),
+    0 44px 80px -52px rgba(27, 29, 28, 0.45);
+}
+
+.card-flip {
+  transform-style: preserve-3d;
+  transition: transform 0.7s var(--ease-out);
+}
+.card-face {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid #3fe8a4;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}
