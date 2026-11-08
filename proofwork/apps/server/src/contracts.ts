@@ -23,6 +23,9 @@ import type {
   User,
   Company,
   Career,
+  CareerPack,
+  PathRequest,
+  Training,
   VisionBoard,
 } from "@pw/shared";
 
@@ -47,10 +50,40 @@ export interface FtuxSession {
   memory: Record<string, unknown>;
 }
 
+/** Input for generating a learner's personal career path. */
+export interface GeneratePathInput {
+  request: PathRequest;
+  user: User;
+  /**
+   * Prefix every generated id with this (e.g. "g-3f9a2c-2"). The career id is exactly idPrefix;
+   * companies "<idPrefix>-c1".., npcs "<idPrefix>-n1".., scenarios "<idPrefix>-s1"..; stage, segment,
+   * PoU and learn ids extend their scenario/stage id as in the authored content.
+   */
+  idPrefix: string;
+  /** The authored training library, so the generator can recommend existing trainings. */
+  trainings: Training[];
+}
+
+/** A generated path. pack must pass validateCareerPack() from @pw/content; jobs must pass validateJobs(). */
+export interface GeneratedPath {
+  pack: CareerPack;
+  /** 5 fictional jobs for this path (careerId = pack.career.id). */
+  jobs: Job[];
+  /** Ids from GeneratePathInput.trainings worth adding to the learner's library (3-8). */
+  recommendedTrainingIds: string[];
+  /** Which engine actually produced it (live calls fall back to practice on error). */
+  engine: "live" | "practice";
+}
+
 export interface AiEngine {
-  /** "live" when Claude credentials are configured, otherwise deterministic "mock" (practice mode). */
+  /** "live" when model credentials are configured, otherwise deterministic "mock" (practice mode). */
   readonly mode: "live" | "mock";
+  /** Which provider serves live calls. "practice" when mode is "mock". */
+  readonly provider: "gemini" | "anthropic" | "practice";
   readonly models: { quality: string; fast: string };
+
+  /** Builds a personal career path (3 projects, companies, managers, jobs) tailored to the request. Never throws. */
+  generatePath(i: GeneratePathInput): Promise<GeneratedPath>;
 
   checkNote(i: { scenario: Scenario; segment: KickoffSegment; text: string; tier?: ModelTier }): Promise<Omit<NoteVerdict, "xp">>;
 
@@ -93,7 +126,19 @@ export interface AiEngine {
   gradePresentation(i: { scenario: Scenario; stage: Stage; input: PresentationInput; priorEvaluations: Evaluation[] }): Promise<GradeResult>;
 
   /** Onboarding step machine. Must return the next view; never throws for user input. */
-  ftuxTurn(i: { session: FtuxSession; turn: FtuxTurn; user: User; careers: Career[]; scenarios: Scenario[] }): Promise<{ view: FtuxView; memory: Record<string, unknown>; board: Partial<VisionBoard>; careerId?: string }>;
+  /**
+   * careers/scenarios/companies include the learner's generated path when one exists. When the learner picks
+   * the custom path (CUSTOM_CAREER_ID), the core generates it first and then calls ftuxTurn with
+   * turn.careerId set to the generated career's id.
+   */
+  ftuxTurn(i: {
+    session: FtuxSession;
+    turn: FtuxTurn;
+    user: User;
+    careers: Career[];
+    scenarios: Scenario[];
+    companies: Company[];
+  }): Promise<{ view: FtuxView; memory: Record<string, unknown>; board: Partial<VisionBoard>; careerId?: string }>;
   ftuxStart(i: { sessionId: string; user: User }): FtuxView;
 
   coachReply(i: { user: User; history: ChatMessage[]; message: string; progressSummary: string }): Promise<string>;
@@ -138,6 +183,8 @@ export interface ServerContext {
   ai: AiEngine;
   verifyToken(token: string): Promise<{ userId: string } | null>;
   getUser(userId: string): User | null;
+  /** Resolves a scenario (authored or this learner's generated path) with its company and manager. */
+  resolveScenario(userId: string, scenarioId: string): { scenario: Scenario; company: Company; npc: Npc } | null;
   getObjective(userId: string, objectiveId: string): Objective | null;
   saveObjective(userId: string, objective: Objective): void;
   /** Debits credits for an AI action. ok=false when the balance is insufficient (nothing debited). */

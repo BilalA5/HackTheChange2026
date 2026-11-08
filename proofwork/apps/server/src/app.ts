@@ -45,7 +45,8 @@ export async function buildServer(opts: BuildOptions = {}): Promise<FastifyInsta
   mkdirSync(paths.uploadsDir, { recursive: true });
   mkdirSync(paths.screenshotsDir, { recursive: true });
 
-  const app = Fastify({ logger: opts.logger ?? false, bodyLimit: 12 * 1024 * 1024 });
+  // Path generation can take 30-90 s with a live model, so the server allows up to 180 s per request.
+  const app = Fastify({ logger: opts.logger ?? false, bodyLimit: 12 * 1024 * 1024, connectionTimeout: 200_000, requestTimeout: 200_000 });
   const content = buildContentIndex(opts.content ?? (await loadDefaultContent()));
   const ai = opts.ai ?? createAiEngine();
   const db = openDatabase(dbPath);

@@ -5,6 +5,7 @@ import { notify } from "./services/notifications.ts";
 import { awardXp } from "./services/progress.ts";
 import { findObjective, findObjectiveByScenario, saveObjective } from "./services/objective-store.ts";
 import { findUser } from "./services/users.ts";
+import { contentFor } from "./user-content.ts";
 import { userIdFromToken } from "./services/auth.ts";
 import type { Core } from "./types.ts";
 
@@ -16,6 +17,7 @@ export function createServerContext(core: Core): ServerContext {
       return userId ? { userId } : null;
     },
     getUser: (userId) => findUser(core.db, userId),
+    resolveScenario: (userId, scenarioId) => contentFor(core, userId).resolveScenario(scenarioId) ?? null,
     getObjective: (userId, objectiveId) => findObjective(core.db, userId, objectiveId),
     saveObjective: (userId, objective) => saveObjective(core.db, userId, objective),
     debit: (userId, action, reason) => debit(core, userId, action, reason),

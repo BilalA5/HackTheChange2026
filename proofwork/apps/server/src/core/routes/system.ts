@@ -9,6 +9,7 @@ export function registerSystemRoutes(api: FastifyInstance, core: Core): void {
   api.get("/health", { config: { public: true } }, async () => ({
     ok: true as const,
     aiMode: core.ai.mode,
+    provider: core.ai.provider,
     models: core.ai.models,
     version: SERVER_VERSION,
   }));
