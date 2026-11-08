@@ -1,5 +1,5 @@
 import { lines } from '../content.js';
-import { Wordmark } from '../components/brand.jsx';
+import Wordmark from '@/shared/Wordmark.jsx';
 import WorldMap from '../components/WorldMap.jsx';
 
 const captionGlass = {

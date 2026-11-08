@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { Wordmark } from '../components/brand.jsx';
+import Wordmark from '@/shared/Wordmark.jsx';
 import { GuideCursor, TurnHint } from '../components/hints.jsx';
 import { BriefcaseIcon } from '../components/icons.jsx';
 import WorldMap from '../components/WorldMap.jsx';

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { IMG } from '../content.js';
 import { useTour } from '../tour.js';
-import { Wordmark } from '../components/brand.jsx';
+import Wordmark from '@/shared/Wordmark.jsx';
 import { SoundControls } from '../components/controls.jsx';
 import { CheckIcon, GoogleIcon } from '../components/icons.jsx';
 

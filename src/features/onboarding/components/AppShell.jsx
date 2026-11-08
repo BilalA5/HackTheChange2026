@@ -1,5 +1,6 @@
 import { learner } from '../content.js';
-import { Avatar, Wordmark } from './brand.jsx';
+import Wordmark from '@/shared/Wordmark.jsx';
+import { Avatar } from './brand.jsx';
 import { SoundIcon } from './icons.jsx';
 
 const tabs = ['For you', 'Jobs', 'Inbox', 'Portfolio'];
