@@ -78,8 +78,8 @@ export default function FirstScenario() {
       <LevelBadge />
       <button
         type="button"
-        onClick={() => finish('/app/scenarios/airbnb-host-cancellations')}
-        aria-label="Open your first scenario"
+        onClick={() => finish('/app')}
+        aria-label="Go to your board"
         className="absolute left-[847px] top-[453px] h-[168px] w-[166px] rounded-[24px] shadow-[inset_0_0_0_1.5px_rgba(255,255,255,.85)] transition hover:bg-white/10"
       />
       <TurnHint className="pointer-events-none absolute left-[928px] top-[402px] -translate-x-1/2" />
