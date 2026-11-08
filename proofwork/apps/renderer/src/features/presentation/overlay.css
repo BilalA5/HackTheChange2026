@@ -1,0 +1,31 @@
+/* Overlay window drag regions. Used by the camera bubble and the record bar. */
+.pw-drag {
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.pw-nodrag {
+  -webkit-app-region: no-drag;
+}
+
+@keyframes pw-rec-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.8);
+  }
+}
+
+.pw-rec-dot {
+  animation: pw-rec-pulse 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pw-rec-dot {
+    animation: none;
+  }
+}
