@@ -1,32 +1,17 @@
 # Task workspace
 
-A dark three-column task workspace, served at `/workspace`: the task brief on the left, a chat with the manager
-in the middle and the meeting notes viewer on the right. It is laid out for a 1710 x 1074 viewport;
-`docs/reference/workspace/` has the target screenshot.
+The scenario workspace, served at `/app/scenarios/:scenarioId`: the brief on the left, the chat with the manager
+and the coach in the middle, and the meeting notes on the right. Its content comes from the scenario's file in
+`src/data/scenarios/`. `docs/reference/workspace/` has the original target screenshot.
 
 ## Files
 
-- `WorkspacePage.jsx`: the three-column layout and the notes panel toggle.
-- `TopBar.jsx`: back button, level chip and the four progress badges.
-- `Sidebar.jsx`: the project, its requirements and the resources.
-- `Chat.jsx`: the conversation with the manager and the time options.
-- `NotesViewer.jsx`: the meeting notes document with zoom, reset and download.
-- `content.js`: all copy and data.
+- `ScenarioPage.jsx`: loads the scenario, holds both conversations and runs Submit for review.
+- `TopBar.jsx`: back button, level and the four skill badges, filled in after a review.
+- `Sidebar.jsx`: the task, its requirements, the resources and Submit for review.
+- `ChatPanel.jsx`: manager and coach tabs, messages, typing, "Try saying" lines and the composer.
+- `ReviewCard.jsx`: the manager's review with skill scores.
+- `useConversation.js`: one saved conversation with a persona.
+- `NotesViewer.jsx`: the meeting notes with zoom, reset and download.
 - `icons.jsx`: the line icons.
 - `workspace.css`: colour tokens, fades and list bullets, scoped to the route.
-
-## What works
-
-- Requirement rows open and close.
-- "Meeting notes" under Project resources reopens the notes panel, and the panel's back arrow closes it.
-- The notes viewer zooms from 50% to 200%, resets, and downloads the notes as Markdown.
-- The time options are selectable, and the GitHub link opens in a new tab.
-- The chat opens scrolled to the write-up card.
-- The back button returns to the landing page.
-
-## Approximations
-
-- Fonts: Google Sans, DM Sans and Geist Mono from Google Fonts.
-- Below 1280px the three columns stack.
-- A few pieces are placeholder copy: the bullets inside the three closed requirements, and the hidden "Stack"
-  section at the bottom of the notes.

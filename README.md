@@ -2,13 +2,17 @@
 
 Learn a job by doing it. Flint is a Vite + React app with three parts:
 
-| Route               | What it is                                                           | Docs                                     |
-| ------------------- | -------------------------------------------------------------------- | ---------------------------------------- |
-| `/`                 | The landing page                                                     | [docs/landing.md](docs/landing.md)       |
-| `/onboarding/:step` | "How Flint works", a 13-screen tour from sign-in to a first scenario | [docs/onboarding.md](docs/onboarding.md) |
-| `/workspace`        | A task workspace: brief, chat with the manager and meeting notes     | [docs/workspace.md](docs/workspace.md)   |
+| Route                        | What it is                                                           | Docs                                     |
+| ---------------------------- | -------------------------------------------------------------------- | ---------------------------------------- |
+| `/`                          | The landing page                                                     | [docs/landing.md](docs/landing.md)       |
+| `/login`                     | Log in with a name and email                                         | [docs/app.md](docs/app.md)               |
+| `/onboarding/:step`          | "How Flint works", the tour a new learner sees after logging in      | [docs/onboarding.md](docs/onboarding.md) |
+| `/app`                       | The world: every scenario on a map, with its manager and coach       | [docs/app.md](docs/app.md)               |
+| `/app/scenarios/:scenarioId` | The workspace: brief, chat with the manager and coach, meeting notes | [docs/workspace.md](docs/workspace.md)   |
+| `/app/portfolio`             | Reviewed projects and skill scores                                   | [docs/app.md](docs/app.md)               |
 
-The landing page's Start key and Enter Flint open the tour, and the tour's last screen opens the workspace.
+Landing → login → tour (first time only) → app. Everything after login is stored in the browser for now; see
+[docs/app.md](docs/app.md) for where the backend plugs in.
 
 ## Run
 
@@ -19,13 +23,13 @@ pnpm dev
 
 Open http://localhost:3000.
 
-| Script         | Does                                |
-| -------------- | ----------------------------------- |
+| Script         | Does                               |
+| -------------- | ---------------------------------- |
 | `pnpm dev`     | Starts the dev server on port 3000 |
-| `pnpm build`   | Builds to `dist/`                   |
+| `pnpm build`   | Builds to `dist/`                  |
 | `pnpm preview` | Serves the build on port 3000      |
-| `pnpm lint`    | Runs ESLint                         |
-| `pnpm format`  | Formats with Prettier               |
+| `pnpm lint`    | Runs ESLint                        |
+| `pnpm format`  | Formats with Prettier              |
 
 ## Layout
 
@@ -37,9 +41,13 @@ src/
   shared/useAppTheme.js scopes each app's page styles to its route
   styles/               Tailwind base and font faces
   features/
+    app/          world, portfolio and the app layout
+    auth/         login, session and the signed-in guard
     landing/
     onboarding/
-    workspace/
+    workspace/    the scenario workspace
+  data/scenarios/       scenarios, with their manager and coach
+  services/             auth, chat, progress and conversations (the backend seam)
 public/assets/          images, fonts, films and voice clips
 docs/                   notes per feature and reference screenshots
 ```
