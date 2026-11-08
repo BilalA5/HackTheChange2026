@@ -9,76 +9,13 @@ import {
   PinIcon,
   PlayIcon,
   ResetIcon,
-  Sparkle,
-  badgeGlyphs,
 } from './icons.jsx';
-import { badges, durations, manager, notes, project, requirements } from './content.js';
+import { durations, manager, notes, project, requirements } from './content.js';
+import TopBar from './TopBar.jsx';
 import './workspace.css';
 
 const FONTS =
   'https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=Geist+Mono:wght@400;500;600&display=swap';
-
-/* --------------------------------------------------------------- top bar */
-
-function ProgressBadge({ glyph, progress, label }) {
-  const r = 12.2;
-  const c = 2 * Math.PI * r;
-  return (
-    <div className="relative h-[27px] w-[27px]" title={`${label}: ${Math.round(progress * 100)}%`}>
-      <svg className="absolute inset-0 -rotate-90" viewBox="0 0 27 27" aria-hidden="true">
-        <circle cx="13.5" cy="13.5" r={r} fill="none" stroke="#262626" strokeWidth="2.4" />
-        <circle
-          cx="13.5"
-          cy="13.5"
-          r={r}
-          fill="none"
-          stroke="var(--ring)"
-          strokeWidth="2.4"
-          strokeLinecap="round"
-          strokeDasharray={`${c * progress} ${c}`}
-        />
-      </svg>
-      <div className="badge-face absolute inset-[2px] flex items-center justify-center rounded-full text-[#c8c7c5]">
-        <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
-          {badgeGlyphs[glyph]}
-        </svg>
-      </div>
-      <span className="sr-only">
-        {label}, {Math.round(progress * 100)} percent
-      </span>
-    </div>
-  );
-}
-
-function TopBar() {
-  return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex h-[54px] items-center justify-between pl-[19px] pr-[16px]">
-      <button
-        type="button"
-        aria-label="Back"
-        className="pointer-events-auto flex h-[26px] w-[26px] items-center justify-center rounded-md text-[#b9b9b9] hover:bg-white/5 hover:text-white"
-      >
-        <ChevronLeft />
-      </button>
-      <div className="pointer-events-auto flex items-center gap-[7px]">
-        <div className="flex h-[31px] items-center gap-[6px] rounded-full border border-[#303030] bg-[var(--chip)] pl-[13px] pr-[15px]">
-          <Sparkle />
-          <span className="text-[15px] font-medium text-[#f1f1f1]">L1</span>
-        </div>
-        <div className="flex h-[33px] items-center gap-[3px] rounded-full bg-gradient-to-b from-[#252525] to-[#292929] pl-[3.5px]">
-          {badges.map((b) => (
-            <ProgressBadge key={b.glyph} {...b} />
-          ))}
-          <img
-            src="/assets/workspace/avatar-user.png"
-            alt="Your profile"
-            className="ml-[3px] h-[34px] w-[34px] rounded-full object-cover"
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
 
 /* --------------------------------------------------------------- sidebar */
 
