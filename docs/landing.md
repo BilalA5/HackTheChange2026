@@ -1,94 +1,41 @@
-# Flint landing page
+# Landing page
 
-The Flint landing page, in React + Tailwind. It started as a recreation of the
-learnwithzero.com landing page, built from
-the full-page capture in `reference/` (3400x23922 at 2x, so 1700px wide).
+The Flint landing page, served at `/`. Source: `src/features/landing/`.
 
-## Run
+## Sections
 
-```sh
-pnpm install
-pnpm dev
-```
-
-Open http://127.0.0.1:30000. Build for production with `pnpm build`.
-`~/Desktop/screen2code/start-all.sh` also starts it, along with the other projects.
-
-## How it was made
-
-The local screenshot-to-code generator was unavailable: its Codex usage limit
-resets on Nov 18, 2026. The page was written by hand instead.
-
-The full-page capture could not be used as-is:
-
-- **The fixed dock was copied over the content.** The capture tool repeated the
-  Start bar about 15 times, and it covers the role cards and the step windows.
-- **The scroll animations never ran.** The capture shows empty stretches where
-  the hero line, the "5,000+ companies" screen and the "You learn. We match."
-  stage should be.
-
-So the artwork, copy and data come from the live site at learnwithzero.com.
-
-- **Artwork and media:** images, the font, role posters, the films of the 7
-  popular roles, and Navid's voice lines.
-- **Text and data:** the role list, fields, tool icons and the Ask Flint answers,
-  parsed as text from the site's script and never run.
-
-The team and coach windows are screenshots of the live prototypes
-(`/protos/team.html` and `/protos/workspace.html`), taken by
-`.runtime/zero-shoot-protos.py`. Everything else is written from scratch.
-
-Helper scripts are in `~/Desktop/screen2code/.runtime/`:
-
-- `zero-build-data.py` regenerates `src/data.js` from a saved copy of the
-  site's script.
-- `zero-shots.py` screenshots each stage of the page while scrolling. Pass a
-  width and height for other sizes, for example `zero-shots.py 390 844`.
-
-## What it does
-
-- **Hero:** the pale city with the Flint mark. Scrolling zooms into the mark
-  until its black fills the screen. Then "5,000+ companies hiring in our talent
-  network." appears, over two rows of company wordmarks drifting in opposite
-  directions.
-- **Roles:**
+- **Hero** (`Hero.jsx`): the pale city with the Flint mark. Scrolling zooms into the mark until its black fills
+  the screen, then "5,000+ companies hiring in our talent network." appears over two rows of company wordmarks
+  drifting in opposite directions.
+- **Roles** (`Roles.jsx`):
   - The row of cards holds still and scrolls sideways as you scroll down.
   - The field tabs filter the roles.
-  - Hovering a popular role plays its film, and the speaker button turns its
-    sound on.
-  - Clicking a card turns it over to show what you ship, the tools, and a Start
-    button for that role.
-- **Learn the job by doing it:**
+  - Hovering a popular role plays its film, and the speaker button turns its sound on.
+  - Clicking a card turns it over to show what you ship, the tools, and a Start button for that role.
+- **Learn the job by doing it** (`Learn.jsx`):
   - The title stays at the top while four steps pass under it.
   - Its words change colour from grey to green to ink as you scroll.
   - A line is drawn down a rail beside each step's title.
-- **You learn. We match.:** ten companies pop in on either side of a portfolio,
-  joined to it by lines, while a Level counter rolls from 1 to 10.
-- **Built to get you hired.:** the same colour wave, with an offer letter that
-  opens between "you" and "hired." and is signed at the end.
-- **Footer:** Flint World. Colour spreads out from the centre as it scrolls in.
-- **Dock:** fixed at the bottom of the screen.
-  - Start opens learnwithzero.com.
-  - The menu has Home, Letters and Why Flint.
-  - "?" opens Ask Flint, which answers typed questions from the site's FAQ by
-    keyword.
-- **Narration:** every round avatar plays Navid's voice line for that section.
-  Only one plays at a time.
+- **You learn. We match.** (`Match.jsx`): ten companies pop in on either side of a portfolio, joined to it by
+  lines, while a Level counter rolls from 1 to 10.
+- **Built to get you hired.** (`End.jsx`): the same colour wave, with an offer letter that opens between "you"
+  and "hired." and is signed at the end.
+- **Footer** (`End.jsx`): Flint World. Colour spreads out from the centre as it scrolls in, and Enter Flint
+  opens the onboarding tour.
+- **Dock** (`Dock.jsx`): fixed at the bottom of the screen.
+  - Start opens the onboarding tour.
+  - The menu has Home, How Flint works and Workspace.
+  - "?" opens Ask Flint, which answers typed questions from `faq.js` by keyword.
+- **Narration** (`ui.jsx`): every round avatar plays the guide's voice line for that section. Only one plays at
+  a time.
 
-## Differences from the live site
+## Data
 
-- The name is Flint, and the mark is an original Flint stone with a spark
-  (`public/assets/brand/flint-mark.svg`). Zero's mark is not used.
-- The live site draws the hero pulse and the footer colour spread with WebGL.
-  Here they are CSS: a zoom with a black fade, and a growing radial mask.
-- The live team and coach windows are running prototype pages. Here they are
-  still screenshots, so the live coach is Jessica as she appears today, which
-  is not the same coach as in your capture.
-- The live site uses Lenis smooth scrolling. This page uses native scrolling.
-- The links to LinkedIn, Instagram and X go to each site's home page, because
-  the capture doesn't show Zero's profile addresses.
-- The Start key's credits counter and the job cards on the footer map are not
-  included.
+- `data.js`: the role catalogue (fields, posters, films and tools).
+- `faq.js`: the Ask Flint questions, answers and the keywords that match them.
 
-The images, films, voice clips and copy belong to Zero. Keep this recreation
-private unless Zero agrees to it being published.
+## Notes
+
+- The hero pulse and the footer colour spread are CSS: a zoom with a black fade, and a growing radial mask.
+- The team and coach windows are still screenshots (`public/assets/protos/`).
+- Scrolling is native; the scroll-driven effects use the hooks in `hooks.js`.
