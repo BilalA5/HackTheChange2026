@@ -125,6 +125,7 @@ function CoworkSession({ client, npc, onRestart, onOpenCredits }: CoworkSessionP
       let started = false;
       tts.speak(m.text, {
         voice: npc.voice,
+        speaker: npc.avatarSeed,
         onStart: () => {
           started = true;
         },

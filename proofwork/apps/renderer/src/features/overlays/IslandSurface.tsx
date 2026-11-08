@@ -83,6 +83,8 @@ export default function IslandSurface() {
     if (!client) return;
     const offText = client.on("text_response", (m) => {
       speak(m.text, {
+        voice: payload?.npcVoice,
+        speaker: payload?.npcAvatarSeed,
         onStart: () => setSpeaking(true),
         onEnd: () => {
           setSpeaking(false);

@@ -54,7 +54,8 @@ export function TrainingPlayer({ training, initial, saveProgress, onExit }: Trai
     speakingRef.current = true;
     setSpeaking(true);
     tts.speak(plainBody, {
-      voice: { rate: speed },
+      voice: { rate: speed, style: "feminine" },
+      speaker: "coach",
       onStart: () => setSpeaking(true),
       onEnd: () => {
         speakingRef.current = false;

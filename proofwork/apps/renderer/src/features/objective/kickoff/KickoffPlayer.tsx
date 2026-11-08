@@ -2,7 +2,7 @@ import { useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from
 import { Pause, Play, RotateCcw } from "lucide-react";
 import type { KickoffSegment, Objective, ScenarioDetail } from "@pw/shared";
 import { api } from "@/lib/api";
-import { cancel, estimateDurationSec, speak } from "@/lib/voice/tts";
+import { cancel, estimateDurationSec, prefetch, speak } from "@/lib/voice/tts";
 import { Button, IconButton } from "@/components/ui/Button";
 import { MonoLabel } from "@/components/ui/Labels";
 import { formatClock } from "@/components/ui/Timer";
@@ -138,6 +138,7 @@ export function KickoffPlayer({ scenario, objective, prefs, replay = false, onOb
     setAudioDone(false);
     speak(text, {
       voice: { ...voice, rate: voice.rate * speed },
+      speaker: scenario.npc.avatarSeed,
       onEnd: () => {
         if (runRef.current === run) setAudioDone(true);
       },
@@ -146,7 +147,12 @@ export function KickoffPlayer({ scenario, objective, prefs, replay = false, onOb
       runRef.current += 1;
       cancel();
     };
-  }, [ticking, segmentText, speed, voice, state.epoch]);
+  }, [ticking, segmentText, speed, voice, state.epoch, scenario.npc.avatarSeed]);
+
+  // Fetch the opening lines of this segment's narration ahead of play, so the voice starts without a wait.
+  useEffect(() => {
+    if (segmentText) prefetch(segmentText, { voice, speaker: scenario.npc.avatarSeed });
+  }, [segmentText, voice, scenario.npc.avatarSeed]);
 
   const timeUp = segment !== undefined && elapsedSec >= durationSec;
   const speechDone = audioDone || elapsedSec >= durationSec + NARRATION_GRACE_SEC;

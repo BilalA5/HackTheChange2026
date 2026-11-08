@@ -53,6 +53,7 @@ export function VoiceBubble({ side, name, avatarSeed, text, voice, durationSec, 
     }
     speak(text, {
       voice,
+      speaker: avatarSeed ?? name,
       onStart: () => setSpeaking(true),
       onEnd: () => setSpeaking(false),
     });

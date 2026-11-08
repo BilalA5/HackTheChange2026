@@ -191,6 +191,7 @@ export default function StagePage() {
     scenarioTitle: scenario.title,
     npcName: npc.name,
     npcAvatarSeed: npc.avatarSeed,
+    npcVoice: npc.voice,
   };
   const toggleItem = (id: string) => {
     void saveChecklist(checklist.map((it) => (it.id === id ? { ...it, done: !it.done } : it)));

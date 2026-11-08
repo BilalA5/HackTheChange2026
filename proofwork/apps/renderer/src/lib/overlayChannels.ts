@@ -1,6 +1,6 @@
 // Cross-window message channels (pw.overlay.broadcast / onMessage) and overlay payload shapes.
 // Shared contract between the main-window features (stage, presentation) and the overlay surfaces.
-import type { CoworkTodo, NormRect, StageMode } from "@pw/shared";
+import type { CoworkTodo, NormRect, NpcVoice, StageMode } from "@pw/shared";
 
 /** Payload for the "pip" (stage companion), "island" (co-worker dynamic island) and "cowork" (highlight canvas) overlays. */
 export interface StageOverlayPayload {
@@ -13,6 +13,8 @@ export interface StageOverlayPayload {
   scenarioTitle: string;
   npcName: string;
   npcAvatarSeed: string;
+  /** The manager's voice, so the island speaks with the same natural voice as the kickoff. */
+  npcVoice?: NpcVoice;
 }
 
 /** Payload for the "recordbar" and "camera" overlays during a presentation. */
