@@ -1,9 +1,8 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
+import { Link } from 'react-router';
 import { roles, sections } from './data.js';
 import { useStickyProgress } from './hooks.js';
 import { Flame, Narrator, SpeakerIcon, TrendUp } from './ui.jsx';
-
-const APP_URL = 'https://learnwithzero.com';
 
 function Tag({ tag }) {
   if (!tag) return null;
@@ -129,14 +128,12 @@ function RoleCard({ role }) {
               </span>
             ))}
           </div>
-          <a
-            href={APP_URL}
-            target="_blank"
-            rel="noreferrer"
+          <Link
+            to="/onboarding"
             className="mt-4 flex h-11 items-center justify-center rounded-[13px] bg-[#111] text-[15px] text-white hover:bg-black"
           >
             Start as {role.title}
-          </a>
+          </Link>
         </div>
       </div>
     </li>
