@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useTour } from '../tour.js';
 import { Avatar, WordmarkChip } from '../components/brand.jsx';
-import { SoundControls } from '../components/controls.jsx';
+import { ContinueButton, SoundControls } from '../components/controls.jsx';
 import { CANVAS } from '../canvas.js';
 
 const MIN_LOOP_SIZE = 90;
@@ -88,6 +88,7 @@ export default function DrawToEnter() {
           className="transition-[stroke] duration-300"
         />
       </svg>
+      <ContinueButton label="Skip" onClick={next} />
       <SoundControls />
     </div>
   );

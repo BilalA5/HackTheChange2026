@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { lines } from '../content.js';
+import { useTour } from '../tour.js';
 import { Avatar, WordmarkChip } from '../components/brand.jsx';
-import { SoundControls } from '../components/controls.jsx';
+import { ContinueButton, SoundControls } from '../components/controls.jsx';
 import { CameraIcon, CheckIcon, MicIcon, ScreenIcon } from '../components/icons.jsx';
 
 const permissions = [
@@ -36,6 +37,7 @@ function PermissionKey({ label, Icon, on, onToggle }) {
 }
 
 export default function WelcomeBack() {
+  const { next } = useTour();
   const [enabled, setEnabled] = useState(() => new Set());
 
   const toggle = (id) =>
@@ -57,6 +59,7 @@ export default function WelcomeBack() {
           <PermissionKey key={id} label={label} Icon={Icon} on={enabled.has(id)} onToggle={() => toggle(id)} />
         ))}
       </div>
+      <ContinueButton onClick={next} />
       <SoundControls />
     </div>
   );

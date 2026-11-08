@@ -1,6 +1,8 @@
 import { lines } from '../content.js';
 import Wordmark from '@/shared/Wordmark.jsx';
+import { ContinueButton } from '../components/controls.jsx';
 import WorldMap from '../components/WorldMap.jsx';
+import { useTour } from '../tour.js';
 
 const captionGlass = {
   background: 'rgba(14,14,16,.74)',
@@ -11,6 +13,8 @@ const captionGlass = {
 };
 
 export default function YourWorld() {
+  const { next } = useTour();
+
   return (
     <WorldMap>
       <div className="absolute left-[32px] top-[26px] drop-shadow-[0_2px_10px_rgba(0,0,0,.35)]">
@@ -22,6 +26,7 @@ export default function YourWorld() {
       >
         {lines.scenarios}
       </p>
+      <ContinueButton onClick={next} />
     </WorldMap>
   );
 }
