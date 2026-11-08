@@ -27,8 +27,8 @@ function ProfileCard() {
             Dubai
           </div>
           <p className="m-0 mt-[13px] text-[11.5px] leading-[1.45] text-[#3b3b40]">
-            I design the parts of a product people touch every day. On Flint I take real briefs from real companies,
-            show my thinking at every step, and keep what the manager says.
+            I design the parts of a product people touch every day. On Flint I take real briefs from real companies
+            and show my thinking at every step.
           </p>
           <div className="mt-[8px] text-[11.5px] text-[#55555b]">See more</div>
           <div className="mt-[19px] flex items-center gap-[11px] text-[11.5px]">
