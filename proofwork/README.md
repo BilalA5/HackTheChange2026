@@ -69,6 +69,20 @@ Without a key the server runs in **practice mode**. A deterministic engine grade
 
 Graders use structured JSON output. The co-worker streams text and uses one-shot tools (`set_todos`, `highlight`, `share_resource`, `award_xp`) with screenshots as vision input.
 
+### Voices
+
+Managers, the co-worker and lessons speak with a natural voice model instead of the robotic system voice. The renderer sends each sentence-sized clip to `POST /api/tts`, plays the WAV it gets back, and fetches the next clip while the current one plays (kickoff narration is prefetched before you press play).
+
+| Engine | When it is used | Notes |
+|---|---|---|
+| **Gemini TTS** (`PW_GEMINI_TTS_MODEL`, default `gemini-3.8-flash-tts`) | First, when `GEMINI_API_KEY` is set and has credits | Paid per line, cached after the first play |
+| **Kokoro-82M** (local) | When Gemini is not set up or fails | An open-weight neural voice model run on the CPU with onnxruntime (about 5x faster than real time on Apple silicon). It downloads once (about 330 MB) into `apps/server/data/models` on first start; free and offline after that |
+| System voice | When the server cannot speak, or **Settings → Voice → Natural voices** is off | The Mac's built-in `speechSynthesis` |
+
+Every manager keeps one voice: authored managers have a voice style, generated managers get one from the model (or from their name pool in practice mode), and the exact voice is chosen from that style and the manager's id. Clips are cached on disk in `apps/server/data/tts-cache`. A billing, auth or rate-limit error skips Gemini for ten minutes, so playback never waits on a failing provider. `PW_TTS_PROVIDER=auto|gemini|kokoro|off` and `PW_KOKORO_DTYPE=fp32|q8` override the defaults.
+
+When live AI calls fail (for example, the Gemini credits run out), `GET /api/health` reports `degraded` with the reason, the coach panel says it is using offline replies, and live calls pause for two minutes before trying again.
+
 ### How a personal path is generated
 
 1. **Outline** (quality model, low thinking): the career, 3 fictional companies, 3 managers and 3 project outlines with key facts and stage titles, tailored to the learner's role, level, industry, company type, location, timeline, why and background.
@@ -106,7 +120,7 @@ Key design points:
 | Command | What it covers |
 |---|---|
 | `npm run typecheck` | All 5 packages (TypeScript 7) |
-| `npm test` | 360 tests: content validator (3); server (106: core and the full learning loop against SQLite, personal paths, websocket protocols, the Gemini client against a fake API, the live path generator with a scripted model, and the practice generator across 16 roles); renderer (251) |
+| `npm test` | 373 tests: content validator (3); server (116: core and the full learning loop against SQLite, personal paths, websocket protocols, the Gemini client against a fake API, the live path generator with a scripted model, the practice generator across 16 roles, voices and the TTS route, and the degraded status); renderer (254) |
 | `PW_LIVE_TESTS=1 npx tsx --test apps/server/test/ai-live.test.ts` | Opt-in smoke test against the real Gemini API: one structured call and one full personal path (about 40 seconds) |
 | `npm run e2e:api` | Walks a new learner through the entire loop against a running server (practice mode). `PW_E2E_PATH=custom` uses a generated path instead of an authored one |
 | `npm run smoke` | Boots Electron with hidden windows and checks the bridge in all 9 windows, the cache, encrypted session storage, capture permission, STT helper status and the renderer server |
@@ -125,7 +139,7 @@ This builds the renderer and runs `electron-builder --mac --dir` (`apps/desktop/
 ## What is simulated or left out
 
 - **Payments**: plan changes and top-ups only change the local ledger.
-- **Speech**: on-device recognition needs you to grant Speech Recognition permission (macOS asks on first use); until then the app offers typed answers. Text-to-speech uses the system voices.
+- **Speech**: on-device recognition needs you to grant Speech Recognition permission (macOS asks on first use); until then the app offers typed answers. Text-to-speech uses Gemini TTS or the local Kokoro model, and the system voice only as a last resort.
 - **Camera recording**: needs camera and microphone permission. Framing is a lighting and centre check, not face detection.
 - **Not included**: cloud voice (LiveKit, Deepgram, ElevenLabs), real job boards and browser automation. The assist-apply flow drafts answers for you to review and never submits anything.
 - **Practice mode**: grading is keyword- and evidence-based, and offline paths come from templates. It is good for demos and offline use, but not a substitute for the live model.
