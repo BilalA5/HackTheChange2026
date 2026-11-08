@@ -1,3 +1,5 @@
+import { videos } from '@/data/videos.js';
+
 export default {
   id: 'shopify-price-recommender',
   company: 'Shopify',
@@ -169,6 +171,8 @@ export default {
       ],
     },
   ],
+
+  videos: [videos.shopifyKickoff],
 
   resources: ['Pricing Pilot Merchant Feedback'],
 

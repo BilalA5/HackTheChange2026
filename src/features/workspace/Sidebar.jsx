@@ -1,5 +1,5 @@
 import { useId, useState } from 'react';
-import { ChevronDown, DocIcon } from './icons.jsx';
+import { ChevronDown, DocIcon, PlayIcon } from './icons.jsx';
 
 function Requirement({ item, open, onToggle }) {
   const panelId = useId();
@@ -67,7 +67,16 @@ const submitLabels = {
   done: 'Reviewed · Submit again',
 };
 
-export default function Sidebar({ scenario, notesOpen, onOpenNotes, reviewStatus = 'idle', onSubmit, next, onNext }) {
+export default function Sidebar({
+  scenario,
+  pane,
+  onOpenNotes,
+  onOpenVideo,
+  reviewStatus = 'idle',
+  onSubmit,
+  next,
+  onNext,
+}) {
   const [openRequirements, setOpenRequirements] = useState(() => new Set([0]));
 
   const toggle = (index) =>
@@ -101,7 +110,12 @@ export default function Sidebar({ scenario, notesOpen, onOpenNotes, reviewStatus
           </section>
 
           <ResourceSection label="Project resources">
-            <ResourceRow icon={<DocIcon />} onClick={onOpenNotes} active={notesOpen}>
+            {scenario.videos?.map((video) => (
+              <ResourceRow key={video.id} icon={<PlayIcon />} onClick={() => onOpenVideo(video)} active={pane === video}>
+                {video.title}
+              </ResourceRow>
+            ))}
+            <ResourceRow icon={<DocIcon />} onClick={onOpenNotes} active={pane === 'notes'}>
               Meeting notes
             </ResourceRow>
           </ResourceSection>

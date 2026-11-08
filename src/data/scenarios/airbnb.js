@@ -1,3 +1,5 @@
+import { videos } from '@/data/videos.js';
+
 export default {
   id: 'airbnb-host-cancellations',
   company: 'Airbnb',
@@ -137,6 +139,8 @@ export default {
       ],
     },
   ],
+
+  videos: [videos.airbnbKickoff],
 
   resources: ['Cancellations by reason.csv'],
 

@@ -12,6 +12,7 @@ import ChatPanel from './ChatPanel.jsx';
 import NotesViewer from './NotesViewer.jsx';
 import Sidebar from './Sidebar.jsx';
 import TopBar from './TopBar.jsx';
+import VideoPane from './VideoPane.jsx';
 import { useConversation } from './useConversation.js';
 import './workspace.css';
 
@@ -30,7 +31,12 @@ function ScenarioWorkspace({ scenario, next }) {
     coach: useConversation({ scenario, persona: 'coach', userId: user.id }),
   };
   const [active, setActive] = useState(params.get('with') === 'coach' ? 'coach' : 'manager');
-  const [notesOpen, setNotesOpen] = useState(true);
+  const [pane, setPane] = useState(() => scenario.videos?.[0] ?? 'notes');
+  const [autoPlay, setAutoPlay] = useState(false);
+  const openVideo = (video) => {
+    setAutoPlay(true);
+    setPane(video);
+  };
   const [reviewStatus, setReviewStatus] = useState(finished ? 'done' : 'idle');
 
   const submitForReview = async () => {
@@ -59,14 +65,15 @@ function ScenarioWorkspace({ scenario, next }) {
       <TopBar onBack={() => navigate('/app')} level={progress.level} scores={finished?.scores} userName={user.name} />
       <main
         className={`grid gap-y-8 px-4 pb-6 xl:h-full xl:gap-y-0 xl:pb-0 xl:pl-[17px] xl:pr-[14px] ${
-          notesOpen ? 'xl:grid-cols-[278px_minmax(0,1fr)_minmax(0,600px)]' : 'xl:grid-cols-[278px_minmax(0,1fr)]'
+          pane ? 'xl:grid-cols-[278px_minmax(0,1fr)_minmax(0,600px)]' : 'xl:grid-cols-[278px_minmax(0,1fr)]'
         }`}
       >
         <div className="xl:h-full xl:min-h-0">
           <Sidebar
             scenario={scenario}
-            notesOpen={notesOpen}
-            onOpenNotes={() => setNotesOpen(true)}
+            pane={pane}
+            onOpenNotes={() => setPane('notes')}
+            onOpenVideo={openVideo}
             reviewStatus={reviewStatus}
             onSubmit={submitForReview}
             next={next}
@@ -76,9 +83,13 @@ function ScenarioWorkspace({ scenario, next }) {
         <div className="h-[760px] min-h-0 xl:h-full">
           <ChatPanel conversations={conversations} active={active} onSelect={setActive} />
         </div>
-        {notesOpen && (
+        {pane && (
           <div className="h-[760px] min-h-0 xl:h-full xl:pb-[14px] xl:pt-[122px]">
-            <NotesViewer scenario={scenario} onClose={() => setNotesOpen(false)} />
+            {pane === 'notes' ? (
+              <NotesViewer scenario={scenario} onClose={() => setPane(null)} />
+            ) : (
+              <VideoPane video={pane} autoPlay={autoPlay} onClose={() => setPane('notes')} />
+            )}
           </div>
         )}
       </main>

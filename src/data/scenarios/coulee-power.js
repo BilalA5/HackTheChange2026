@@ -1,3 +1,5 @@
+import { videos } from '@/data/videos.js';
+
 export default {
   id: 'coulee-power-price-drop',
   company: 'Coulee Power',
@@ -157,6 +159,8 @@ export default {
       ],
     },
   ],
+
+  videos: [videos.couleePowerKickoff, videos.poolPrice],
 
   resources: ['AESO market statistics 2024', 'AESO market statistics 2025'],
 
