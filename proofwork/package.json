@@ -1,0 +1,30 @@
+{
+  "name": "proofwork",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n server,web,desktop -c blue,magenta,green \"npm:dev:server\" \"npm:dev:web\" \"npm:dev:desktop\"",
+    "dev:server": "npm run dev -w @pw/server",
+    "dev:web": "npm run dev -w @pw/renderer",
+    "dev:desktop": "npm run dev -w @pw/desktop",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "build": "npm run build -w @pw/renderer && npm run build -w @pw/desktop",
+    "stt:build": "bash native/stt-helper/build.sh",
+    "e2e:api": "tsx scripts/e2e-api.ts",
+    "smoke": "npm run smoke -w @pw/desktop",
+    "dist": "npm run build -w @pw/renderer && npm run dist -w @pw/desktop"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "concurrently": "^10.0.7",
+    "prettier": "^3.9.10",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}
