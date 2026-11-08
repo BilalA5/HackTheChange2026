@@ -1,4 +1,4 @@
-import React from 'react';
+import { Link } from 'react-router';
 import { ease, range, useViewProgress } from './hooks.js';
 import { WaveLine } from './Learn.jsx';
 import { Mark, Narrator } from './ui.jsx';
@@ -82,17 +82,14 @@ export function Footer() {
       <div className="absolute left-1/2 top-[52%] -translate-x-1/2 -translate-y-1/2">
         <span className="dome-ripple absolute left-1/2 top-1/2 h-[180px] w-[180px] rounded-full border border-white/80" aria-hidden="true" />
         <span className="dome-ripple absolute left-1/2 top-1/2 h-[180px] w-[180px] rounded-full border border-white/60 [animation-delay:1.4s]" aria-hidden="true" />
-        <a
-          href="https://learnwithzero.com"
-          target="_blank"
-          rel="noreferrer"
+        <Link
+          to="/onboarding"
           className="relative flex items-center gap-2.5 rounded-full bg-white/85 py-2.5 pl-3 pr-5 text-[16px] tracking-[-0.01em] text-[#111] shadow-[0_14px_34px_-14px_rgba(0,0,0,0.5)] backdrop-blur transition-transform hover:scale-[1.03]"
         >
           <Mark className="h-7 w-7" />
           Enter Flint
-        </a>
+        </Link>
       </div>
-
     </footer>
   );
 }
