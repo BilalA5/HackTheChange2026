@@ -4,7 +4,7 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
 
 export default [
-  { ignores: ['dist', 'public', 'data', 'tools'] },
+  { ignores: ['dist', 'public', 'data', 'tools', 'convex/_generated'] },
   js.configs.recommended,
   {
     files: ['**/*.{js,jsx}'],

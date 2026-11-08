@@ -5,3 +5,5 @@ dist
 generation-events.json
 *.log
 .eslintcache
+
+.env.local
