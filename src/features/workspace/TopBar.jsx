@@ -1,3 +1,4 @@
+import InitialsAvatar from '@/shared/InitialsAvatar.jsx';
 import { ChevronLeft, Sparkle } from './icons.jsx';
 
 const badgeGlyphs = {
@@ -23,14 +24,6 @@ const badges = [
   { glyph: 'chat', skill: 'communication', label: 'Communication' },
   { glyph: 'shield', skill: 'reliability', label: 'Reliability' },
 ];
-
-const initialsOf = (name) =>
-  name
-    .split(/\s+/)
-    .map((part) => part[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
 
 const RADIUS = 12.2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
@@ -84,12 +77,7 @@ export default function TopBar({ onBack, level = 1, scores = {}, userName = '' }
           {badges.map(({ glyph, skill, label }) => (
             <ProgressBadge key={glyph} glyph={glyph} label={label} progress={scores[skill] ?? 0} />
           ))}
-          <span
-            title={userName}
-            className="ml-[3px] grid h-[34px] w-[34px] place-items-center rounded-full bg-[#3a3a3a] text-[12.5px] font-semibold text-white"
-          >
-            {initialsOf(userName)}
-          </span>
+          <InitialsAvatar name={userName} size={34} className="ml-[3px]" />
         </div>
       </div>
     </div>
