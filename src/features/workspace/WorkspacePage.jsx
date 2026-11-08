@@ -1,4 +1,9 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
+import { useAppTheme } from '@/shared/useAppTheme.js';
+import './workspace.css';
+
+const FONTS =
+  'https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=Geist+Mono:wght@400;500;600&display=swap';
 
 /* ------------------------------------------------------------------ icons */
 
@@ -635,10 +640,14 @@ function NotesViewer({ onClose }) {
 
 /* ------------------------------------------------------------------- app */
 
-export default function App() {
+export default function WorkspacePage() {
+  useAppTheme('workspace');
   const [notesOpen, setNotesOpen] = useState(true);
   return (
     <div className="relative min-h-full bg-[var(--page)] xl:h-full xl:overflow-hidden">
+      <title>Task workspace · Flint</title>
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+      <link rel="stylesheet" href={FONTS} precedence="default" />
       <div className="absolute inset-x-0 top-0 h-[2px] bg-black" aria-hidden="true" />
       <TopBar />
       <main
