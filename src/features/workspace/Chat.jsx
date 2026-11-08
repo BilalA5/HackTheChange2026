@@ -67,10 +67,9 @@ export default function Chat() {
           <div className="mt-[38px]">
             <ManagerBubble>
               <p>
-                Sparse is a cutoff you choose. Count how many weeks of sales each product has, then set a minimum
-                number of weeks, say 8, and any product with fewer weeks of data gets sparse = True. Pick the number
-                yourself and write one sentence in the overview note on why that cutoff makes sense for a model to
-                learn from.
+                Sparse is a cutoff you choose. Count how many weeks of sales each product has, then set a minimum number
+                of weeks, say 8, and any product with fewer weeks of data gets sparse = True. Pick the number yourself
+                and write one sentence in the overview note on why that cutoff makes sense for a model to learn from.
               </p>
               <p className="mt-[21px]">What cutoff are you going with, and what is the reason?</p>
             </ManagerBubble>
@@ -122,8 +121,8 @@ export default function Chat() {
             </p>
             <p className="mt-[3px] text-[14.5px] leading-[21.3px] tracking-[-0.008em] text-[#ededed]">
               So basically I took your flag categories such as Sparse is based on what we've seen for a given selected
-              week and how minimal it is. As well as if we've ONLY ever seen 1 price of something that is a
-              single-price flag conditioned to True.
+              week and how minimal it is. As well as if we've ONLY ever seen 1 price of something that is a single-price
+              flag conditioned to True.
             </p>
           </article>
         </div>

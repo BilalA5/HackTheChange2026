@@ -90,12 +90,7 @@ export default function Sidebar({ notesOpen, onOpenNotes }) {
             <h3 className="eyebrow leading-[14px]">Requirements</h3>
             <div className="mt-[17px] pb-[17px]">
               {requirements.map((item, i) => (
-                <Requirement
-                  key={item.title}
-                  item={item}
-                  open={openRequirements.has(i)}
-                  onToggle={() => toggle(i)}
-                />
+                <Requirement key={item.title} item={item} open={openRequirements.has(i)} onToggle={() => toggle(i)} />
               ))}
             </div>
           </section>

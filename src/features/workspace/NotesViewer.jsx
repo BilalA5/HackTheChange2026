@@ -30,7 +30,9 @@ function NotesDocument() {
         </p>
       </div>
       <div className="mt-[11px] h-[2px] bg-[#111]" />
-      <h3 className="mt-[4px] text-[29px] font-bold leading-[34px] tracking-[-0.025em] text-[#151515]">Meeting notes</h3>
+      <h3 className="mt-[4px] text-[29px] font-bold leading-[34px] tracking-[-0.025em] text-[#151515]">
+        Meeting notes
+      </h3>
       {notes.map(({ heading, items }, i) => (
         <section key={heading} className={i === 0 ? 'mt-[25px]' : 'mt-[26px]'}>
           <h4 className="text-[10px] font-bold uppercase leading-[14px] tracking-[0.2em] text-[#8a8a8a]">{heading}</h4>
@@ -82,7 +84,11 @@ export default function NotesViewer({ onClose }) {
         <p className="ml-[13px] flex-1 font-mono-ui text-[11px] uppercase tracking-[0.18em] text-[#a8a8a8]">
           Meeting notes
         </p>
-        <ToolbarButton label="Download meeting notes" onClick={downloadNotes} className="h-[24px] w-[24px] text-[#a9a9a9]">
+        <ToolbarButton
+          label="Download meeting notes"
+          onClick={downloadNotes}
+          className="h-[24px] w-[24px] text-[#a9a9a9]"
+        >
           <DownloadIcon />
         </ToolbarButton>
       </header>
