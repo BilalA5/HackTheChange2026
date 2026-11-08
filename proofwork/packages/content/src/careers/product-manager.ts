@@ -61,7 +61,7 @@ const pack: CareerPack = {
       companyId: "harbourmeal",
       personality:
         "Direct and numbers first. She asks what would change your mind before she asks what you recommend, and she cuts short any story that never reaches a decision. She has been burned by roadmaps built on survey quotes, so she wants the sample size before the insight.",
-      voice: { rate: 1.0, pitch: 1.05 },
+      voice: { rate: 1.0, pitch: 1.05, style: "feminine" },
       avatarSeed: "nadia-brennan",
     },
     {
@@ -71,7 +71,7 @@ const pack: CareerPack = {
       companyId: "ledgerlark",
       personality:
         "Calm, careful and deeply aware of regulators. He will challenge any idea that trades customer trust for conversion, and he always asks what the stop condition is. He speaks slowly, pauses before he pushes back, and gives credit when a plan is honest about its risks.",
-      voice: { rate: 0.94, pitch: 0.9 },
+      voice: { rate: 0.94, pitch: 0.9, style: "masculine" },
       avatarSeed: "mateo-ruiz",
     },
     {
@@ -81,7 +81,7 @@ const pack: CareerPack = {
       companyId: "quillbox",
       personality:
         "Energetic, commercial and quick. She thinks in tradeoffs between revenue, sales velocity and roadmap focus, and she wants the recommendation in the first minute. She respects a PM who admits uncertainty but gets impatient with vague answers.",
-      voice: { rate: 1.06, pitch: 1.12 },
+      voice: { rate: 1.06, pitch: 1.12, style: "feminine" },
       avatarSeed: "corinne-adeyemi",
     },
   ],

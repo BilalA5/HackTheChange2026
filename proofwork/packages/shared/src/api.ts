@@ -11,11 +11,13 @@ import type {
   Evaluation,
   FtuxTurn,
   FtuxView,
+  IsoDate,
   Job,
   JobApplication,
   NoteSection,
   NoteVerdict,
   NotificationItem,
+  NpcVoice,
   Objective,
   OtaInfo,
   Portfolio,
@@ -67,12 +69,43 @@ export interface BugReportInput {
  * Route map. Key = "METHOD /path" (path relative to /api, `:param` placeholders).
  * `body` = JSON request body, `query` = query string, `res` = JSON response.
  */
+export type TtsEngineName = "gemini" | "kokoro";
+
+export interface TtsRequest {
+  text: string;
+  /** The speaker's voice settings; style picks the voice family. */
+  voice?: Partial<Pick<NpcVoice, "style" | "voiceName">>;
+  /** Stable speaker id (an NPC avatar seed) so each character keeps one voice. */
+  speaker?: string;
+}
+
+export interface AiDegraded {
+  reason: "billing" | "auth" | "rate_limit" | "error";
+  message: string;
+  since: IsoDate;
+}
+
 export interface ApiRoutes {
   // ── health / auth ──
   /** PUBLIC */
   "GET /health": {
-    res: { ok: true; aiMode: "live" | "mock"; provider: "gemini" | "anthropic" | "practice"; models: { quality: string; fast: string }; version: string };
+    res: {
+      ok: true;
+      aiMode: "live" | "mock";
+      provider: "gemini" | "anthropic" | "practice";
+      models: { quality: string; fast: string };
+      /** Set while live calls are failing (for example the provider's credits ran out); replies come from practice. */
+      degraded: AiDegraded | null;
+      /** Natural voice engines in order of preference; empty means the renderer uses the system voice. */
+      tts: { engines: TtsEngineName[] };
+      version: string;
+    };
   };
+  /**
+   * Speech for `text` (max 600 characters) as audio/wav. The x-tts-engine response header names the engine that
+   * spoke. Binary, so the renderer calls it with fetch rather than the JSON client. 503 when no engine can speak.
+   */
+  "POST /tts": { body: TtsRequest; res: Blob };
   /** PUBLIC. Local auth: email + display name, no password (dev product). Creates the user on first login. */
   "POST /auth/login": { body: { email: string; name?: string }; res: AuthResponse };
   /** PUBLIC. Begins the browser → deep-link login. Returns the URL the desktop opens in the system browser. */

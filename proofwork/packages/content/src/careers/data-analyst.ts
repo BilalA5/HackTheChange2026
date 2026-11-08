@@ -58,7 +58,7 @@ const npcs: Npc[] = [
     companyId: "pulseline-studio",
     personality:
       "Priya is warm but exacting and speaks in short, direct sentences. She cares most about whether a number would survive a skeptical product manager, so she will ask you to define a metric before she looks at it. She rewards clean reasoning far more than clever queries.",
-    voice: { rate: 1.0, pitch: 1.08 },
+    voice: { rate: 1.0, pitch: 1.08, style: "feminine" },
     avatarSeed: "priya-raman",
   },
   {
@@ -68,7 +68,7 @@ const npcs: Npc[] = [
     companyId: "hearthmark-market",
     personality:
       "Dev is dry, funny and deliberate, and he often opens with a question. He protects sellers and will push hard on fairness and on anything that moves fees. He wants a memo a busy executive can read in five minutes, with the caveats stated up front.",
-    voice: { rate: 0.94, pitch: 0.9 },
+    voice: { rate: 0.94, pitch: 0.9, style: "masculine" },
     avatarSeed: "dev-halvorsen",
   },
   {
@@ -78,7 +78,7 @@ const npcs: Npc[] = [
     companyId: "larkfield-grocers",
     personality:
       "Ruth is brisk and operational, the kind of person who has walked a store floor at 5 a.m. She thinks in cases, pallets and out-of-stocks, and gets impatient with abstract accuracy scores. She wants you to explain what a forecast miss costs a store in lost sales or spoiled produce.",
-    voice: { rate: 1.04, pitch: 1.12 },
+    voice: { rate: 1.04, pitch: 1.12, style: "feminine" },
     avatarSeed: "ruth-abernathy",
   },
 ];

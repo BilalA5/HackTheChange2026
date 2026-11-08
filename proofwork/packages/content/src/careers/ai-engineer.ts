@@ -58,7 +58,7 @@ const pack: CareerPack = {
       companyId: "kettle-commerce",
       personality:
         "Ines is direct, warm and a little impatient with vague plans. She talks in short, numbered points, asks for concrete numbers, and she always wants to know what happens when the model is wrong. She cares most about merchants never losing money because of an automated mistake.",
-      voice: { rate: 1.02, pitch: 1.05 },
+      voice: { rate: 1.02, pitch: 1.05, style: "feminine" },
       avatarSeed: "ines-okafor-kc",
     },
     {
@@ -68,7 +68,7 @@ const pack: CareerPack = {
       companyId: "maplewood-toys",
       personality:
         "Tomas speaks slowly and precisely, and he likes to ask why before he asks how. He pushes back gently on any answer that is not backed by a page number or a measurement. He cares about children's safety above all, and he would rather see a refusal than a confident guess.",
-      voice: { rate: 0.94, pitch: 0.9 },
+      voice: { rate: 0.94, pitch: 0.9, style: "masculine" },
       avatarSeed: "tomas-lindqvist-mt",
     },
     {
@@ -78,7 +78,7 @@ const pack: CareerPack = {
       companyId: "larkspur-travel",
       personality:
         "Dana is upbeat, quick and fond of analogies, but she gets very focused when money or personal data is involved. She asks for thresholds and gate definitions, and she wants your reasoning more than your tooling. She cares that every prompt change is measured before it reaches a traveler.",
-      voice: { rate: 1.07, pitch: 1.12 },
+      voice: { rate: 1.07, pitch: 1.12, style: "feminine" },
       avatarSeed: "dana-whitfield-lt",
     },
   ],

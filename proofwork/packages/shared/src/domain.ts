@@ -44,6 +44,8 @@ export interface NpcVoice {
   voiceName?: string;
   rate: number;
   pitch: number;
+  /** Which family of natural (model) voices the character speaks with. Unset: chosen from the avatar seed. */
+  style?: "feminine" | "masculine";
 }
 
 /** AI manager / teammate character. */
@@ -220,7 +222,8 @@ export interface UserSettings {
   theme: "system" | "light" | "dark";
   sounds: { enabled: boolean; volume: number };
   notifications: Record<NotificationCategory, boolean> & { osDelivery: boolean };
-  voice: { stt: "apple" | "typed"; ttsEnabled: boolean; ttsRate: number };
+  /** ttsNatural: speak with the server's voice model (Gemini or Kokoro) instead of the system voice. */
+  voice: { stt: "apple" | "typed"; ttsEnabled: boolean; ttsRate: number; ttsNatural: boolean };
   aiModel: "quality" | "fast";
   devices: { cameraId?: string; micId?: string; speakerId?: string };
   privacy: { shareAnalytics: boolean; storeRecordings: boolean };
