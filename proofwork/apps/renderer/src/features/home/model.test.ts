@@ -2,8 +2,12 @@ import { describe, expect, it } from "vitest";
 import type { Job, ObjectivePhase, ScenarioCard } from "@pw/shared";
 import { scenarios } from "@pw/content";
 import {
+  GENERATED_DECORATIVE_LIMIT,
+  careerNodeFor,
   careerScenarios,
   cycleIndex,
+  decorativeCards,
+  decorativeLimitFor,
   defaultScenarioId,
   draftFromVision,
   eligibleJobCount,
@@ -87,14 +91,54 @@ describe("selection and ordering", () => {
 });
 
 describe("mergeScenarioCards", () => {
-  it("covers every content scenario and prefers API cards", () => {
+  it("keeps the learner's API cards first and adds the authored scenarios they do not cover", () => {
     const apiCard = card({ id: scenarios[0].id, status: "in_progress", objectiveId: "o9", careerId: scenarios[0].careerId });
     const merged = mergeScenarioCards([apiCard]);
+    expect(merged[0]).toBe(apiCard);
+    expect(merged.filter((c) => c.id === scenarios[0].id)).toHaveLength(1);
     expect(merged).toHaveLength(scenarios.length);
-    expect(merged.find((c) => c.id === scenarios[0].id)).toBe(apiCard);
-    const other = merged.find((c) => c.careerId !== scenarios[0].careerId);
-    expect(other?.status).toBe("locked");
-    expect(other?.objectiveId).toBeNull();
+    const decorative = merged.find((c) => c.id === scenarios[1].id);
+    expect(decorative?.status).toBe("locked");
+    expect(decorative?.objectiveId).toBeNull();
+  });
+
+  it("never draws an authored scenario the learner already has a card for", () => {
+    const own = scenarios.slice(0, 3).map((s) => card({ id: s.id, careerId: s.careerId }));
+    const decorative = decorativeCards(own);
+    const ownIds = new Set(own.map((c) => c.id));
+    expect(decorative.some((c) => ownIds.has(c.id))).toBe(false);
+    expect(decorative).toHaveLength(scenarios.length - 3);
+  });
+
+  it("caps decorative buildings on a generated path", () => {
+    const generated = [
+      card({ id: "g-own-1", careerId: "g-me-1", order: 1, status: "available" }),
+      card({ id: "g-own-2", careerId: "g-me-1", order: 2, status: "locked" }),
+      card({ id: "g-own-3", careerId: "g-me-1", order: 3, status: "locked" }),
+    ];
+    const merged = mergeScenarioCards(generated, { limit: GENERATED_DECORATIVE_LIMIT });
+    const decorative = merged.slice(generated.length);
+    expect(decorative.length).toBe(Math.min(GENERATED_DECORATIVE_LIMIT, scenarios.length));
+    expect(decorative.every((c) => !c.id.startsWith("g-own"))).toBe(true);
+  });
+
+  it("uses the limit only for generated careers", () => {
+    expect(decorativeLimitFor({ generated: true })).toBe(GENERATED_DECORATIVE_LIMIT);
+    expect(decorativeLimitFor({ generated: false })).toBeUndefined();
+    expect(decorativeLimitFor(undefined)).toBeUndefined();
+  });
+});
+
+describe("careerNodeFor", () => {
+  const careers = [{ id: "ai-engineer", title: "AI Engineer", color: "#7B6CF6" }];
+
+  it("uses the learner's career title and colour", () => {
+    expect(careerNodeFor(careers, "ai-engineer")).toEqual({ title: "AI Engineer", color: "#7B6CF6" });
+  });
+
+  it("falls back while careers load, and is null without a career", () => {
+    expect(careerNodeFor([], "g-me-1")).toEqual({ title: "Career", color: "var(--color-accent)" });
+    expect(careerNodeFor(careers, null)).toBeNull();
   });
 });
 

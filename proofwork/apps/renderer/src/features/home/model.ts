@@ -1,5 +1,5 @@
 // Pure view-model helpers for the Home screen. Safe to unit test.
-import type { Company, Job, Npc, ObjectivePhase, Scenario, ScenarioCard, ScenarioStatus, VisionBoard } from "@pw/shared";
+import type { Career, Company, Job, Npc, ObjectivePhase, Scenario, ScenarioCard, ScenarioStatus, VisionBoard } from "@pw/shared";
 import { getCompany, getNpc, scenarios as contentScenarios } from "@pw/content";
 
 export interface ObjectiveRouteInput {
@@ -48,26 +48,54 @@ export function placeholderCard(s: Scenario, company: Company, npc: Npc): Scenar
   };
 }
 
+/** A generated path shows at most this many decorative authored buildings, so the map is not crowded. */
+export const GENERATED_DECORATIVE_LIMIT = 6;
+
+export interface DecorativeOptions {
+  /** Authored scenarios to pick from. Defaults to @pw/content. */
+  content?: readonly Scenario[];
+  /** Upper bound on decorative buildings. Omit for no limit. */
+  limit?: number;
+}
+
 /**
- * Every scenario on the map. Cards from the API win (they carry learner status). Scenarios the API
- * did not return (other careers, or while loading) come from content as locked placeholders.
+ * Authored scenarios drawn as dimmed decorative buildings. Only scenarios the learner does not have
+ * a card for are used, so a learner's own companies are never duplicated.
  */
-export function mergeScenarioCards(apiCards: readonly ScenarioCard[], content: readonly Scenario[] = contentScenarios): ScenarioCard[] {
-  const byId = new Map(apiCards.map((c) => [c.id, c] as const));
+export function decorativeCards(apiCards: readonly ScenarioCard[], options: DecorativeOptions = {}): ScenarioCard[] {
+  const { content = contentScenarios, limit = Number.POSITIVE_INFINITY } = options;
+  const ownIds = new Set(apiCards.map((c) => c.id));
   const out: ScenarioCard[] = [];
   for (const s of content) {
-    const api = byId.get(s.id);
-    if (api) {
-      out.push(api);
-      continue;
-    }
+    if (out.length >= limit) break;
+    if (ownIds.has(s.id)) continue;
     const company = getCompany(s.companyId);
     const npc = getNpc(s.npcId);
     if (!company || !npc) continue;
     out.push(placeholderCard(s, company, npc));
   }
-  for (const c of apiCards) if (!out.some((o) => o.id === c.id)) out.push(c);
   return out;
+}
+
+/**
+ * Every building on the map. The learner's cards from the API come first and carry their status.
+ * Authored scenarios the learner does not have follow as decorative, dimmed buildings.
+ */
+export function mergeScenarioCards(apiCards: readonly ScenarioCard[], options: DecorativeOptions = {}): ScenarioCard[] {
+  return [...apiCards, ...decorativeCards(apiCards, options)];
+}
+
+/** Decorative limit for a learner's career: generated paths get a short list, authored ones show all. */
+export function decorativeLimitFor(career: Pick<Career, "generated"> | null | undefined): number | undefined {
+  return career?.generated === true ? GENERATED_DECORATIVE_LIMIT : undefined;
+}
+
+/** Title and colour for the career node in the timeline. Falls back while GET /careers is loading. */
+export function careerNodeFor(careers: readonly Pick<Career, "id" | "title" | "color">[], careerId: string | null): { title: string; color: string } | null {
+  if (!careerId) return null;
+  const found = careers.find((c) => c.id === careerId);
+  if (found) return { title: found.title, color: found.color };
+  return { title: "Career", color: "var(--color-accent)" };
 }
 
 /** Cards for one career, in project order. */

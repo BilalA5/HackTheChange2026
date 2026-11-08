@@ -1,8 +1,7 @@
-import { useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router";
 import { Briefcase, Check, Download, Link2, Lock, Pencil, X } from "lucide-react";
 import type { Portfolio, PortfolioProject } from "@pw/shared";
-import { getCompany, getScenario } from "@pw/content";
 import { CompanyGlyph, PerformanceBadge, XpChip } from "@/components/domain";
 import { Button, EmptyState, GlassCard, IconButton, Input, Pill, Skeleton, Textarea, toast } from "@/components/ui";
 import { api, useApi } from "@/lib/api";
@@ -12,6 +11,8 @@ import { companyInitials } from "./careerHelpers";
 
 /** Public share host shown in the copied link. Preview only: the link is not live yet. */
 const SHARE_ORIGIN = "https://proofwork.app/p/";
+/** Fallback glyph colour when a project's company is not on the learner's cards. */
+const ACCENT = "var(--color-accent)";
 
 const RESUME_CSS = `
 .pw-resume { display: none; }
@@ -27,6 +28,12 @@ export default function PortfolioPage() {
   const navigate = useNavigate();
   const name = useSession((s) => s.user?.name ?? "");
   const portfolio = useApi("GET /portfolio");
+  // Project glyphs take their colour from the learner's scenario cards. Unknown projects use the accent.
+  const scenariosRes = useApi("GET /scenarios");
+  const colors = useMemo(
+    () => new Map((scenariosRes.data ?? []).map((c) => [c.id, c.company.color] as const)),
+    [scenariosRes.data],
+  );
 
   if (portfolio.loading && !portfolio.data) {
     return (
@@ -58,7 +65,7 @@ export default function PortfolioPage() {
     return <LockedPortfolio onBack={() => navigate("/")} />;
   }
 
-  return <UnlockedPortfolio name={name} portfolio={data} onChange={portfolio.mutate} />;
+  return <UnlockedPortfolio name={name} portfolio={data} colors={colors} onChange={portfolio.mutate} />;
 }
 
 // ───────────────────────────── locked ─────────────────────────────
@@ -91,7 +98,17 @@ function LockedPortfolio({ onBack }: { onBack: () => void }) {
 
 // ───────────────────────────── unlocked ─────────────────────────────
 
-function UnlockedPortfolio({ name, portfolio, onChange }: { name: string; portfolio: Portfolio; onChange: (next: Portfolio) => void }) {
+function UnlockedPortfolio({
+  name,
+  portfolio,
+  colors,
+  onChange,
+}: {
+  name: string;
+  portfolio: Portfolio;
+  colors: ReadonlyMap<string, string>;
+  onChange: (next: Portfolio) => void;
+}) {
   const shareUrl = `${SHARE_ORIGIN}${portfolio.shareSlug}`;
 
   const saveField = async (patch: { headline?: string; bio?: string }) => {
@@ -174,7 +191,7 @@ function UnlockedPortfolio({ name, portfolio, onChange }: { name: string; portfo
         ) : (
           <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(300px,1fr))]">
             {portfolio.projects.map((p) => (
-              <ProjectCard key={p.scenarioId} project={p} />
+              <ProjectCard key={p.scenarioId} project={p} color={colors.get(p.scenarioId) ?? ACCENT} />
             ))}
           </div>
         )}
@@ -185,10 +202,8 @@ function UnlockedPortfolio({ name, portfolio, onChange }: { name: string; portfo
   );
 }
 
-function ProjectCard({ project }: { project: PortfolioProject }) {
-  const scenario = getScenario(project.scenarioId);
-  const company = scenario ? getCompany(scenario.companyId) : undefined;
-  const glyph = company ?? { name: project.company, glyph: companyInitials(project.company), color: "#3A3D46" };
+function ProjectCard({ project, color }: { project: PortfolioProject; color: string }) {
+  const glyph = { name: project.company, glyph: companyInitials(project.company), color };
   const completed = new Date(project.completedAt);
   return (
     <GlassCard className="flex flex-col gap-3">

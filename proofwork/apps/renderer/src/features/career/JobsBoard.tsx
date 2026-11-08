@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Job } from "@pw/shared";
-import { careers } from "@pw/content";
-import { Badge, GlassCard, Pill, Select, Skeleton, Switch, EmptyState } from "@/components/ui";
+import { Badge, Button, GlassCard, Pill, Select, Skeleton, Switch, EmptyState } from "@/components/ui";
+import { useApi } from "@/lib/api";
 import { useSession } from "@/stores/session";
 import { companyInitials, filterJobs, jobEligible } from "./careerHelpers";
 
@@ -15,6 +15,8 @@ interface JobsBoardProps {
 /** Filters and job cards. The default career is the learner's own career. */
 export function JobsBoard({ jobs, level, loading, onOpen }: JobsBoardProps) {
   const userCareer = useSession((s) => s.user?.careerId ?? null);
+  const careersRes = useApi("GET /careers");
+  // Default to the learner's own career, generated or not. The title comes from GET /careers.
   const [careerId, setCareerId] = useState<string>(userCareer ?? "all");
   const [remoteOnly, setRemoteOnly] = useState(false);
   const [eligibleOnly, setEligibleOnly] = useState(false);
@@ -24,13 +26,27 @@ export function JobsBoard({ jobs, level, loading, onOpen }: JobsBoardProps) {
     [jobs, careerId, remoteOnly, eligibleOnly, level],
   );
 
-  const careerOptions = [{ value: "all", label: "All careers" }, ...careers.map((c) => ({ value: c.id, label: c.title }))];
+  const careerOptions = useMemo(
+    () => [
+      { value: "all", label: "All careers" },
+      ...(careersRes.data ?? []).map((c) => ({ value: c.id, label: c.generated ? `${c.title} (your path)` : c.title })),
+    ],
+    [careersRes.data],
+  );
 
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-end gap-5">
         <div className="w-[240px]">
           <Select label="Career" options={careerOptions} value={careerId} onValueChange={setCareerId} />
+          {careersRes.error && (
+            <div role="alert" className="mt-2 flex items-center gap-2 text-[12px] text-danger">
+              <span>Could not load careers.</span>
+              <Button variant="ghost" size="sm" onClick={careersRes.reload}>
+                Try again
+              </Button>
+            </div>
+          )}
         </div>
         <Switch checked={remoteOnly} onCheckedChange={setRemoteOnly} label="Remote only" />
         <Switch checked={eligibleOnly} onCheckedChange={setEligibleOnly} label="Eligible only" />

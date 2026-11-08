@@ -2,7 +2,6 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router";
 import { JOB_PORTAL_UNLOCK_SCENARIOS } from "@pw/shared";
-import { getCareer } from "@pw/content";
 import { useApi } from "@/lib/api";
 import { useSession } from "@/stores/session";
 import { useUi } from "@/stores/ui";
@@ -13,8 +12,10 @@ import { WorldMap } from "./WorldMap";
 import { ScenarioCarousel } from "./ScenarioCarousel";
 import { TimelineDock } from "./TimelineDock";
 import {
+  careerNodeFor,
   careerScenarios,
   cycleIndex,
+  decorativeLimitFor,
   defaultScenarioId,
   isJobPortalUnlocked,
   mergeScenarioCards,
@@ -69,8 +70,15 @@ export default function HomePage() {
 
   const scenariosQ = useApi("GET /scenarios", careerId ? {} : null, [careerId]);
   const progressQ = useApi("GET /progress");
+  const careersQ = useApi("GET /careers");
 
-  const cards = useMemo(() => mergeScenarioCards(scenariosQ.data ?? []), [scenariosQ.data]);
+  const career = useMemo(() => careersQ.data?.find((c) => c.id === careerId) ?? null, [careersQ.data, careerId]);
+  const careerNode = careerNodeFor(careersQ.data ?? [], careerId);
+
+  const cards = useMemo(
+    () => mergeScenarioCards(scenariosQ.data ?? [], { limit: decorativeLimitFor(career) }),
+    [scenariosQ.data, career],
+  );
   const careerList = useMemo(
     () => (scenariosQ.data ? careerScenarios(cards, careerId) : []),
     [cards, careerId, scenariosQ.data],
@@ -156,7 +164,7 @@ export default function HomePage() {
       {careerList.length > 0 && (
         <div className="absolute bottom-5 left-1/2 -translate-x-1/2">
           <TimelineDock
-            career={careerId ? getCareer(careerId) ?? null : null}
+            career={careerNode}
             cards={careerList}
             selectedId={selectedId}
             onSelect={select}

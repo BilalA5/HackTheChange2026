@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { Lock } from "lucide-react";
 import type { Job, JobApplication } from "@pw/shared";
-import { getJob } from "@pw/content";
 import { Button, EmptyState, GlassCard, ProgressBar, Skeleton, Tabs, Pill } from "@/components/ui";
 import { useApi } from "@/lib/api";
 import { useProgress } from "@/stores/progress";
@@ -63,7 +62,7 @@ export default function JobsPage() {
     return <LockedJobs completed={progress?.completedScenarios ?? 0} loaded={progress !== null} error={progressError} onBack={() => navigate("/")} />;
   }
 
-  const sheetJob = sheet ? jobById.get(sheet.jobId) ?? getJob(sheet.jobId) : undefined;
+  const sheetJob = sheet ? jobById.get(sheet.jobId) : undefined;
 
   return (
     <div className="flex flex-col gap-6 p-8">
