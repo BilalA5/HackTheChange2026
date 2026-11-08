@@ -1,0 +1,223 @@
+@import "tailwindcss";
+@import "@fontsource-variable/inter/index.css";
+@import "@fontsource-variable/jetbrains-mono/index.css";
+@import "@fontsource-variable/fraunces/index.css";
+
+/* ───────────── Tokens (docs/DESIGN.md). Use these classes; never raw hex in components. ───────────── */
+@theme {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, monospace;
+  --font-serif: "Fraunces Variable", Georgia, serif;
+
+  --color-accent: #7b6cf6;
+  --color-accent-hover: #8f82ff;
+  --color-xp: #f5c451;
+  --color-success: #3dd68c;
+  --color-warning: #f2a33a;
+  --color-danger: #f0605d;
+
+  --color-ink: #1a1b1f;
+  --color-muted: #6b6a66;
+  --color-paper: #f4f1ea;
+  --color-paper-card: #ffffff;
+
+  --color-night: #17181c;
+  --color-night-2: #1e1f25;
+  --color-glass: rgba(18, 20, 26, 0.72);
+  --color-line: rgba(255, 255, 255, 0.08);
+
+  /* Extra tokens (not in the list above, used by the city map and theme-aware text). */
+  --color-water: #0e3b43;
+  --color-sand: #e9d8b4;
+  --color-muted-dark: #9ba0aa;
+  /* Theme-aware text: switched by .theme-night / .theme-paper below. */
+  --color-fg: var(--c-fg);
+  --color-fg-muted: var(--c-fg-muted);
+  --color-fg-line: var(--c-line);
+  /* Theme-aware form field fills. */
+  --color-field: var(--c-field);
+  --color-field-hover: var(--c-field-hover);
+  --color-field-focus: var(--c-field-focus);
+
+  --radius-card: 22px;
+  --radius-glass: 28px;
+}
+
+/* Theme contexts. Dark is the default. Wrap paper screens in .theme-paper. */
+:root,
+.theme-night {
+  --c-fg: #f4f5f7;
+  --c-fg-muted: #9ba0aa;
+  --c-line: rgba(255, 255, 255, 0.08);
+  --c-field: rgba(255, 255, 255, 0.06);
+  --c-field-hover: rgba(255, 255, 255, 0.08);
+  --c-field-focus: rgba(255, 255, 255, 0.1);
+  /* Re-resolve the theme tokens here: custom properties that reference other variables are computed
+     where they are declared, so @theme's :root values would otherwise leak into nested themes. */
+  --color-fg: var(--c-fg);
+  --color-fg-muted: var(--c-fg-muted);
+  --color-fg-line: var(--c-line);
+  --color-line: var(--c-line);
+  --color-field: var(--c-field);
+  --color-field-hover: var(--c-field-hover);
+  --color-field-focus: var(--c-field-focus);
+  color-scheme: dark;
+}
+.theme-paper {
+  --c-fg: #1a1b1f;
+  --c-fg-muted: #6b6a66;
+  --c-line: rgba(26, 27, 31, 0.1);
+  --c-field: rgba(26, 27, 31, 0.04);
+  --c-field-hover: rgba(26, 27, 31, 0.06);
+  --c-field-focus: #ffffff;
+  /* Re-resolve the theme tokens here: custom properties that reference other variables are computed
+     where they are declared, so @theme's :root values would otherwise leak into nested themes. */
+  --color-fg: var(--c-fg);
+  --color-fg-muted: var(--c-fg-muted);
+  --color-fg-line: var(--c-line);
+  --color-line: var(--c-line);
+  --color-field: var(--c-field);
+  --color-field-hover: var(--c-field-hover);
+  --color-field-focus: var(--c-field-focus);
+  color-scheme: light;
+}
+
+/* ───────────── Base ───────────── */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  background: var(--color-night);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  overflow: hidden;
+}
+
+/* Overlay surfaces: transparent so the desktop shows through. Main window keeps its background. */
+html[data-surface]:not([data-surface="main"]),
+html[data-surface]:not([data-surface="main"]) body,
+html[data-surface]:not([data-surface="main"]) #root {
+  background: transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 40%, transparent);
+}
+
+/* Scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.14) transparent;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 0.14);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+.theme-paper ::-webkit-scrollbar-thumb {
+  background: rgb(26 27 31 / 0.16);
+  background-clip: padding-box;
+}
+
+/* ───────────── Surfaces ───────────── */
+.glass {
+  background: var(--color-glass);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  backdrop-filter: blur(24px) saturate(140%);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-glass);
+  box-shadow: 0 24px 60px -24px rgb(0 0 0 / 0.6);
+  color: var(--color-fg);
+}
+
+.paper {
+  background: var(--color-paper-card);
+  border-radius: var(--radius-card);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 0.04), 0 12px 32px -12px rgb(30 25 10 / 0.18);
+  color: var(--color-ink);
+}
+
+.paper-page {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+/* ───────────── Motion helpers ───────────── */
+@keyframes pw-wave {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+.pw-wave-bar {
+  transform-origin: center;
+  animation: pw-wave 0.9s ease-in-out infinite;
+  animation-delay: var(--d, 0ms);
+}
+.pw-wave-bar[data-idle="true"] {
+  animation: none;
+  transform: scaleY(0.35);
+}
+
+@keyframes pw-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.pw-spin {
+  animation: pw-spin 0.9s linear infinite;
+}
+
+@keyframes pw-pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+.pw-pulse-ring::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid var(--color-accent);
+  animation: pw-pulse-ring 1.6s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pw-wave-bar,
+  .pw-spin,
+  .pw-pulse-ring::after {
+    animation-duration: 3s;
+  }
+}
