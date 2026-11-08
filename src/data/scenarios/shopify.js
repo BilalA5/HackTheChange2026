@@ -76,7 +76,7 @@ export default {
         text: 'The merchant app can be plain Streamlit. One product picker, the price sweep graph and the three revenue points.',
       },
       {
-        keywords: ['deadline', 'when', 'due', 'time'],
+        keywords: ['deadline', 'due', 'eod', 'end of day'],
         text: 'Aim to have the spec to me by end of day. If it slips, tell me early, not late.',
       },
     ],

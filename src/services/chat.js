@@ -13,8 +13,13 @@ function typingDelay(text) {
   return 600 + Math.min(1800, text.length * 12);
 }
 
+function mentions(said, words, keyword) {
+  return keyword.includes(' ') ? said.includes(keyword) : words.has(keyword);
+}
+
 function pickReply(persona, text, history) {
   const said = normalize(text);
+  const words = new Set(said.split(' '));
 
   const scripted = persona.script.find((line) => normalize(line.say) === said);
   if (scripted) return scripted.reply;
@@ -22,7 +27,10 @@ function pickReply(persona, text, history) {
   let best = null;
   let bestScore = 0;
   for (const reply of persona.replies) {
-    const score = reply.keywords.reduce((total, keyword) => (said.includes(keyword) ? total + keyword.length : total), 0);
+    const score = reply.keywords.reduce(
+      (total, keyword) => (mentions(said, words, keyword) ? total + keyword.length : total),
+      0,
+    );
     if (score > bestScore) {
       best = reply;
       bestScore = score;
