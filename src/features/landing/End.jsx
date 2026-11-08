@@ -54,20 +54,6 @@ export function Hired() {
   );
 }
 
-const social = [
-  {
-    name: 'LinkedIn',
-    href: 'https://www.linkedin.com/',
-    d: 'M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9.5h4V21H3V9.5Zm7 0h3.8v1.6h.06c.53-1 1.83-2 3.77-2 4.03 0 4.77 2.65 4.77 6.1V21h-4v-5.1c0-1.22-.02-2.78-1.7-2.78-1.7 0-1.96 1.33-1.96 2.7V21H10V9.5Z',
-  },
-  {
-    name: 'Instagram',
-    href: 'https://www.instagram.com/',
-    d: 'M12 7.3a4.7 4.7 0 1 0 0 9.4 4.7 4.7 0 0 0 0-9.4Zm0 7.7a3 3 0 1 1 0-6 3 3 0 0 1 0 6Zm6-7.9a1.1 1.1 0 1 1-2.2 0 1.1 1.1 0 0 1 2.2 0ZM12 3.6c2.7 0 3 0 4.1.06 2.7.12 4 1.42 4.13 4.13.05 1.06.06 1.38.06 4.1s0 3.05-.06 4.1c-.12 2.71-1.42 4.01-4.13 4.13-1.07.05-1.39.06-4.1.06s-3.04 0-4.1-.06c-2.72-.12-4.01-1.42-4.13-4.13C3.6 15.05 3.6 14.73 3.6 12s0-3.04.06-4.1C3.78 5.18 5.08 3.88 7.8 3.76 8.96 3.6 9.28 3.6 12 3.6Z',
-  },
-  { name: 'X', href: 'https://x.com/', d: 'M17.8 3h3.1l-6.8 7.8L22 21h-6.2l-4.9-6.4L5.3 21H2.2l7.3-8.3L2 3h6.4l4.4 5.8L17.8 3Zm-1.1 16.2h1.7L7.4 4.7H5.6l11.1 14.5Z' },
-];
-
 /** The foot of the page: Flint World. Colour spreads out from Flint's dome as it comes into view. */
 export function Footer() {
   const [ref, p] = useViewProgress(1, 0.05);
@@ -107,26 +93,6 @@ export function Footer() {
         </a>
       </div>
 
-      <div className="absolute inset-x-0 bottom-[max(24px,4svh)] mx-auto flex max-w-[1428px] items-center justify-between gap-3 px-4 lg:[width:calc(100%-16vw)] lg:px-0">
-        <nav aria-label="Legal" className="flex h-[43px] items-center gap-[clamp(10px,1.5vw,22px)] rounded-full bg-[rgba(52,52,52,0.78)] px-[18px] text-[14px] text-white backdrop-blur">
-          <a href="https://learnwithzero.com/terms.html" className="hover:underline">
-            Terms
-          </a>
-          <a href="https://learnwithzero.com/privacy.html" className="hover:underline">
-            Privacy
-          </a>
-          <span className="text-white/70">© 2026 Flint</span>
-        </nav>
-        <nav aria-label="Flint on social" className="flex h-[43px] items-center gap-[14px] rounded-full bg-[rgba(52,52,52,0.78)] px-[16px] text-white backdrop-blur">
-          {social.map((s) => (
-            <a key={s.name} href={s.href} target="_blank" rel="noreferrer" aria-label={`Flint on ${s.name}`} className="opacity-90 hover:opacity-100">
-              <svg viewBox="0 0 24 24" className="h-[16px] w-[16px]" fill="currentColor" aria-hidden="true">
-                <path d={s.d} />
-              </svg>
-            </a>
-          ))}
-        </nav>
-      </div>
     </footer>
   );
 }
