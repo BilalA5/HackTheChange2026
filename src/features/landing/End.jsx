@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import { ease, range, useViewProgress } from './hooks.js';
 import { WaveLine } from './Learn.jsx';
-import { Mark, Narrator } from './ui.jsx';
+import { Mark } from './ui.jsx';
 
 function OfferLetter({ open, signed }) {
   return (
@@ -51,14 +51,13 @@ export function Hired() {
       <h2
         id="hired-title"
         className="text-[length:var(--h2)] font-normal leading-[1.08] tracking-[-0.045em]"
-        aria-label="Built to get you hired."
+        aria-label="Ready for your first offer."
       >
         <span aria-hidden="true">
-          <WaveLine progress={p * 0.62}>Built to get you</WaveLine>
+          <WaveLine progress={p * 0.62}>Ready for your first</WaveLine>
           <OfferLetter open={p > 0.45} signed={p > 0.95} />
-          <WaveLine progress={range(p, 0.55, 1)}>hired.</WaveLine>
+          <WaveLine progress={range(p, 0.55, 1)}>offer.</WaveLine>
         </span>
-        <Narrator clip="hired" size={46} className="ml-2 -translate-y-[0.35em]" />
       </h2>
     </section>
   );
@@ -82,7 +81,7 @@ export function Footer() {
           />
           <img
             src="/assets/shots/city@2x.webp"
-            alt="Flint World, the city of companies where you work"
+            alt="Flint World, the city where your projects happen"
             className="absolute inset-0 h-full w-full object-cover"
             style={{
               WebkitMaskImage: `radial-gradient(circle at 50% 52%, #000 ${r}%, rgba(0,0,0,0.35) ${r + 6}%, transparent ${r + 14}%)`,

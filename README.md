@@ -48,7 +48,7 @@ src/
     workspace/    the scenario workspace
   data/scenarios/       scenarios, with their manager and coach
   services/             auth, chat, progress and conversations (the backend seam)
-public/assets/          images, fonts, films and voice clips
+public/assets/          images and fonts
 docs/                   notes per feature and reference screenshots
 ```
 

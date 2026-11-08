@@ -2,7 +2,7 @@ export const faq = [
   {
     question: 'What roles can I train for?',
     answer:
-      'AI and product engineering, design, data, growth, business analysis, banking and more. Tap a role on this page, or hit Start and tell us yours.',
+      'The roles growing in Alberta: energy analysis, AI and data, finance, security and more. Tap a role on this page, or hit Start and tell us yours.',
     keywords: [
       'role',
       'roles',
@@ -23,7 +23,7 @@ export const faq = [
   {
     question: 'How does this get me hired?',
     answer:
-      'Your projects become evidence of your skills. We combine that evidence with your profile and connect you through the Flint talent network. Hiring decisions stay with each employer.',
+      'Your projects become evidence of your skills: real analysis on real Alberta data, reviewed and scored. Bring that portfolio to interviews. Hiring decisions stay with each employer.',
     keywords: [
       'hired',
       'hire',
@@ -62,20 +62,8 @@ export const faq = [
   {
     question: 'Are these real companies?',
     answer:
-      'The projects are simulations inspired by familiar business problems. Company names describe the project context, not employment, endorsement or a partnership.',
-    keywords: [
-      'real',
-      'companies',
-      'company',
-      'partner',
-      'partners',
-      'netflix',
-      'spotify',
-      'google',
-      'nike',
-      'openai',
-      'endorsed',
-    ],
+      'The companies are simulations, but the data can be real. The Energy Analyst brief uses public AESO market statistics. Names describe the project context, not employment, endorsement or a partnership.',
+    keywords: ['real', 'companies', 'company', 'partner', 'partners', 'aeso', 'alberta', 'endorsed'],
     suggested: true,
   },
   {
@@ -96,7 +84,7 @@ export const faq = [
   {
     question: 'How does it work?',
     answer:
-      'Pick a role. Build projects in our simulated world, work with your team, get coached along the way and build your portfolio. Then we connect you into our talent network.',
+      'Pick a role and a brief. Work it through with your manager, get unstuck with a coach, then submit it for review. Every reviewed project goes into your portfolio.',
     keywords: ['how does it work', 'how does flint work', 'how it works', 'step', 'steps', 'process'],
   },
   {
@@ -120,7 +108,7 @@ export const faq = [
   {
     question: 'What kind of projects?',
     answer:
-      'You build projects in our simulated world, inspired by familiar business problems. A conversion analysis for ChatGPT, say, or an AI rewrite prototype in Gmail.',
+      'Briefs built on Alberta problems and public data. For example: work out why Alberta’s power price fell by half from 2023 to 2024, using AESO pool price and demand figures.',
     keywords: [
       'project',
       'projects',
@@ -130,6 +118,9 @@ export const faq = [
       'task',
       'tasks',
       'assignment',
+      'energy',
+      'electricity',
+      'power',
       'what will i do',
       'what would i do',
     ],
@@ -137,7 +128,7 @@ export const faq = [
   {
     question: 'Is a job guaranteed?',
     answer:
-      'No one can promise a job, and hiring decisions stay with each employer. What we do is turn your projects into evidence of your skills and connect you through our talent network.',
+      'No one can promise a job, and hiring decisions stay with each employer. What we do is turn your projects into evidence of your skills.',
     keywords: [
       'guarantee',
       'guaranteed',
@@ -150,42 +141,15 @@ export const faq = [
     ],
   },
   {
-    question: 'Which companies hire through Flint?',
-    answer:
-      'More than 5,000 companies are hiring in our talent network. As you level up, you unlock more roles and more companies.',
-    keywords: [
-      'talent network',
-      'network',
-      'employers',
-      'employer',
-      'which companies',
-      'companies hiring',
-      '5000',
-      '5,000',
-    ],
-  },
-  {
     question: 'How do levels work?',
-    answer:
-      'Your work raises your level. Each level unlocks more roles and connects you with more companies in our talent network.',
+    answer: 'Finishing projects earns XP and raises your level. Each level unlocks more briefs.',
     keywords: ['level', 'levels', 'level up', 'xp', 'unlock', 'progress'],
   },
   {
     question: 'Who are the coaches?',
     answer:
-      'You pick your coach: Jenna is warm, Jessica strategic and Ian motivational. Your coach follows four things in your work: speed, quality, communication and independence.',
-    keywords: [
-      'coach',
-      'coaches',
-      'coaching',
-      'mentor',
-      'mentors',
-      'mentorship',
-      'jenna',
-      'jessica',
-      'ian',
-      'feedback',
-    ],
+      'Every brief comes with a coach who helps when you are stuck and checks your work against the brief before you submit it.',
+    keywords: ['coach', 'coaches', 'coaching', 'mentor', 'mentors', 'mentorship', 'feedback'],
   },
   {
     question: 'Will I work with a team?',
@@ -202,7 +166,7 @@ export const faq = [
   {
     question: 'What do I get at the end?',
     answer:
-      'Every project you finish becomes part of your portfolio, verified by Flint. It is evidence of your skills that employers can see.',
+      'Every project you finish is reviewed and goes into your portfolio with scores for insight, quality, communication and reliability.',
     keywords: [
       'portfolio',
       'resume',
@@ -220,7 +184,7 @@ export const faq = [
   {
     question: 'What tools will I use?',
     answer:
-      'The tools the job uses. Each role lists its own, from Python and Google Sheets to Cursor and Claude. Tap a role card on this page to see them.',
+      'The tools the job uses. Each role lists its own, from Python, pandas and Power BI to Google Sheets and Claude. Tap a role card on this page to see them.',
     keywords: [
       'tool',
       'tools',

@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { clamp, useViewProgress } from './hooks.js';
-import { Logo, Narrator } from './ui.jsx';
+import { Mark } from './ui.jsx';
 
 /**
  * A line whose colour is a wave run by the scroll: words start pale grey, turn green as the wave
@@ -26,7 +26,7 @@ function WorldWindow() {
       <div className="h-full w-full origin-[66%_46%] scale-[1.9]">
         <img
           src="/assets/shots/city@2x.webp"
-          alt="Flint World: a city of company buildings"
+          alt="Flint World: the city where your briefs happen"
           className="slow-pan h-full w-full object-cover object-[64%_38%]"
           loading="lazy"
         />
@@ -35,7 +35,7 @@ function WorldWindow() {
         <span className="pin-ping absolute left-1/2 top-[86px] h-6 w-6 rounded-full bg-white/70" />
         <span className="absolute left-1/2 top-[78px] h-[14px] w-[14px] -translate-x-1/2 rounded-full border-[3px] border-white bg-white/50 shadow" />
         <span className="grid h-[56px] w-[56px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-[14px] bg-white shadow-[0_10px_24px_-8px_rgba(0,0,0,0.45)]">
-          <Logo name="nike" className="h-auto w-[34px]" alt="" />
+          <Mark className="h-[34px] w-[34px]" />
         </span>
       </div>
     </div>
@@ -50,10 +50,10 @@ function PortfolioWindow() {
   return (
     <div className="h-full overflow-hidden rounded-[16px] bg-white">
       <img
-        src="/assets/protos/portfolio-2x.webp"
-        alt="A Flint portfolio: Maya Reyes, GTM AI Engineer, with her projects"
+        src="/assets/protos/portfolio.webp"
+        alt="A Flint portfolio: reviewed projects, led by the Alberta power price brief, with skill scores"
         className="portfolio-tour w-full"
-        style={{ '--tour': '-42%' }}
+        style={{ '--tour': '-31%' }}
         loading="lazy"
       />
     </div>
@@ -61,27 +61,30 @@ function PortfolioWindow() {
 }
 
 const steps = [
-  { lead: 'Build projects in our simulated', last: 'world.', clip: 'world', body: <WorldWindow /> },
+  { id: 'world', lead: 'Pick a role and a', last: 'brief.', body: <WorldWindow /> },
   {
-    lead: 'Work with your',
-    last: 'team.',
-    clip: 'team',
-    body: (
-      <ShotWindow src="/assets/protos/team.webp" alt="The team workspace: a manager's brief, the team and the ask" />
-    ),
-  },
-  {
-    lead: 'Get coached along the',
-    last: 'way.',
-    clip: 'coach',
+    id: 'team',
+    lead: 'Work it through with your',
+    last: 'manager.',
     body: (
       <ShotWindow
-        src="/assets/protos/coach.webp"
-        alt="Choosing a coach: Jessica, finds the pattern behind the problem"
+        src="/assets/protos/workspace-manager.webp"
+        alt="The Flint workspace: Avery, the manager, walks through AESO pool prices with the learner"
       />
     ),
   },
-  { lead: 'Build your', last: 'portfolio.', clip: 'portfolio', body: <PortfolioWindow />, wave: true },
+  {
+    id: 'coach',
+    lead: 'Get unstuck with a',
+    last: 'coach.',
+    body: (
+      <ShotWindow
+        src="/assets/protos/workspace-coach.webp"
+        alt="The coach, Jenna, explains how Alberta's pool price is set"
+      />
+    ),
+  },
+  { id: 'portfolio', lead: 'Get reviewed. Keep the', last: 'work.', body: <PortfolioWindow />, wave: true },
 ];
 
 function Thread({ box, nodes, progress }) {
@@ -180,8 +183,7 @@ export default function Learn() {
         className="sticky top-0 z-20 bg-[linear-gradient(180deg,var(--page)_72%,rgba(248,249,251,0))] pb-[64px] pt-[44px] text-center"
       >
         <h2 id="learn-title" className="px-6 text-[length:var(--h2)] font-normal leading-[1.08] tracking-[-0.045em]">
-          <WaveLine progress={headP}>Learn the job by doing it.</WaveLine>
-          <Narrator clip="learn" size={46} className="ml-2 -translate-y-[0.35em]" />
+          <WaveLine progress={headP}>Learn by doing the work.</WaveLine>
         </h2>
       </div>
 
@@ -190,7 +192,7 @@ export default function Learn() {
         <ol className="space-y-[clamp(80px,12svh,208px)] pt-[clamp(80px,14svh,180px)]">
           {steps.map((s, i) => (
             <li
-              key={s.clip}
+              key={s.id}
               className="grid items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,831px)] lg:gap-[clamp(36px,5vw,100px)]"
             >
               <h3
@@ -203,7 +205,6 @@ export default function Learn() {
                 {s.wave ? <WaveLine progress={lastP}>{s.lead}</WaveLine> : s.lead}{' '}
                 <span className="whitespace-nowrap">
                   {s.wave ? <WaveLine progress={lastP}>{s.last}</WaveLine> : s.last}
-                  <Narrator clip={s.clip} size={46} className="ml-2.5 -translate-y-[0.2em]" />
                 </span>
               </h3>
               <div className="window aspect-[831/520] w-full">{s.body}</div>

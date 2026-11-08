@@ -139,10 +139,7 @@ function AskFlint({ open, onClose }) {
   );
 }
 
-const menuLinks = [
-  { label: 'Log in', to: '/login' },
-  { label: 'Open Flint', to: '/app' },
-];
+const menuLinks = [{ label: 'Log in', to: '/login' }];
 
 const menuItemClass =
   'block w-full rounded-[16px] px-5 py-3.5 text-left text-[22px] tracking-[-0.03em] text-[#111] hover:bg-black/[0.05]';

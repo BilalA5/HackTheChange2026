@@ -1,147 +1,129 @@
-import { ease, range, useStickyProgress } from './hooks.js';
-import { Logo, Mark, Narrator } from './ui.jsx';
+import { Link } from 'react-router';
+import { roles } from '@/data/roles.js';
+import Wordmark from '@/shared/Wordmark.jsx';
+import { Play } from './ui.jsx';
 
-const rowA = [
-  'google',
-  'openai',
-  'airbnb',
-  'stripe',
-  'netflix',
-  'spotify',
-  'notion',
-  'shopify',
-  'slack',
-  'figma',
-  'uber',
-  'meta',
-];
-const rowB = [
-  'microsoft',
-  'amazon',
-  'apple',
-  'nike',
-  'adobe',
-  'anthropic',
-  'samsung',
-  'ibm',
-  'paypal',
-  'zoom',
-  'duolingo',
-  'hubspot',
-];
+const industries = ['Energy', 'Clean tech', 'AI & data', 'Agriculture', 'Finance', 'Health'];
 
-function LogoRow({ names, direction }) {
-  // Two copies side by side so the drift loops without a seam.
-  const items = [...names, ...names];
+const poolPrice = roles.find((role) => role.id === 'energy-analyst').chart;
+
+function PriceDrop() {
+  const max = Math.max(...poolPrice.points.map(([, value]) => value));
   return (
-    <div className="overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_14%,#000_86%,transparent)]">
-      <div
-        className={`flex w-max items-center gap-[clamp(40px,5vw,84px)] ${direction === 'left' ? 'drift-left' : 'drift-right'}`}
-      >
-        {items.map((n, i) => (
-          <Logo
-            key={i}
-            name={n}
-            dark
-            className="h-[clamp(18px,1.8vw,28px)] w-auto opacity-55"
-            alt={i < names.length ? n : ''}
+    <div className="mt-6 flex h-[180px] items-end gap-4" role="img" aria-label={`${poolPrice.label}: 2023 to 2025`}>
+      {poolPrice.points.map(([year, value], i) => (
+        <div key={year} className="flex h-full flex-1 flex-col items-center justify-end gap-2">
+          <span className="text-[14px] tabular-nums tracking-[-0.01em] text-[var(--ink)]">${value.toFixed(2)}</span>
+          <span
+            className="hero-bar w-full rounded-t-[10px] bg-gradient-to-b from-[#ffb03a] to-[#ff6a1a]"
+            style={{ height: `${(value / max) * 72}%`, animationDelay: `${i * 120}ms` }}
           />
-        ))}
-      </div>
+          <span className="text-[13px] tabular-nums text-[var(--muted)]">{year}</span>
+        </div>
+      ))}
     </div>
   );
 }
 
-export default function Hero() {
-  const [ref, p] = useStickyProgress();
-  const zoom = ease(range(p, 0.06, 0.5));
-  const markScale = 1 + Math.pow(range(p, 0.06, 0.5), 2.6) * 46;
-  const black = range(p, 0.36, 0.48);
-  const copyOut = range(p, 0.02, 0.16);
-  const net = ease(range(p, 0.5, 0.64));
-  const rows = ease(range(p, 0.6, 0.74));
-
+function BriefCard() {
   return (
-    <section id="top" ref={ref} className="relative h-[330vh]" aria-labelledby="hero-title">
-      <div className="sticky top-0 h-[100svh] overflow-hidden bg-[var(--page)]">
-        <div
-          className="absolute inset-0"
-          aria-hidden="true"
-          style={{ transform: `scale(${1 + zoom * 1.1})`, transformOrigin: '50% 59%' }}
-        >
-          <img
-            src="/assets/shots/world-pale.webp"
-            alt=""
-            className="h-full w-full object-cover object-[50%_60%]"
-            draggable="false"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,var(--page)_0%,var(--page)_22%,rgba(248,249,251,0.75)_34%,rgba(248,249,251,0.25)_55%,rgba(248,249,251,0.12)_100%)]" />
-        </div>
+    <article className="window relative p-6 sm:p-8" aria-labelledby="brief-title">
+      <p className="flex items-center gap-2 text-[12px] font-medium uppercase tracking-[0.14em] text-[var(--muted)]">
+        <span className="h-1.5 w-1.5 rounded-full bg-[#ff6a1a]" />
+        Your first brief · Energy Analyst
+      </p>
+      <h2 id="brief-title" className="mt-4 text-[clamp(22px,1.2rem+0.7vw,30px)] leading-[1.12] tracking-[-0.035em]">
+        Alberta’s power price fell 53% in a year. Find out why.
+      </h2>
+      <PriceDrop />
+      <p className="mt-3 text-[12.5px] text-[var(--muted)]">
+        {poolPrice.label}. Source: {poolPrice.source}.
+      </p>
+      <ul className="mt-6 flex flex-wrap gap-2 border-t border-black/[0.06] pt-5 text-[13px] text-[#3a3b39]">
+        {['Real AESO data', 'A manager and a coach', 'AI review of your work'].map((item) => (
+          <li key={item} className="rounded-full bg-black/[0.04] px-3 py-1.5">
+            {item}
+          </li>
+        ))}
+      </ul>
+    </article>
+  );
+}
 
-        <div
-          className="absolute inset-x-0 top-[17svh] z-10 px-6 text-center"
-          style={{ opacity: 1 - copyOut, transform: `translateY(${-copyOut * 60}px)` }}
+export default function Hero() {
+  return (
+    <section id="top" aria-labelledby="hero-title" className="relative overflow-hidden">
+      <div className="absolute inset-0" aria-hidden="true">
+        <img
+          src="/assets/shots/world-pale.webp"
+          alt=""
+          className="h-full w-full object-cover object-[50%_70%] opacity-60"
+          draggable="false"
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,var(--page)_0%,rgba(248,249,251,0.82)_45%,var(--page)_100%)]" />
+      </div>
+
+      <header className="relative z-10 mx-auto flex max-w-[1280px] items-center justify-between px-6 pt-6">
+        <Link to="/" aria-label="Flint home">
+          <Wordmark size={26} tone="dark" />
+        </Link>
+        <Link
+          to="/login"
+          className="rounded-full px-4 py-2 text-[15px] tracking-[-0.01em] text-[var(--ink)] hover:bg-black/[0.05]"
         >
+          Log in
+        </Link>
+      </header>
+
+      <div className="relative z-10 mx-auto grid max-w-[1280px] items-center gap-12 px-6 pb-[clamp(48px,8svh,96px)] pt-[clamp(48px,10svh,120px)] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-16">
+        <div>
+          <p className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1.5 text-[13px] tracking-[-0.005em] text-[#3a3b39] shadow-[0_0_0_0.5px_rgba(0,0,0,0.08)]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#1d9e4b]" />
+            Made for Alberta
+          </p>
           <h1
             id="hero-title"
-            className="text-[clamp(2.5rem,1.2rem+3.4vw,4.5rem)] font-normal leading-[0.99] tracking-[-0.052em] text-[var(--ink)]"
+            className="mt-6 max-w-[12em] text-[clamp(2.6rem,1.4rem+3.6vw,5rem)] font-normal leading-[0.98] tracking-[-0.055em] text-[var(--ink)]"
           >
-            Get hired with{' '}
-            <span className="whitespace-nowrap">
-              no experience.
-              <Narrator clip="hero" size={44} className="ml-3 -translate-y-[0.35em]" />
-            </span>
+            Real work experience for Alberta’s next jobs.
           </h1>
-        </div>
-
-        <div className="absolute left-1/2 top-[59%] z-10 h-[clamp(130px,11.5vw,196px)] w-[clamp(130px,11.5vw,196px)] -translate-x-1/2 -translate-y-1/2">
-          <Mark className="h-full w-full will-change-transform" style={{ transform: `scale(${markScale})` }} />
-        </div>
-
-        <div
-          className="absolute inset-0 z-20 bg-[var(--night)]"
-          style={{ opacity: black, pointerEvents: black > 0.5 ? 'auto' : 'none' }}
-        >
-          <div className="flex h-full flex-col items-center justify-center px-6 pb-[18svh] text-center text-white">
-            <h2
-              id="network"
-              className="font-normal"
-              style={{ opacity: net, transform: `translateY(${(1 - net) * 40}px)` }}
+          <p className="mt-6 max-w-[30em] text-[clamp(17px,1rem+0.25vw,19px)] leading-[1.45] tracking-[-0.012em] text-[var(--muted)]">
+            Take on projects built from public Alberta data. Work them through with a manager and a coach, get your work
+            reviewed, and leave with a portfolio you can show.
+          </p>
+          <div className="mt-9 flex flex-wrap items-center gap-3">
+            <Link
+              to="/login"
+              className="start-key flex h-[54px] items-center gap-2.5 rounded-[15px] px-7 text-[16px] font-medium text-white transition-transform hover:scale-[1.015] active:scale-[0.985]"
             >
-              <span className="block text-[clamp(4.5rem,2rem+9vw,11rem)] leading-[0.9] tracking-[-0.07em]">5,000+</span>
-              <span className="mt-[0.34em] block text-[clamp(1.6rem,1rem+1.6vw,2.7rem)] leading-[1.05] tracking-[-0.045em] text-white/70">
-                companies hiring in our talent network.
-              </span>
-            </h2>
-          </div>
-          <div
-            className="absolute inset-x-0 bottom-[16svh] space-y-[clamp(22px,3svh,36px)]"
-            style={{ opacity: rows, transform: `translateY(${(1 - rows) * 30}px) perspective(900px) rotateX(18deg)` }}
-            role="group"
-            aria-label="Companies hiring in our talent network"
-          >
-            <LogoRow names={rowA} direction="left" />
-            <LogoRow names={rowB} direction="right" />
+              <Play className="h-3 w-3" />
+              Start a project
+            </Link>
+            <a
+              href="#roles"
+              className="soft-key flex h-[52px] items-center rounded-[15px] px-6 text-[16px] text-[var(--ink)]"
+            >
+              See the roles
+            </a>
           </div>
         </div>
+        <BriefCard />
+      </div>
 
-        <p
-          className="absolute bottom-7 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 text-[14px] tracking-[-0.01em] text-[#5f615e] transition-opacity duration-500"
-          style={{ opacity: p < 0.01 ? 1 : 0 }}
-          aria-hidden="true"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            className="h-4 w-4 animate-bounce"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          >
-            <path d="M12 5v14M6 13l6 6 6-6" />
-          </svg>
-          Scroll down
+      <div className="relative z-10 mx-auto max-w-[1280px] px-6 pb-[10svh]">
+        <p className="text-[13px] uppercase tracking-[0.14em] text-[var(--muted)]">
+          Projects across the province’s industries
         </p>
+        <ul className="mt-4 flex flex-wrap gap-2.5">
+          {industries.map((industry) => (
+            <li
+              key={industry}
+              className="rounded-full bg-white px-4 py-2 text-[15px] tracking-[-0.01em] text-[var(--ink)] shadow-[0_0_0_0.5px_rgba(0,0,0,0.08)]"
+            >
+              {industry}
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );
