@@ -45,7 +45,7 @@ function AskFlint({ open, onClose }) {
       role="dialog"
       aria-label="Ask Flint"
       aria-hidden={!open}
-      inert={open ? undefined : ''}
+      inert={!open}
       className={`glass-panel fixed bottom-[96px] left-1/2 z-50 flex max-h-[min(560px,calc(100svh-140px))] w-[min(400px,calc(100vw-32px))] -translate-x-1/2 flex-col overflow-hidden rounded-[24px] transition-all duration-500 ${
         open ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-4 opacity-0'
       }`}
