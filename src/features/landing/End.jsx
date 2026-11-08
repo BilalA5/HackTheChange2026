@@ -50,12 +50,6 @@ export function Hired() {
         </span>
         <Narrator clip="hired" size={46} className="ml-2 -translate-y-[0.35em]" />
       </h2>
-      <p
-        className="mt-[34px] text-[17px] leading-[1.3] tracking-[-0.01em] text-[#5b5d5a] transition-all duration-700"
-        style={{ opacity: p > 0.7 ? 1 : 0, transform: `translateY(${p > 0.7 ? 0 : 12}px)` }}
-      >
-        Start free, then only $99 a month.
-      </p>
     </section>
   );
 }
