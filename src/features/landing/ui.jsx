@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from 'react';
-
-/* ------------------------------------------------------------- narrator */
+import { useEffect, useState } from 'react';
 
 // One clip plays at a time across the page.
 let current = null;
@@ -29,7 +27,6 @@ function playClip(key) {
   notify();
 }
 
-/** The guide's face with a speaker badge. Pressing it plays the guide's line for that part of the page. */
 export function Narrator({ clip, size = 52, dark = false, className = '' }) {
   const [playing, setPlaying] = useState(null);
   useEffect(() => {
@@ -75,8 +72,6 @@ export function Narrator({ clip, size = 52, dark = false, className = '' }) {
   );
 }
 
-/* ---------------------------------------------------------------- marks */
-
 export function Mark({ className = '', style }) {
   return <img src="/assets/brand/flint-mark.svg" alt="" aria-hidden="true" className={className} style={style} draggable="false" />;
 }
@@ -93,8 +88,6 @@ export function Logo({ name, dark = false, className = '', style, alt }) {
     />
   );
 }
-
-/* ---------------------------------------------------------------- icons */
 
 export const Flame = () => (
   <svg viewBox="0 0 24 24" className="h-[14px] w-[14px]" aria-hidden="true">
