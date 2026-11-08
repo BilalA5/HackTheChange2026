@@ -4,19 +4,19 @@ import { faq } from './faq.js';
 import { useScrolled } from './hooks.js';
 import { Mark, Play } from './ui.jsx';
 
+const FALLBACK_ANSWER = "I don't know that one yet. Try one of the questions below, or hit Start to take the tour.";
+
 function answer(text) {
-  const q = text.toLowerCase().replace(/[^a-z0-9$' ]/g, ' ');
-  let best = null;
-  let score = 0;
-  for (const item of faq) {
-    const s = item.k.reduce((n, k) => (q.includes(k) ? n + k.length : n), 0);
-    if (s > score) {
-      best = item;
-      score = s;
-    }
-  }
-  return best?.a ?? "I don't know that one yet. Try one of the questions below, or hit Start to take the tour.";
+  const query = text.toLowerCase().replace(/[^a-z0-9$' ]/g, ' ');
+  const scored = faq.map((item) => ({
+    item,
+    score: item.keywords.reduce((total, keyword) => (query.includes(keyword) ? total + keyword.length : total), 0),
+  }));
+  const best = scored.reduce((top, entry) => (entry.score > top.score ? entry : top), { item: null, score: 0 });
+  return best.item?.answer ?? FALLBACK_ANSWER;
 }
+
+const suggestions = faq.filter((item) => item.suggested);
 
 function AskFlint({ open, onClose }) {
   const [log, setLog] = useState([
@@ -72,18 +72,16 @@ function AskFlint({ open, onClose }) {
         ))}
       </div>
       <div className="no-scrollbar flex gap-1.5 overflow-x-auto px-5 pb-3">
-        {faq
-          .filter((f) => f.chip)
-          .map((f) => (
-            <button
-              key={f.q}
-              type="button"
-              onClick={() => ask(f.q)}
-              className="shrink-0 rounded-full bg-black/[0.05] px-3 py-1.5 text-[13px] text-[#1b1d1c] hover:bg-black/[0.09]"
-            >
-              {f.q}
-            </button>
-          ))}
+        {suggestions.map(({ question }) => (
+          <button
+            key={question}
+            type="button"
+            onClick={() => ask(question)}
+            className="shrink-0 rounded-full bg-black/[0.05] px-3 py-1.5 text-[13px] text-[#1b1d1c] hover:bg-black/[0.09]"
+          >
+            {question}
+          </button>
+        ))}
       </div>
       <form
         className="m-3 mt-0 flex items-center gap-2 rounded-[16px] bg-white p-1.5 pl-4 shadow-[0_0_0_0.5px_rgba(0,0,0,0.1)]"

@@ -1,376 +1,248 @@
-// Ask Flint answers, copied from the live site's FAQ data.
 export const faq = [
   {
-    "chip": true,
-    "q": "What's the cost?",
-    "k": [
-      "cost",
-      "price",
-      "pricing",
-      "pay",
-      "free",
-      "credit",
-      "points",
-      "month",
-      "how much",
-      "expensive",
-      "subscription",
-      "fee"
+    question: 'What roles can I train for?',
+    answer:
+      'AI and product engineering, design, data, growth, business analysis, banking and more. Tap a role on this page, or hit Start and tell us yours.',
+    keywords: [
+      'role',
+      'roles',
+      'engineer',
+      'designer',
+      'analyst',
+      'banking',
+      'marketing',
+      'train',
+      'training',
+      'career',
+      'careers',
+      'field',
+      'fields',
     ],
-    "a": "Start free, then only $99 a month. You also earn credits as you use Flint, and the more credits you earn, the more you use Flint for free."
+    suggested: true,
   },
   {
-    "chip": true,
-    "q": "What roles can I train for?",
-    "k": [
-      "role",
-      "roles",
-      "engineer",
-      "designer",
-      "analyst",
-      "banking",
-      "marketing",
-      "train",
-      "training",
-      "career",
-      "careers",
-      "field",
-      "fields"
+    question: 'How does this get me hired?',
+    answer:
+      'Your projects become evidence of your skills. We combine that evidence with your profile and connect you through the Flint talent network. Hiring decisions stay with each employer.',
+    keywords: [
+      'hired',
+      'hire',
+      'hiring',
+      'job',
+      'jobs',
+      'recruit',
+      'recruiter',
+      'recruiters',
+      'match',
+      'intro',
+      'interview',
+      'interviews',
+      'get hired',
     ],
-    "a": "AI and product engineering, design, data, growth, business analysis, banking and more. Tap a role on this page, or hit Start and tell us yours."
+    suggested: true,
   },
   {
-    "chip": true,
-    "q": "How does this get me hired?",
-    "k": [
-      "hired",
-      "hire",
-      "hiring",
-      "job",
-      "jobs",
-      "recruit",
-      "recruiter",
-      "recruiters",
-      "match",
-      "intro",
-      "interview",
-      "interviews",
-      "get hired"
+    question: 'Do I need prior experience?',
+    answer: 'No. Pick a role you are curious about. Learn the skills in context, as you work through the project.',
+    keywords: [
+      'experience',
+      'beginner',
+      'beginners',
+      'no experience',
+      'prior',
+      'background',
+      'new to',
+      'never',
+      'code',
+      'coding',
+      'need to know',
     ],
-    "a": "Your projects become evidence of your skills. We combine that evidence with your profile and connect you through the Flint talent network. Hiring decisions stay with each employer."
+    suggested: true,
   },
   {
-    "chip": true,
-    "q": "Do I need prior experience?",
-    "k": [
-      "experience",
-      "beginner",
-      "beginners",
-      "no experience",
-      "prior",
-      "background",
-      "new to",
-      "never",
-      "code",
-      "coding",
-      "need to know"
+    question: 'Are these real companies?',
+    answer:
+      'The projects are simulations inspired by familiar business problems. Company names describe the project context, not employment, endorsement or a partnership.',
+    keywords: [
+      'real',
+      'companies',
+      'company',
+      'partner',
+      'partners',
+      'netflix',
+      'spotify',
+      'google',
+      'nike',
+      'openai',
+      'endorsed',
     ],
-    "a": "No. Pick a role you are curious about. Learn the skills in context, as you work through the project."
+    suggested: true,
   },
   {
-    "chip": true,
-    "q": "Are these real companies?",
-    "k": [
-      "real",
-      "companies",
-      "company",
-      "partner",
-      "partners",
-      "netflix",
-      "spotify",
-      "google",
-      "nike",
-      "openai",
-      "endorsed"
+    question: 'What is Flint?',
+    answer:
+      'Flint is a place to learn a job by doing it. You take on real kinds of work inside a simulated world, with a manager, a team and a coach, and you leave with work you can show.',
+    keywords: [
+      'what is flint',
+      'whats flint',
+      'what is this',
+      'whats this',
+      'about flint',
+      'what does flint do',
+      'what do you do',
+      'tell me about',
     ],
-    "a": "The projects are simulations inspired by familiar business problems. Company names describe the project context, not employment, endorsement or a partnership."
   },
   {
-    "chip": false,
-    "q": "What is Flint?",
-    "k": [
-      "what is flint",
-      "whats flint",
-      "what is this",
-      "whats this",
-      "about flint",
-      "what does flint do",
-      "what do you do",
-      "tell me about"
-    ],
-    "a": "Flint is a place to learn a job by doing it. You take on real kinds of work inside a simulated world, with a manager, a team and a coach, and you leave with work you can show."
+    question: 'How does it work?',
+    answer:
+      'Pick a role. Build projects in our simulated world, work with your team, get coached along the way and build your portfolio. Then we connect you into our talent network.',
+    keywords: ['how does it work', 'how does flint work', 'how it works', 'step', 'steps', 'process'],
   },
   {
-    "chip": false,
-    "q": "How does it work?",
-    "k": [
-      "how does it work",
-      "how does flint work",
-      "how it works",
-      "step",
-      "steps",
-      "process"
+    question: 'How do I start?',
+    answer: 'Hit Start at the bottom of the screen to take the tour.',
+    keywords: [
+      'start',
+      'started',
+      'get started',
+      'sign up',
+      'signup',
+      'join',
+      'begin',
+      'account',
+      'register',
+      'enroll',
+      'apply',
     ],
-    "a": "Pick a role. Build projects in our simulated world, work with your team, get coached along the way and build your portfolio. Then we connect you into our talent network."
   },
   {
-    "chip": false,
-    "q": "How do I start?",
-    "k": [
-      "start",
-      "started",
-      "get started",
-      "sign up",
-      "signup",
-      "join",
-      "begin",
-      "account",
-      "register",
-      "enroll",
-      "apply"
+    question: 'What kind of projects?',
+    answer:
+      'You build projects in our simulated world, inspired by familiar business problems. A conversion analysis for ChatGPT, say, or an AI rewrite prototype in Gmail.',
+    keywords: [
+      'project',
+      'projects',
+      'simulation',
+      'simulated',
+      'flint world',
+      'task',
+      'tasks',
+      'assignment',
+      'what will i do',
+      'what would i do',
     ],
-    "a": "Hit Start at the bottom of the screen. It opens Flint, and you can start free."
   },
   {
-    "chip": false,
-    "q": "What kind of projects?",
-    "k": [
-      "project",
-      "projects",
-      "simulation",
-      "simulated",
-      "flint world",
-      "task",
-      "tasks",
-      "assignment",
-      "what will i do",
-      "what would i do"
+    question: 'Is a job guaranteed?',
+    answer:
+      'No one can promise a job, and hiring decisions stay with each employer. What we do is turn your projects into evidence of your skills and connect you through our talent network.',
+    keywords: [
+      'guarantee',
+      'guaranteed',
+      'guarantees',
+      'promise',
+      'job guaranteed',
+      'guarantee a job',
+      'guaranteed a job',
+      'guaranteed job',
     ],
-    "a": "You build projects in our simulated world, inspired by familiar business problems. A conversion analysis for ChatGPT, say, or an AI rewrite prototype in Gmail."
   },
   {
-    "chip": false,
-    "q": "Is a job guaranteed?",
-    "k": [
-      "guarantee",
-      "guaranteed",
-      "guarantees",
-      "promise",
-      "job guaranteed",
-      "guarantee a job",
-      "guaranteed a job",
-      "guaranteed job"
+    question: 'Which companies hire through Flint?',
+    answer:
+      'More than 5,000 companies are hiring in our talent network. As you level up, you unlock more roles and more companies.',
+    keywords: [
+      'talent network',
+      'network',
+      'employers',
+      'employer',
+      'which companies',
+      'companies hiring',
+      '5000',
+      '5,000',
     ],
-    "a": "No one can promise a job, and hiring decisions stay with each employer. What we do is turn your projects into evidence of your skills and connect you through our talent network."
   },
   {
-    "chip": false,
-    "q": "Which companies hire through Flint?",
-    "k": [
-      "talent network",
-      "network",
-      "employers",
-      "employer",
-      "which companies",
-      "companies hiring",
-      "5000",
-      "5,000"
-    ],
-    "a": "More than 5,000 companies are hiring in our talent network. As you level up, you unlock more roles and more companies."
+    question: 'How do levels work?',
+    answer:
+      'Your work raises your level. Each level unlocks more roles and connects you with more companies in our talent network.',
+    keywords: ['level', 'levels', 'level up', 'xp', 'unlock', 'progress'],
   },
   {
-    "chip": false,
-    "q": "How do levels work?",
-    "k": [
-      "level",
-      "levels",
-      "level up",
-      "xp",
-      "unlock",
-      "progress"
+    question: 'Who are the coaches?',
+    answer:
+      'You pick your coach: Jenna is warm, Jessica strategic and Ian motivational. Your coach follows four things in your work: speed, quality, communication and independence.',
+    keywords: [
+      'coach',
+      'coaches',
+      'coaching',
+      'mentor',
+      'mentors',
+      'mentorship',
+      'jenna',
+      'jessica',
+      'ian',
+      'feedback',
     ],
-    "a": "Your work raises your level. Each level unlocks more roles and connects you with more companies in our talent network."
   },
   {
-    "chip": false,
-    "q": "Who are the coaches?",
-    "k": [
-      "coach",
-      "coaches",
-      "coaching",
-      "mentor",
-      "mentors",
-      "mentorship",
-      "jenna",
-      "jessica",
-      "ian",
-      "navi",
-      "feedback"
-    ],
-    "a": "You pick your coach: Jenna is warm, Jessica strategic, Ian motivational and Navi direct. Your coach follows four things in your work: speed, quality, communication and independence."
+    question: 'Will I work with a team?',
+    answer:
+      'Yes. Inside Flint you work with a manager and a team, the way you would on the job. They are run by AI and built for practice.',
+    keywords: ['manager', 'team', 'teammate', 'teammates', 'boss', 'colleague', 'colleagues', 'alone'],
   },
   {
-    "chip": false,
-    "q": "Will I work with a team?",
-    "k": [
-      "manager",
-      "team",
-      "teammate",
-      "teammates",
-      "boss",
-      "colleague",
-      "colleagues",
-      "alone"
-    ],
-    "a": "Yes. Inside Flint you work with a manager and a team, the way you would on the job. They are run by AI and built for practice."
+    question: 'Are the people real?',
+    answer:
+      'The companies, managers, teammates and coaches you meet inside Flint World are simulations. They are run by AI and built for practice.',
+    keywords: ['ai', 'bot', 'bots', 'robot', 'human', 'humans', 'real people', 'real person', 'chatbot'],
   },
   {
-    "chip": false,
-    "q": "Are the people real?",
-    "k": [
-      "ai",
-      "bot",
-      "bots",
-      "robot",
-      "human",
-      "humans",
-      "real people",
-      "real person",
-      "chatbot"
+    question: 'What do I get at the end?',
+    answer:
+      'Every project you finish becomes part of your portfolio, verified by Flint. It is evidence of your skills that employers can see.',
+    keywords: [
+      'portfolio',
+      'resume',
+      'cv',
+      'proof',
+      'evidence',
+      'verified',
+      'verify',
+      'show employers',
+      'at the end',
+      'certificate',
+      'certification',
     ],
-    "a": "The companies, managers, teammates and coaches you meet inside Flint World are simulations. They are run by AI and built for practice."
   },
   {
-    "chip": false,
-    "q": "What do I get at the end?",
-    "k": [
-      "portfolio",
-      "resume",
-      "cv",
-      "proof",
-      "evidence",
-      "verified",
-      "verify",
-      "show employers",
-      "at the end",
-      "certificate",
-      "certification"
+    question: 'What tools will I use?',
+    answer:
+      'The tools the job uses. Each role lists its own, from Python and Google Sheets to Cursor and Claude. Tap a role card on this page to see them.',
+    keywords: [
+      'tool',
+      'tools',
+      'software',
+      'python',
+      'sql',
+      'excel',
+      'sheets',
+      'cursor',
+      'claude',
+      'chatgpt',
+      'figma',
+      'stack',
     ],
-    "a": "Every project you finish becomes part of your portfolio, verified by Flint. It is evidence of your skills that employers can see."
   },
   {
-    "chip": false,
-    "q": "What tools will I use?",
-    "k": [
-      "tool",
-      "tools",
-      "software",
-      "python",
-      "sql",
-      "excel",
-      "sheets",
-      "cursor",
-      "claude",
-      "chatgpt",
-      "figma",
-      "stack"
-    ],
-    "a": "The tools the job uses. Each role lists its own, from Python and Google Sheets to Cursor and Claude. Tap a role card on this page to see them."
+    question: 'Hi',
+    answer: 'Hi. Ask me anything about Flint, or tap one of the questions below.',
+    keywords: ['hi', 'hello', 'hey', 'yo', 'sup', 'hiya'],
   },
   {
-    "chip": false,
-    "q": "What about my data?",
-    "k": [
-      "privacy",
-      "private",
-      "my data",
-      "personal",
-      "delete",
-      "cookies",
-      "cookie",
-      "gdpr",
-      "information"
-    ],
-    "a": "We collect what we need to run Flint for you, and you can ask to see it or have it deleted. Write to team@zero.university. The full policy is under Privacy at the foot of the page."
+    question: 'Thanks',
+    answer: 'Any time. Hit Start when you are ready.',
+    keywords: ['thanks', 'thank', 'thx', 'cheers', 'ty'],
   },
-  {
-    "chip": false,
-    "q": "How do I contact you?",
-    "k": [
-      "contact",
-      "email",
-      "support",
-      "reach",
-      "talk to",
-      "speak to",
-      "phone",
-      "call",
-      "help"
-    ],
-    "a": "Write to team@zero.university and we will help."
-  },
-  {
-    "chip": false,
-    "q": "Who is behind Flint?",
-    "k": [
-      "founder",
-      "founders",
-      "founded",
-      "who made",
-      "who built",
-      "who is behind",
-      "who runs",
-      "navid",
-      "ceo"
-    ],
-    "a": "Tap the voice dots beside the titles on this page to hear Navid talk you through it."
-  },
-  {
-    "chip": false,
-    "q": "Where can I follow Flint?",
-    "k": [
-      "linkedin",
-      "instagram",
-      "twitter",
-      "social",
-      "socials",
-      "follow"
-    ],
-    "a": "We are on LinkedIn, Instagram and X. The links are at the foot of the page."
-  },
-  {
-    "chip": false,
-    "q": "Hi",
-    "k": [
-      "hi",
-      "hello",
-      "hey",
-      "yo",
-      "sup",
-      "hiya"
-    ],
-    "a": "Hi. Ask me anything about Flint, or tap one of the questions below."
-  },
-  {
-    "chip": false,
-    "q": "Thanks",
-    "k": [
-      "thanks",
-      "thank",
-      "thx",
-      "cheers",
-      "ty"
-    ],
-    "a": "Any time. Hit Start when you are ready."
-  }
 ];
