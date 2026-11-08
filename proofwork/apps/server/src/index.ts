@@ -20,3 +20,23 @@ const actualPort = typeof address === "object" && address ? address.port : port;
 console.log(`Proofwork server: http://127.0.0.1:${actualPort} (ai mode: ${ai.mode}, voices: ${tts.engines().join(" > ") || "system only"})`);
 // Load the local voice model now (a one-time ~330 MB download on first run) so the first line plays promptly.
 tts.warm();
+
+// Shut down in order: stop taking requests and close the database, release the voice model, then exit.
+// onnxruntime-node (the local voice model) aborts inside its own exit-time cleanup on macOS ("libc++abi ... mutex lock
+// failed") even after its sessions are released, so once the model has been loaded the process ends with SIGKILL,
+// which skips that cleanup. Everything that matters (requests, the SQLite database) is closed before that point.
+let stopping = false;
+for (const signal of ["SIGINT", "SIGTERM"] as const) {
+  process.once(signal, () => {
+    if (stopping) return;
+    stopping = true;
+    const force = setTimeout(() => process.exit(0), 3000);
+    force.unref();
+    void app
+      .close()
+      .catch(() => undefined)
+      .then(() => tts.close())
+      .then((nativeLoaded) => (nativeLoaded ? process.kill(process.pid, "SIGKILL") : process.exit(0)))
+      .catch(() => process.exit(0));
+  });
+}

@@ -29,6 +29,8 @@ export interface TtsService {
   speak(req: SpeakRequest): Promise<SpeakResult>;
   /** Loads slow engines in the background. */
   warm(): void;
+  /** Releases engine resources. Resolves true when a native (onnxruntime) model had been loaded. */
+  close(): Promise<boolean>;
 }
 
 export class NoVoiceError extends Error {
@@ -69,6 +71,11 @@ export function createTtsService(opts: {
 
     warm() {
       for (const e of opts.engines) e.warm?.();
+    },
+
+    async close() {
+      const released = await Promise.all(opts.engines.map((e) => e.close?.() ?? Promise.resolve(false)));
+      return released.some(Boolean);
     },
 
     async speak(req) {

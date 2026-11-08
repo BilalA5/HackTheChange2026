@@ -10,6 +10,8 @@ export interface TtsEngine {
   synthesize(text: string, voiceId: string): Promise<Buffer>;
   /** Starts any slow setup (model load) ahead of the first request. Never throws. */
   warm?(): void;
+  /** Releases native resources. Called once on shutdown. Resolves true when a native model had been loaded. */
+  close?(): Promise<boolean>;
 }
 
 /** Wraps 16-bit little-endian mono PCM in a WAV header. */
@@ -46,7 +48,11 @@ export class GeminiTtsEngine implements TtsEngine {
 
 const KOKORO_MODEL = "onnx-community/Kokoro-82M-v1.0-ONNX";
 
-type KokoroModel = { generate(text: string, opts: { voice: string }): Promise<{ toWav(): ArrayBuffer }> };
+type KokoroModel = {
+  generate(text: string, opts: { voice: string }): Promise<{ toWav(): ArrayBuffer }>;
+  /** The underlying transformers.js model, whose onnxruntime sessions must be released before the process exits. */
+  model?: { dispose?: () => Promise<unknown> };
+};
 
 export class KokoroEngine implements TtsEngine {
   readonly name = "kokoro" as const;
@@ -82,6 +88,20 @@ export class KokoroEngine implements TtsEngine {
 
   warm(): void {
     this.load().catch((err: unknown) => this.log(`[tts] kokoro could not load: ${err instanceof Error ? err.message : String(err)}`));
+  }
+
+  /** Releases the onnxruntime sessions. Resolves true when the model had been loaded. */
+  async close(): Promise<boolean> {
+    const pending = this.model;
+    this.model = null;
+    if (!pending) return false;
+    try {
+      await this.queue;
+      await (await pending).model?.dispose?.();
+      return true;
+    } catch {
+      return false; // never finished loading: nothing native to release
+    }
   }
 
   synthesize(text: string, voiceId: string): Promise<Buffer> {
