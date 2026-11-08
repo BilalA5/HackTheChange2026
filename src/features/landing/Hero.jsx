@@ -47,7 +47,7 @@ export default function Hero() {
           <h1 id="hero-title" className="text-[clamp(2.5rem,1.2rem+3.4vw,4.5rem)] font-normal leading-[0.99] tracking-[-0.052em] text-[var(--ink)]">
             Get hired with{' '}
             <span className="whitespace-nowrap">
-              zero experience.
+              no experience.
               <Narrator clip="hero" size={44} className="ml-3 -translate-y-[0.35em]" />
             </span>
           </h1>
