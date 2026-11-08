@@ -8,6 +8,7 @@ import { trainings } from "./trainings.ts";
 import { jobs } from "./jobs.ts";
 
 export type { CareerPack } from "./types.ts";
+export { validateCareerPack, validateJobs, validateTrainings } from "./validate.ts";
 
 export const careerPacks: CareerPack[] = [aiEngineer, productManager, dataAnalyst];
 
