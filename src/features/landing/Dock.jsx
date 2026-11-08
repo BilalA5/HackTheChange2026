@@ -111,39 +111,39 @@ function AskFlint({ open, onClose }) {
   );
 }
 
+const menuLinks = [
+  { label: 'How Flint works', to: '/onboarding' },
+  { label: 'Workspace', to: '/workspace' },
+];
+
+const menuItemClass =
+  'block w-full rounded-[16px] px-5 py-3.5 text-left text-[22px] tracking-[-0.03em] text-[#111] hover:bg-black/[0.05]';
+
 function Menu({ open, onClose }) {
-  const links = [
-    { label: 'Home', href: '#top', internal: true },
-    { label: 'Letters', href: 'https://learnwithzero.com/letters.html' },
-    { label: 'Why Flint', href: 'https://why.zero.university/' },
-  ];
   return (
     <div
       role="dialog"
       aria-label="Menu"
       aria-hidden={!open}
-      inert={open ? undefined : ''}
+      inert={!open}
       className={`glass-panel fixed bottom-[96px] left-1/2 z-50 w-[min(300px,calc(100vw-32px))] -translate-x-1/2 rounded-[24px] p-2 transition-all duration-500 ${
         open ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-4 opacity-0'
       }`}
     >
-      {links.map((l) => (
-        <a
-          key={l.label}
-          href={l.href}
-          target={l.internal ? undefined : '_blank'}
-          rel={l.internal ? undefined : 'noreferrer'}
-          onClick={(e) => {
-            if (l.internal) {
-              e.preventDefault();
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-            onClose();
-          }}
-          className="block rounded-[16px] px-5 py-3.5 text-[22px] tracking-[-0.03em] text-[#111] hover:bg-black/[0.05]"
-        >
-          {l.label}
-        </a>
+      <button
+        type="button"
+        className={menuItemClass}
+        onClick={() => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          onClose();
+        }}
+      >
+        Home
+      </button>
+      {menuLinks.map((link) => (
+        <Link key={link.to} to={link.to} onClick={onClose} className={menuItemClass}>
+          {link.label}
+        </Link>
       ))}
     </div>
   );
