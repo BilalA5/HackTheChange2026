@@ -12,6 +12,7 @@ import {
   Sparkle,
   badgeGlyphs,
 } from './icons.jsx';
+import { badges, durations, manager, notes, project, requirements } from './content.js';
 import './workspace.css';
 
 const FONTS =
@@ -50,12 +51,6 @@ function ProgressBadge({ glyph, progress, label }) {
 }
 
 function TopBar() {
-  const badges = [
-    { glyph: 'bulb', progress: 0.3, label: 'Insight' },
-    { glyph: 'star', progress: 0.45, label: 'Quality' },
-    { glyph: 'chat', progress: 0.3, label: 'Communication' },
-    { glyph: 'shield', progress: 0.5, label: 'Reliability' },
-  ];
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex h-[54px] items-center justify-between pl-[19px] pr-[16px]">
       <button
@@ -86,39 +81,6 @@ function TopBar() {
 }
 
 /* --------------------------------------------------------------- sidebar */
-
-const requirements = [
-  {
-    title: 'A price rule with a set step count',
-    steps: [
-      "Open your Stage 1 price range table with Claude Code, and note each product's min and max price",
-      'Write Rule 1 in the spec file, naming one step count, like 10 evenly spaced prices from min to max',
-      'Run one flagged product through the rule by hand, you should be able to list every price it tries',
-    ],
-  },
-  {
-    title: 'The revenue formula and three revenue points',
-    steps: [
-      'Write revenue as price times the units the model predicts at that price',
-      'Name the three points the merchant sees: last price, expected price and recommended price',
-      'Check the recommended point really is the highest revenue on the price sweep',
-    ],
-  },
-  {
-    title: 'Two backup rules for odd products',
-    steps: [
-      'Sparse products: fall back to the last price and mark the fallback status',
-      'Single-price products: keep the one price seen, since there is nothing to sweep',
-    ],
-  },
-  {
-    title: 'An accuracy bar the model must clear',
-    steps: [
-      'Beat the last-week baseline on every slice of the test weeks',
-      'Price 100% of products with no blanks, every price inside its past range',
-    ],
-  },
-];
 
 function Requirement({ item, open, onToggle, id }) {
   return (
@@ -188,14 +150,14 @@ function Sidebar({ notesOpen, onOpenNotes }) {
           <img src="/assets/workspace/shopify-bag.png" alt="" className="h-[24px] w-[24px]" />
         </div>
         <h1 className="text-[15.5px] font-medium leading-[18.5px] text-[#f1f1f1]">
-          Building a Black Friday Price Recommender at Shopify
+          {project.title}
         </h1>
       </div>
 
       <div className="mt-[22px] flex min-h-0 flex-1 flex-col rounded-[17px] border border-[var(--line)]">
         <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-[16px] pt-[15px]">
           <h2 className="text-[19.5px] font-bold leading-[23.5px] tracking-[-0.025em] text-white">
-            Draft the merchant-ready price recommender spec
+            {project.task}
           </h2>
 
           <section className="mt-[17px] border-t border-[var(--line)] pt-[19px]">
@@ -222,7 +184,7 @@ function Sidebar({ notesOpen, onOpenNotes }) {
             <ResourceRow icon={<DocIcon />}>Pricing Pilot Merchant Feedback</ResourceRow>
           </ResourceSection>
           <ResourceSection label="Shared in chat">
-            <ResourceRow icon={<PlayIcon />}>Watch: Draft the merchant-ready price recommender spec</ResourceRow>
+            <ResourceRow icon={<PlayIcon />}>Watch: {project.task}</ResourceRow>
           </ResourceSection>
         </div>
       </div>
@@ -272,15 +234,13 @@ function Chat() {
     };
   }, []);
 
-  const durations = ['30 minutes', '45 minutes', '1 hour', '2 hours'];
-
   return (
-    <section className="mx-auto flex h-full min-h-0 w-full max-w-[459px] flex-col xl:translate-x-2" aria-label="Chat with Erik Vogt">
+    <section className="mx-auto flex h-full min-h-0 w-full max-w-[459px] flex-col xl:translate-x-2" aria-label={`Chat with ${manager.name}`}>
       <header className="flex h-[100px] shrink-0 items-start gap-[12px] pl-[24px] pt-[61px]">
-        <img src="/assets/workspace/avatar-erik.png" alt="" className="h-[35px] w-[35px] rounded-full" />
+        <img src={manager.photo} alt="" className="h-[35px] w-[35px] rounded-full" />
         <div className="-mt-[1px]">
-          <p className="text-[15.5px] font-medium leading-[19px] text-white">Erik Vogt</p>
-          <p className="text-[12.5px] leading-[19px] text-[#8c8c8c]">Manager</p>
+          <p className="text-[15.5px] font-medium leading-[19px] text-white">{manager.name}</p>
+          <p className="text-[12.5px] leading-[19px] text-[#8c8c8c]">{manager.role}</p>
         </div>
       </header>
 
@@ -317,7 +277,7 @@ function Chat() {
           </div>
 
           <a
-            href="https://github.com/BilalA5/Shopify-Black-Friday-Price-Recommender"
+            href={project.repo}
             target="_blank"
             rel="noreferrer"
             className="mr-[8px] mt-[45px] flex h-[45px] max-w-[301px] items-center gap-[9px] self-end rounded-[22px] bg-[#292929] pl-[13px] pr-[18px] text-[14.5px] text-[#d4d4d4] hover:bg-[#2f2f2f]"
@@ -325,7 +285,7 @@ function Chat() {
             <span className="shrink-0 text-[#a9a9a9]">
               <LinkIcon />
             </span>
-            <span className="truncate">https://github.com/BilalA5/Shopify-Black-Friday-Price-Recommender</span>
+            <span className="truncate">{project.repo}</span>
           </a>
           <p className="mr-[12px] mt-[13px] self-end text-[14.5px] leading-[20px] text-[#a9a9a9]">Url Sent</p>
 
@@ -380,52 +340,8 @@ function Chat() {
 
 /* --------------------------------------------------------- meeting notes */
 
-const notes = [
-  {
-    heading: 'Problem',
-    items: [
-      'Merchants pick prices by gut feel or copy by competitors',
-      'Two ways to lose : priced too low (sold out), priced too high (buy competitors)',
-      'No Merchant Intelligence based on sales history of customers',
-      'Cost to Shopify: merchants sell less, gross merchandise volume drops, and unhappy merchants leave.',
-    ],
-  },
-  {
-    heading: 'Outcome',
-    items: [
-      'Recommended Price XGBoost Demand Model',
-      'Units sold at any price and revenue at 3 prices',
-      'Model makes smaller mistakes than simply guessing',
-      'Train on earlier weeks and test on later ones',
-      'Must beat last week on every slice and 100% of products priced no blanks, Every price inside its past range',
-      'Black Friday price recommender app: a Streamlit app suggesting a price for each product.',
-    ],
-  },
-  {
-    heading: 'Deliverable',
-    items: [
-      'Recommended, Expected and Last PRice',
-      'Fallback status when a model cant product a price',
-      'Revenue at 3 prices',
-      'Price Sweep Graph',
-      'Black Friday price recommender app: a Streamlit app suggesting a price for each product.',
-      'Tests model on unseen weeks and compares prediction error against baseline to prove model value.',
-    ],
-  },
-  {
-    heading: 'Stack',
-    items: [
-      'Python and pandas for units sold and week price ber product',
-      'XGBoost for the demand model',
-      'Streamlit for the merchant app',
-    ],
-  },
-];
-
-const notesTitle = 'Building a Black Friday Price Recommender at Shopify';
-
 function downloadNotes() {
-  const md = [`# ${notesTitle}`, '', '## Meeting notes', '']
+  const md = [`# ${project.title}`, '', '## Meeting notes', '']
     .concat(...notes.map((s) => [`### ${s.heading}`, ...s.items.map((i) => `- ${i}`), '']))
     .join('\n');
   const url = URL.createObjectURL(new Blob([md], { type: 'text/markdown' }));
@@ -438,7 +354,7 @@ function NotesDocument() {
   return (
     <div className="rounded-t-[12px] bg-white px-[33px] pb-[96px] pt-[33px] text-[#363636]">
       <div className="flex items-start gap-[29px]">
-        <h2 className="min-w-0 flex-1 xl:max-w-[430px] text-[19.5px] font-bold leading-[30px] text-[#151515]">{notesTitle}</h2>
+        <h2 className="min-w-0 flex-1 xl:max-w-[430px] text-[19.5px] font-bold leading-[30px] text-[#151515]">{project.title}</h2>
         <p className="mt-[5px] w-[64px] shrink-0 text-[9.5px] font-bold uppercase leading-[15px] tracking-[0.2em] text-[#8a8a8a]">
           Meeting notes
         </p>
