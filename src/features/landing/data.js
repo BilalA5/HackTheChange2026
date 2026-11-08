@@ -1,4 +1,3 @@
-// Role catalogue for the landing page. Edit by hand freely.
 export const sections = [
   {
     "id": "popular",

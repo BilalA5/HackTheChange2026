@@ -1,7 +1,7 @@
 import { ease, range, useStickyProgress } from './hooks.js';
 import { Logo, Narrator } from './ui.jsx';
 
-// Company and the logo's width-to-height ratio, as the live site lists them.
+// Each company with its logo's width-to-height ratio.
 const companies = [
   ['google', 2.96],
   ['spotify', 3.24],
@@ -15,7 +15,6 @@ const companies = [
   ['figma', 2.05],
 ];
 
-// Stage is 1100 x 520; the portfolio sits in the middle.
 const PF = { x: 550, y: 280, w: 560, h: 340 };
 const slots = [0, 1, 2, 3, 4].map((row) => 80 + row * 100);
 
@@ -36,7 +35,6 @@ function Odometer({ value }) {
   );
 }
 
-/** "You learn. We match." The portfolio rests in the middle and companies are matched to it one by one. */
 export default function Match() {
   const [ref, p] = useStickyProgress();
   const shown = companies.filter((_, i) => p > 0.12 + i * 0.075).length;

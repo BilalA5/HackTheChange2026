@@ -27,7 +27,6 @@
   letter-spacing: -0.045em;
 }
 
-/* Fixed dock: a dark Start key, then menu and help keys, on a frosted tray. */
 .dock-tray {
   background: rgba(255, 255, 255, 0.55);
   -webkit-backdrop-filter: blur(14px) saturate(1.6);
@@ -76,7 +75,6 @@
   animation: nv-ring 1.4s var(--ease-out) infinite;
 }
 
-/* Company wordmarks drifting on the black screen. */
 @keyframes drift-left {
   to {
     transform: translateX(-50%);
@@ -97,7 +95,6 @@
   animation: drift-right 80s linear infinite;
 }
 
-/* The portfolio in its window scrolls itself, slowly, up and back. */
 @keyframes portfolio-tour {
   0%,
   12% {

@@ -147,7 +147,6 @@ function Menu({ open, onClose }) {
   );
 }
 
-/** The only navigation: Start, a menu and a question mark that opens Ask Flint. */
 export default function Dock() {
   const shown = useScrolled(160);
   const [panel, setPanel] = useState(null);

@@ -67,7 +67,6 @@ const steps = [
   { lead: 'Build your', last: 'portfolio.', clip: 'portfolio', body: <PortfolioWindow />, wave: true },
 ];
 
-/** The path: one line drawn by the scroll, from under the title to a rail beside each step's title. */
 function Thread({ box, nodes, progress }) {
   const path = useRef(null);
   const [len, setLen] = useState(0);
@@ -91,7 +90,6 @@ function Thread({ box, nodes, progress }) {
   );
 }
 
-/** "Learn the job by doing it." then four steps, each a title on the left and its window on the right. */
 export default function Learn() {
   const [headRef, headP] = useViewProgress(0.95, 0.3);
   const wrap = useRef(null);

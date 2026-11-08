@@ -30,7 +30,6 @@ function ToolIcon({ tool }) {
   );
 }
 
-/** A tall role card: its film with the tag, name and tools. Clicking turns it over to what you ship. */
 function RoleCard({ role }) {
   const video = useRef(null);
   const [flipped, setFlipped] = useState(false);
@@ -140,7 +139,6 @@ function RoleCard({ role }) {
   );
 }
 
-/** "We train you for the hottest roles." The row of cards is held on screen and scrolls sideways as you scroll down. */
 export default function Roles() {
   const [field, setField] = useState('popular');
   const shown = roles.filter((r) => (field === 'popular' ? r.popular : r.section === field));
@@ -196,7 +194,6 @@ export default function Roles() {
           </ul>
         </div>
       </div>
-      {/* The dark screen ends on a curve. */}
       <svg viewBox="0 0 1700 90" preserveAspectRatio="none" className="block h-[clamp(40px,5.3vw,90px)] w-full" aria-hidden="true">
         <path d="M0 0H1700V48Q850 128 0 48Z" fill="var(--night)" />
       </svg>

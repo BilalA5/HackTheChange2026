@@ -3,7 +3,6 @@ import { ease, range, useViewProgress } from './hooks.js';
 import { WaveLine } from './Learn.jsx';
 import { Mark, Narrator } from './ui.jsx';
 
-/** A small offer letter that opens between "you" and "hired." and is signed when the wave reaches the end. */
 function OfferLetter({ open, signed }) {
   return (
     <span
@@ -54,7 +53,6 @@ export function Hired() {
   );
 }
 
-/** The foot of the page: Flint World. Colour spreads out from Flint's dome as it comes into view. */
 export function Footer() {
   const [ref, p] = useViewProgress(1, 0.05);
   const spread = ease(range(p, 0.25, 1));
