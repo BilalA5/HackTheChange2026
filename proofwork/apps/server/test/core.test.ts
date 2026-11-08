@@ -1,23 +1,28 @@
 // Core API tests: auth, onboarding, the objective game loop, credits, uploads and the notifications socket.
 import { after, before, describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { parsePathRequest } from "../src/core/services/paths.ts";
+import { createHash } from "node:crypto";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import type { FastifyInstance } from "fastify";
-import type {
-  AuthResponse,
-  CreditsSummary,
-  FtuxView,
-  Job,
-  NotificationItem,
-  Objective,
-  Portfolio,
-  Progress,
-  ScenarioCard,
-  TrainingProgress,
-  User,
+import {
+  CUSTOM_CAREER_ID,
+  type AuthResponse,
+  type Career,
+  type CareerPathSummary,
+  type CreditsSummary,
+  type FtuxView,
+  type Job,
+  type NotificationItem,
+  type Objective,
+  type Portfolio,
+  type Progress,
+  type ScenarioCard,
+  type TrainingProgress,
+  type User,
 } from "@pw/shared";
 import { buildServer } from "../src/app.ts";
 import {
@@ -28,6 +33,7 @@ import {
   SCENARIO_ONE_ID,
   SCENARIO_TWO_ID,
   TRAINING_ID,
+  TRAINING_TWO_ID,
   WORK_STAGE_ID,
 } from "./fixtures.ts";
 import { createStubAi, type StubState } from "./stubAi.ts";
@@ -683,6 +689,242 @@ describe("credits exhaustion", () => {
     const credits = await send<CreditsSummary>(app, "GET", "/api/credits", token);
     assert.equal(credits.body.balance, 5);
   });
+
+  it("returns 402 for a new path when the balance is below the path cost, and writes no path", async () => {
+    const login = await send<AuthResponse>(app, "POST", "/api/auth/login", null, { email: "broke@example.com" });
+    const res = await send<{ error: string }>(app, "POST", "/api/me/path", login.body.token, { targetRole: "Analyst" });
+    assert.equal(res.status, 402);
+    assert.equal(res.body.error, "insufficient_credits");
+    const path = await send<{ path: CareerPathSummary | null }>(app, "GET", "/api/me/path", login.body.token);
+    assert.equal(path.body.path, null);
+    const credits = await send<CreditsSummary>(app, "GET", "/api/credits", login.body.token);
+    assert.equal(credits.body.balance, 5);
+  });
+});
+
+describe("personal career paths", () => {
+  let dir: string;
+  let app: FastifyInstance;
+  let stub: ReturnType<typeof createStubAi>;
+  let token = "";
+  let userId = "";
+  let sessionId = "";
+  let generatedId = "";
+  let secondId = "";
+  let firstScenarioId = "";
+  let objectiveId = "";
+
+  /** The n-th generated career id for a user, as the core builds it. */
+  const pathId = (uid: string, n: number) => `g-${createHash("sha256").update(uid).digest("hex").slice(0, 8)}-${n}`;
+
+  before(async () => {
+    dir = mkdtempSync(join(tmpdir(), "pw-paths-"));
+    stub = createStubAi();
+    app = await startApp(dir, { stub });
+  });
+
+  after(async () => {
+    await app.close();
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  it("reports the provider on /health", async () => {
+    const res = await send<{ provider: string }>(app, "GET", "/api/health", null);
+    assert.equal(res.body.provider, "practice");
+  });
+
+  it("generates the custom path during onboarding and makes it the career", async () => {
+    const login = await send<AuthResponse>(app, "POST", "/api/auth/login", null, { email: "maker@example.com" });
+    token = login.body.token;
+    userId = login.body.user.id;
+
+    const start = await send<FtuxView>(app, "POST", "/api/onboarding/session-start", token);
+    sessionId = start.body.sessionId;
+    await send<FtuxView>(app, "POST", "/api/onboarding/session-turn", token, {
+      sessionId,
+      turn: { kind: "DRAWN", dataUrl: "data:image/png;base64,iVBORw0KGgo=" },
+    });
+    const chat = await send<FtuxView>(app, "POST", "/api/onboarding/session-turn", token, {
+      sessionId,
+      turn: { kind: "MESSAGE", text: "Turn support data into product decisions" },
+    });
+    assert.equal(chat.body.step, "recommend");
+    assert.equal(chat.body.recommendations.find((r) => r.kind === "custom")?.careerId, CUSTOM_CAREER_ID);
+
+    const picked = await send<FtuxView>(app, "POST", "/api/onboarding/session-turn", token, {
+      sessionId,
+      turn: { kind: "SELECT_CAREER", careerId: CUSTOM_CAREER_ID },
+    });
+    assert.equal(picked.status, 200);
+    assert.equal(picked.body.step, "roadmap");
+
+    const me = await send<User>(app, "GET", "/api/me", token);
+    generatedId = me.body.careerId ?? "";
+    assert.equal(generatedId, pathId(userId, 1));
+    assert.equal(me.body.vision?.targetRole, "Turn support data into product decisions");
+    assert.equal(stub.state.pathRequests.length, 1);
+    assert.equal(stub.state.pathRequests[0]?.targetRole, "Turn support data into product decisions");
+
+    const trainings = await send<{ library: string[]; recommended: string[] }>(app, "GET", "/api/me/trainings", token);
+    assert.deepEqual(trainings.body.recommended, [TRAINING_ID, TRAINING_TWO_ID]);
+    assert.ok(trainings.body.library.includes(TRAINING_TWO_ID));
+  });
+
+  it("does not create a second path when the custom selection is sent again", async () => {
+    const again = await send<FtuxView>(app, "POST", "/api/onboarding/session-turn", token, {
+      sessionId,
+      turn: { kind: "SELECT_CAREER", careerId: CUSTOM_CAREER_ID },
+    });
+    assert.equal(again.status, 200);
+    assert.equal(stub.state.pathRequests.length, 1);
+    const careers = await send<Career[]>(app, "GET", "/api/careers", token);
+    assert.equal(careers.body.filter((c) => c.generated).length, 1);
+    const me = await send<User>(app, "GET", "/api/me", token);
+    assert.equal(me.body.careerId, generatedId);
+  });
+
+  it("lists the generated career and gives three cards with the first available", async () => {
+    const careers = await send<Career[]>(app, "GET", "/api/careers", token);
+    assert.ok(careers.body.some((c) => c.id === CAREER_ID));
+    assert.equal(careers.body.find((c) => c.id === generatedId)?.generated, true);
+
+    const cards = await send<ScenarioCard[]>(app, "GET", "/api/scenarios", token);
+    assert.equal(cards.body.length, 3);
+    assert.deepEqual(cards.body.map((c) => c.order), [1, 2, 3]);
+    assert.equal(cards.body[0]?.status, "available");
+    assert.equal(cards.body[1]?.status, "locked");
+    assert.equal(cards.body[0]?.careerId, generatedId);
+    firstScenarioId = cards.body[0]?.id ?? "";
+    assert.equal(firstScenarioId, `${generatedId}-s1`);
+    assert.equal(cards.body[0]?.company.name, "Harbor Lane");
+
+    const path = await send<{ path: CareerPathSummary | null }>(app, "GET", "/api/me/path", token);
+    assert.equal(path.body.path?.careerId, generatedId);
+    assert.equal(path.body.path?.scenarioTitles.length, 3);
+    assert.equal(path.body.path?.engine, "practice");
+    assert.equal(path.body.path?.provider, "practice");
+
+    const notes = await send<NotificationItem[]>(app, "GET", "/api/notifications", token);
+    const ready = notes.body.find((n) => n.title === "Your path is ready");
+    assert.equal(ready?.category, "progress");
+    assert.equal(ready?.body, "3 projects built for Turn support data into product decisions");
+  });
+
+  it("runs the kickoff of a generated scenario through notes and completion", async () => {
+    const opened = await send<Objective>(app, "POST", "/api/objectives", token, { scenarioId: firstScenarioId });
+    assert.equal(opened.status, 200);
+    objectiveId = opened.body.id;
+
+    for (const n of [1, 2, 3]) {
+      const segmentId = `${firstScenarioId}-seg-${n}`;
+      const watched = await send<Objective>(app, "POST", `/api/objectives/${objectiveId}/kickoff/watched`, token, { segmentId });
+      assert.equal(watched.status, 200);
+      const check = await send<{ verdict: { accepted: boolean } }>(app, "POST", `/api/objectives/${objectiveId}/kickoff/notes-check`, token, {
+        segmentId,
+        text: "The team needs a clear answer to this part of the project.",
+      });
+      assert.equal(check.body.verdict.accepted, true);
+    }
+    const complete = await send<Objective>(app, "POST", `/api/objectives/${objectiveId}/kickoff/complete`, token);
+    assert.equal(complete.status, 200);
+    assert.equal(complete.body.phase, "pou");
+  });
+
+  it("keeps generated content private: another learner gets 404", async () => {
+    const other = await send<AuthResponse>(app, "POST", "/api/auth/login", null, { email: "rival@example.com" });
+    const detail = await send<{ error: string }>(app, "GET", `/api/scenarios/${firstScenarioId}`, other.body.token);
+    assert.equal(detail.status, 404);
+    const opened = await send<{ error: string }>(app, "POST", "/api/objectives", other.body.token, { scenarioId: firstScenarioId });
+    assert.equal(opened.status, 404);
+    const careers = await send<Career[]>(app, "GET", "/api/careers", other.body.token);
+    assert.equal(careers.body.some((c) => c.id === generatedId), false);
+    const path = await send<{ path: CareerPathSummary | null }>(app, "GET", "/api/me/path", other.body.token);
+    assert.equal(path.body.path, null);
+    const patch = await send<{ error: string }>(app, "PATCH", "/api/me", other.body.token, { careerId: generatedId });
+    assert.equal(patch.status, 400);
+  });
+
+  it("generates a second path from Settings for credits, switches career and keeps old objectives readable", async () => {
+    const before = (await send<CreditsSummary>(app, "GET", "/api/credits", token)).body.balance ?? 0;
+    const res = await send<{ path: CareerPathSummary; career: Career; scenarios: ScenarioCard[] }>(app, "POST", "/api/me/path", token, {
+      targetRole: "Growth Analyst",
+      level: "Junior",
+      why: "   ",
+    });
+    assert.equal(res.status, 200);
+    secondId = res.body.path.careerId;
+    assert.equal(secondId, pathId(userId, 2));
+    assert.equal(res.body.career.id, secondId);
+    assert.equal(res.body.scenarios.length, 3);
+    assert.equal(res.body.scenarios[0]?.status, "available");
+
+    const credits = await send<CreditsSummary>(app, "GET", "/api/credits", token);
+    assert.equal(credits.body.balance, before - 60);
+
+    const me = await send<User>(app, "GET", "/api/me", token);
+    assert.equal(me.body.careerId, secondId);
+    assert.equal(me.body.vision?.level, "Junior");
+    assert.equal(me.body.vision?.targetRole, "Growth Analyst");
+
+    const old = await send<Objective>(app, "GET", `/api/objectives/${objectiveId}`, token);
+    assert.equal(old.status, 200);
+    assert.equal(old.body.scenarioId, firstScenarioId);
+    const oldScenario = await send<{ id: string; title: string }>(app, "GET", `/api/scenarios/${firstScenarioId}`, token);
+    assert.equal(oldScenario.status, 200);
+    const list = await send<Objective[]>(app, "GET", "/api/objectives", token);
+    assert.equal(list.body.length, 1);
+
+    const current = await send<{ path: CareerPathSummary | null }>(app, "GET", "/api/me/path", token);
+    assert.equal(current.body.path?.careerId, secondId);
+    assert.deepEqual(current.body.path?.request, { targetRole: "Growth Analyst", level: "Junior" });
+  });
+
+  it("lists the user's own generated jobs first when on a generated path", async () => {
+    const jobs = await send<{ unlocked: boolean; jobs: Job[] }>(app, "GET", "/api/jobs", token);
+    assert.equal(jobs.status, 200);
+    assert.equal(jobs.body.jobs.length, 11);
+    assert.ok(jobs.body.jobs.slice(0, 5).every((j) => j.careerId === secondId));
+    assert.equal(jobs.body.jobs[5]?.id, JOB_ID);
+    assert.ok(jobs.body.jobs.slice(6).every((j) => j.careerId === generatedId));
+
+    const draft = await send<{ error: string }>(app, "POST", `/api/jobs/${secondId}-j1/applications`, token);
+    assert.equal(draft.status, 403, "a generated job id resolves; the portal is simply still locked");
+    assert.equal(draft.body.error, "locked");
+  });
+
+  it("switches the career back to one of the learner's own generated paths via PATCH /me", async () => {
+    const res = await send<User>(app, "PATCH", "/api/me", token, { careerId: generatedId });
+    assert.equal(res.status, 200);
+    assert.equal(res.body.careerId, generatedId);
+    const jobs = await send<{ jobs: Job[] }>(app, "GET", "/api/jobs", token);
+    assert.ok(jobs.body.jobs.slice(0, 5).every((j) => j.careerId === generatedId));
+    await send<User>(app, "PATCH", "/api/me", token, { careerId: secondId });
+  });
+
+  it("refunds and leaves the career alone when the generated path fails validation", async () => {
+    const before = (await send<CreditsSummary>(app, "GET", "/api/credits", token)).body.balance ?? 0;
+    stub.state.brokenPaths = 1;
+    const res = await send<{ error: string; message: string }>(app, "POST", "/api/me/path", token, { targetRole: "Broken Role" });
+    assert.equal(res.status, 500);
+    assert.equal(res.body.message, "Could not build your path, please try again");
+    const credits = await send<CreditsSummary>(app, "GET", "/api/credits", token);
+    assert.equal(credits.body.balance, before);
+    const me = await send<User>(app, "GET", "/api/me", token);
+    assert.equal(me.body.careerId, secondId);
+  });
+
+  it("rejects a path request without a target role", async () => {
+    const res = await send<{ error: string }>(app, "POST", "/api/me/path", token, { targetRole: " " });
+    assert.equal(res.status, 400);
+    const none = await send<{ error: string }>(app, "POST", "/api/me/path", token, { level: "Junior" });
+    assert.equal(none.status, 400);
+  });
+
+  it("exports the generated path rows", async () => {
+    const exported = await send<{ tables: Record<string, unknown[]> }>(app, "GET", "/api/me/export", token);
+    assert.equal(exported.status, 200);
+    assert.equal((exported.body.tables.generated_paths ?? []).length, 2);
+  });
 });
 
 /** Queues incoming socket messages so tests can await them in order. */
@@ -708,3 +950,14 @@ function messageQueue(ws: { on(event: "message", listener: (data: unknown) => vo
       }),
   };
 }
+
+it("path requests drop no-preference answers instead of quoting them", () => {
+  const request = parsePathRequest({
+    targetRole: "Marketing Coordinator",
+    industry: "Not sure yet",
+    companyType: "any",
+    location: "Toronto",
+    timeline: " 3 months ",
+  });
+  assert.deepEqual(request, { targetRole: "Marketing Coordinator", location: "Toronto", timeline: "3 months" });
+});

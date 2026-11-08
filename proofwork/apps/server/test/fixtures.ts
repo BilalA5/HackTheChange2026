@@ -22,6 +22,7 @@ export const SCENARIO_TWO_ID = "scn-two";
 export const WORK_STAGE_ID = "stg-plan";
 export const PRESENTATION_STAGE_ID = "stg-present";
 export const TRAINING_ID = "tr-prompting";
+export const TRAINING_TWO_ID = "tr-mindset";
 export const JOB_ID = "job-junior";
 
 const slide: Slide = { heading: "Context", bullets: ["Tickets arrive all day", "Routing is manual today"] };
@@ -167,6 +168,19 @@ const trainings: Training[] = [
     lessons: [
       { title: "Lesson one", body: "Be specific." },
       { title: "Lesson two", body: "Show examples." },
+    ],
+  },
+  {
+    id: TRAINING_TWO_ID,
+    kind: "mindset",
+    title: "Asking for help",
+    summary: "Know when to ask and how.",
+    minutes: 8,
+    tags: ["communication"],
+    recommendedFor: [],
+    lessons: [
+      { title: "Lesson one", body: "Ask early." },
+      { title: "Lesson two", body: "Bring a hypothesis." },
     ],
   },
 ];
