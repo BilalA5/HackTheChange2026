@@ -1,0 +1,4 @@
+#!/bin/bash
+# cdp <cmd> <target> [args]  → drives a running Proofwork desktop build (CDP_PORT, default 9333).
+DIR="$(cd "$(dirname "$0")" && pwd)"
+CDP_PORT="${CDP_PORT:-9333}" exec node "$DIR/cdp.mjs" "$@"

@@ -1,0 +1,6 @@
+#!/bin/bash
+# q <cmd> [key=value ...]  → calls the QA harness. Example: q goto url=http://localhost:5180/login ; q shot out=/tmp/a.png
+cmd="$1"; shift
+args=()
+for kv in "$@"; do args+=(--data-urlencode "$kv"); done
+curl -s -G "http://127.0.0.1:${QA_PORT:-9555}/$cmd" "${args[@]}"; echo
