@@ -1,6 +1,6 @@
 // Live: coach, support, application drafting and portfolio bio (fast tier).
 import type { ChatMessage, Job, Portfolio, User } from "@pw/shared";
-import type { Llm } from "../llm.ts";
+import type { LlmClient } from "../llm.ts";
 import { clip, obj, str } from "./common.ts";
 
 const COACH_SYSTEM = `
@@ -10,7 +10,7 @@ Never promise job offers, salaries or outcomes. Never give personalised financia
 `.trim();
 
 export async function coachReplyLive(
-  llm: Llm,
+  llm: LlmClient,
   i: { user: User; history: ChatMessage[]; message: string; progressSummary: string },
 ): Promise<string> {
   const history = i.history
@@ -33,7 +33,7 @@ Always end by saying that a human from the team reads every thread within one bu
 Do not promise fixes, refunds or timelines beyond that.
 `.trim();
 
-export async function supportReplyLive(llm: Llm, i: { user: User; history: ChatMessage[]; message: string }): Promise<string> {
+export async function supportReplyLive(llm: LlmClient, i: { user: User; history: ChatMessage[]; message: string }): Promise<string> {
   const history = i.history
     .slice(-10)
     .map((m) => `${m.role === "npc" ? "Support" : "Learner"}: ${clip(m.text, 400)}`)
@@ -80,7 +80,7 @@ const APPLY_SCHEMA = {
 };
 
 export async function draftApplicationLive(
-  llm: Llm,
+  llm: LlmClient,
   i: { job: Job; user: User; portfolio: Portfolio },
   fallback: { answers: Record<string, string>; guessed: string[]; coverLetter: string },
 ): Promise<{ answers: Record<string, string>; guessed: string[]; coverLetter: string }> {
@@ -135,7 +135,7 @@ Headline: under 12 words. Bio: 2 to 3 sentences, first or third person, no super
 `.trim();
 
 export async function portfolioBioLive(
-  llm: Llm,
+  llm: LlmClient,
   i: { user: User; projects: Portfolio["projects"] },
 ): Promise<{ headline: string; bio: string }> {
   const projects = i.projects.map((p) => `- ${p.title} (${p.company}, ${p.overall}): ${p.summary}`).join("\n");

@@ -11,7 +11,6 @@ import type { FastifyInstance } from "fastify";
 import type {
   AuthFrame,
   ChatMessage,
-  Company,
   CoworkClientMessage,
   CoworkServerMessage,
   CoworkTodo,
@@ -25,18 +24,6 @@ import type {
   User,
 } from "@pw/shared";
 import type { AiEngine, ModelTier, ServerContext } from "../contracts.ts";
-
-/** Lookup of authored content. Defaults to @pw/content; tests inject a fixture. */
-export interface ContentLookup {
-  getScenario(id: string): Scenario | undefined;
-  findStage(scenarioId: string, stageId: string): Stage | undefined;
-  getNpc(id: string): Npc | undefined;
-  getCompany?(id: string): Company | undefined;
-}
-
-export interface CoworkSocketOptions {
-  content?: ContentLookup;
-}
 
 /** Minimal structural view of the ws socket that @fastify/websocket hands the handler. */
 interface SocketLike {
@@ -52,16 +39,6 @@ const MAX_XP_AWARDS = 3;
 const MAX_KEYS = 500;
 const HISTORY_MAX = 20;
 const WS_UNAUTHORIZED = 4401;
-
-async function defaultContent(): Promise<ContentLookup> {
-  const c = await import("@pw/content");
-  return {
-    getScenario: (id) => c.getScenario(id),
-    findStage: (scenarioId, stageId) => c.findStage(scenarioId, stageId),
-    getNpc: (id) => c.getNpc(id),
-    getCompany: (id) => c.getCompany(id),
-  };
-}
 
 function rawToString(raw: unknown): string {
   if (typeof raw === "string") return raw;
@@ -105,13 +82,13 @@ interface Turn {
 }
 
 /** Registers GET /ws/cowork on the given Fastify app. Requires @fastify/websocket to be registered. */
-export function registerCoworkSocket(app: FastifyInstance, ctx: ServerContext, opts: CoworkSocketOptions = {}): void {
+export function registerCoworkSocket(app: FastifyInstance, ctx: ServerContext): void {
   app.get("/ws/cowork", { websocket: true }, (socket: unknown) => {
-    handleConnection(socket as SocketLike, ctx, opts);
+    handleConnection(socket as SocketLike, ctx);
   });
 }
 
-function handleConnection(socket: SocketLike, ctx: ServerContext, opts: CoworkSocketOptions): void {
+function handleConnection(socket: SocketLike, ctx: ServerContext): void {
   let closed = false;
   let authPromise: Promise<string | null> | null = null;
   let userId: string | null = null;
@@ -282,21 +259,14 @@ function handleConnection(socket: SocketLike, ctx: ServerContext, opts: CoworkSo
       send({ type: "error", code: "not_found", message: "Objective not found." });
       return;
     }
-    let content: ContentLookup;
-    try {
-      content = opts.content ?? (await defaultContent());
-    } catch (err) {
-      ctx.log("cowork content unavailable", { error: String(err) });
-      send({ type: "error", code: "content_unavailable", message: "Content is unavailable right now." });
-      return;
-    }
-    const scenario = content.getScenario(objective.scenarioId);
-    const stage = content.findStage(objective.scenarioId, msg.stageId);
-    const npc = scenario ? content.getNpc(scenario.npcId) : undefined;
-    if (!scenario || !stage || !npc) {
+    // Scenarios are resolved through the core, so a learner's generated path works like an authored one.
+    const resolved = ctx.resolveScenario(userId, objective.scenarioId);
+    const stage = resolved?.scenario.stages.find((st) => st.id === msg.stageId);
+    if (!resolved || !stage) {
       send({ type: "error", code: "not_found", message: "Stage not found." });
       return;
     }
+    const { scenario, npc } = resolved;
     const user = ctx.getUser(userId);
     const learnerName = msg.learnerName?.trim() || user?.name || "there";
     live = {

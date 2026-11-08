@@ -1,29 +1,43 @@
-// Live engine: same method signatures as the mock. Every call that fails or is refused logs a short
-// warning and falls back to the deterministic mock, so the app never breaks.
-import type { AiEngine } from "../../contracts.ts";
-import { describeError, type Llm, type Models } from "../llm.ts";
+// Live engine: same method signatures as the practice engine. Every call that fails or is refused logs a
+// short warning and falls back to the deterministic practice engine, so the app never breaks.
+import type { AiEngine, GeneratedPath, GeneratePathInput } from "../../contracts.ts";
+import { describeError, type LlmClient } from "../llm.ts";
 import { createMockEngine } from "../mock/index.ts";
+import { generatePathPractice } from "../mock/pathgen/index.ts";
 import { checkNoteLive, answerKickoffLive, judgePouLive } from "./kickoff.ts";
 import { planTurnLive, learnChatLive } from "./plan.ts";
 import { gradePresentationLive, gradeSubmissionLive } from "./grade.ts";
 import { coachReplyLive, supportReplyLive, draftApplicationLive, portfolioBioLive } from "./writing.ts";
 import { coworkTurnLive } from "./cowork.ts";
+import { generatePathLive } from "./pathgen.ts";
 
 async function attempt<T>(name: string, live: () => Promise<T>, fallback: () => T | Promise<T>): Promise<T> {
   try {
     return await live();
   } catch (err) {
-    console.warn(`[ai] live ${name} failed, using mock: ${describeError(err)}`);
+    console.warn(`[ai] live ${name} failed, using practice: ${describeError(err)}`);
     return await fallback();
   }
 }
 
-export function createLiveEngine(models: Models, llm: Llm): AiEngine {
-  const mock = createMockEngine(models);
+export function createLiveEngine(llm: LlmClient): AiEngine {
+  const mock = createMockEngine({ quality: "practice", fast: "practice" });
 
   return {
     mode: "live",
-    models,
+    provider: llm.provider,
+    models: llm.models,
+
+    generatePath: (i: GeneratePathInput): Promise<GeneratedPath> =>
+      attempt(
+        "generatePath",
+        async () => {
+          // Practice output supplies the jobs and the request-tailored structure; live output replaces the pack.
+          const practice = generatePathPractice(i);
+          return generatePathLive(llm, i, practice);
+        },
+        async () => ({ ...generatePathPractice(i), engine: "practice" as const }),
+      ),
 
     checkNote: (i) => attempt("checkNote", () => checkNoteLive(llm, i), () => mock.checkNote(i)),
 
@@ -57,7 +71,7 @@ export function createLiveEngine(models: Models, llm: Llm): AiEngine {
     portfolioBio: (i) => attempt("portfolioBio", () => portfolioBioLive(llm, i), () => mock.portfolioBio(i)),
 
     coworkTurn: async (i) => {
-      // Once text has streamed, a mock retry would duplicate it in the UI; return what arrived instead.
+      // Once text has streamed, a practice retry would duplicate it in the UI; return what arrived instead.
       let emitted = "";
       try {
         return await coworkTurnLive(

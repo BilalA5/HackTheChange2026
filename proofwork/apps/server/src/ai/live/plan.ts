@@ -1,6 +1,6 @@
 // Live: Plan-mode negotiation (quality tier) and Learn-mode tutoring (fast tier).
 import type { ChatMessage, Npc, Scenario, Stage } from "@pw/shared";
-import type { Llm } from "../llm.ts";
+import type { LlmClient } from "../llm.ts";
 import { clip, obj, personaBlock, str, strArr, STRING_ARRAY } from "./common.ts";
 
 const PLAN_SYSTEM = (npc: Npc, scenario: Scenario, stage: Stage) =>
@@ -32,7 +32,7 @@ const PLAN_SCHEMA = {
 };
 
 export async function planTurnLive(
-  llm: Llm,
+  llm: LlmClient,
   i: { scenario: Scenario; stage: Stage; npc: Npc; history: ChatMessage[]; message: string },
 ): Promise<{ reply: string; agreedRequirements: string[]; estimatedMinutes: number | null; isComplete: boolean; todos: string[] }> {
   const transcript = i.history
@@ -77,7 +77,7 @@ ${stage.learn.map((l) => `## ${l.title}\n${l.body}`).join("\n\n")}
 `.trim();
 
 export async function learnChatLive(
-  llm: Llm,
+  llm: LlmClient,
   i: { scenario: Scenario; stage: Stage; history: ChatMessage[]; message: string },
 ): Promise<string> {
   const history = i.history

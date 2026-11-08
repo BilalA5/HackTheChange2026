@@ -2,7 +2,7 @@
 import type { Evaluation, Objective, PresentationInput, Rubric, RubricAxis, RubricLevel, Scenario, Stage, Submission } from "@pw/shared";
 import { RUBRIC_AXES } from "@pw/shared";
 import type { GradeResult } from "../../contracts.ts";
-import type { Llm } from "../llm.ts";
+import type { LlmClient } from "../llm.ts";
 import { clip, obj, oneOf, str, strArr, STRING_ARRAY } from "./common.ts";
 import { overallOf } from "../mock/grade.ts";
 
@@ -73,7 +73,7 @@ function validateGrade(raw: unknown, fallbackOverall: (levels: RubricLevel[]) =>
 }
 
 export async function gradeSubmissionLive(
-  llm: Llm,
+  llm: LlmClient,
   i: {
     scenario: Scenario;
     stage: Stage;
@@ -114,7 +114,7 @@ export async function gradeSubmissionLive(
 }
 
 export async function gradePresentationLive(
-  llm: Llm,
+  llm: LlmClient,
   i: { scenario: Scenario; stage: Stage; input: PresentationInput; priorEvaluations: Evaluation[] },
 ): Promise<GradeResult> {
   const priors = i.priorEvaluations.slice(-5).map((e) => `- ${e.overall}: ${e.summary}`).join("\n");

@@ -1,7 +1,7 @@
 // Live co-worker turn: streamed text plus one-shot tool actions (todos, highlight, resource, xp).
 import type { Npc, Scenario, Stage } from "@pw/shared";
 import type { ModelTier } from "../../contracts.ts";
-import type { ContentBlock, Llm, ToolDef, ToolUse } from "../llm.ts";
+import type { ContentBlock, LlmClient, ToolDef, ToolUse } from "../llm.ts";
 import { imageBlock } from "../llm.ts";
 import { clip, personaBlock } from "./common.ts";
 
@@ -41,7 +41,7 @@ export const COWORK_TOOLS: ToolDef[] = [
   {
     name: "set_todos",
     description: "Replace the learner's todo list for this stage. Use only when the list should genuinely change, for example at intro.",
-    input_schema: {
+    parameters: {
       type: "object",
       properties: {
         items: {
@@ -58,40 +58,36 @@ export const COWORK_TOOLS: ToolDef[] = [
       required: ["items"],
       additionalProperties: false,
     },
-    eager_input_streaming: true,
   },
   {
     name: "highlight",
     description: "Point at one region of the learner's screenshot. Coordinates are normalised 0 to 1 of the screenshot.",
-    input_schema: {
+    parameters: {
       type: "object",
       properties: { x: unit, y: unit, w: unit, h: unit, label: { type: "string" } },
       required: ["x", "y", "w", "h", "label"],
       additionalProperties: false,
     },
-    eager_input_streaming: true,
   },
   {
     name: "share_resource",
     description: "Share one short resource such as a tip, a doc excerpt or a link relevant to the next step.",
-    input_schema: {
+    parameters: {
       type: "object",
       properties: { title: { type: "string" }, body: { type: "string" }, url: { type: "string" } },
       required: ["title", "body"],
       additionalProperties: false,
     },
-    eager_input_streaming: true,
   },
   {
     name: "award_xp",
     description: "Award a small amount of XP for a clear step the learner just completed. Use sparingly.",
-    input_schema: {
+    parameters: {
       type: "object",
       properties: { amount: { type: "integer", minimum: 10, maximum: 50 }, reason: { type: "string" } },
       required: ["amount", "reason"],
       additionalProperties: false,
     },
-    eager_input_streaming: true,
   },
 ];
 
@@ -187,7 +183,7 @@ function historyMessages(history: CoworkLiveInput["history"]): { role: "user" | 
 }
 
 export async function coworkTurnLive(
-  llm: Llm,
+  llm: LlmClient,
   i: CoworkLiveInput,
   onDelta: (d: string) => void,
 ): Promise<CoworkLiveResult> {

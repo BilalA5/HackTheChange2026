@@ -1,7 +1,7 @@
 // Live: kickoff note checks, kickoff Q&A and Proof-of-Understanding judging.
 import type { Company, KickoffSegment, Npc, NoteVerdict, PouQuestion, Scenario } from "@pw/shared";
 import type { ModelTier } from "../../contracts.ts";
-import type { Llm } from "../llm.ts";
+import type { LlmClient } from "../llm.ts";
 import { wordCount } from "../text.ts";
 import { STRING_ARRAY, clip, obj, oneOf, personaBlock, str, strArr, subsetOf } from "./common.ts";
 
@@ -28,7 +28,7 @@ const NOTE_SCHEMA = {
 };
 
 export async function checkNoteLive(
-  llm: Llm,
+  llm: LlmClient,
   i: { scenario: Scenario; segment: KickoffSegment; text: string; tier?: ModelTier },
 ): Promise<Omit<NoteVerdict, "xp">> {
   const points = i.segment.rubricPoints;
@@ -62,7 +62,7 @@ Do not invent figures, names or commitments.
 `.trim();
 
 export async function answerKickoffLive(
-  llm: Llm,
+  llm: LlmClient,
   i: { scenario: Scenario; npc: Npc; company: Company; segment: KickoffSegment; question: string },
 ): Promise<string> {
   const slides = i.segment.slides
@@ -104,7 +104,7 @@ const POU_SCHEMA = {
 };
 
 export async function judgePouLive(
-  llm: Llm,
+  llm: LlmClient,
   i: { scenario: Scenario; npc: Npc; question: PouQuestion; transcript: string; isFollowUp: boolean },
 ): Promise<{ verdict: "pass" | "partial" | "fail"; reaction: string; covered: string[]; missing: string[] }> {
   const points = i.question.rubricPoints;
