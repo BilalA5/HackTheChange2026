@@ -17,13 +17,13 @@ pnpm install
 pnpm dev
 ```
 
-Open http://127.0.0.1:30000.
+Open http://localhost:3000.
 
 | Script         | Does                                |
 | -------------- | ----------------------------------- |
-| `pnpm dev`     | Starts the dev server on port 30000 |
+| `pnpm dev`     | Starts the dev server on port 3000 |
 | `pnpm build`   | Builds to `dist/`                   |
-| `pnpm preview` | Serves the build on port 30000      |
+| `pnpm preview` | Serves the build on port 3000      |
 | `pnpm lint`    | Runs ESLint                         |
 | `pnpm format`  | Formats with Prettier               |
 
