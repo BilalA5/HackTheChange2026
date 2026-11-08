@@ -11,6 +11,7 @@ import {
   type StageProgress,
 } from "@pw/shared";
 import type { ResolvedScenario } from "../content.ts";
+import { contentFor } from "../user-content.ts";
 import { hasXpReason, awardXp, recordActivity, releaseHeldXp } from "./progress.ts";
 import { conflict, locked, notFound } from "../errors.ts";
 import type { Core } from "../types.ts";
@@ -65,8 +66,8 @@ export function newObjective(scenario: Scenario): Objective {
   };
 }
 
-export function resolveFor(core: Core, obj: Objective): ResolvedScenario {
-  const resolved = core.content.resolveScenario(obj.scenarioId);
+export function resolveFor(core: Core, userId: string, obj: Objective): ResolvedScenario {
+  const resolved = contentFor(core, userId).resolveScenario(obj.scenarioId);
   if (!resolved) throw new Error(`Content missing for scenario ${obj.scenarioId}`);
   return resolved;
 }
@@ -90,12 +91,13 @@ export function getUserObjective(core: Core, userId: string, id: string): Object
 }
 
 export async function createObjective(core: Core, userId: string, scenarioId: string): Promise<Objective> {
-  const scenario = core.content.getScenario(scenarioId);
+  const content = contentFor(core, userId);
+  const scenario = content.getScenario(scenarioId);
   if (!scenario) throw notFound("Scenario not found.");
   return withLock(`create:${userId}:${scenarioId}`, async () => {
     const existing = findObjectiveByScenario(core.db, userId, scenarioId);
     if (existing) return existing;
-    if (scenarioStatus(core, scenario, objectivesByScenario(core.db, userId)) === "locked") {
+    if (scenarioStatus(content, scenario, objectivesByScenario(core.db, userId)) === "locked") {
       throw locked("Finish the previous project to unlock this one.");
     }
     const objective = newObjective(scenario);
@@ -128,7 +130,7 @@ export function patchObjective(core: Core, userId: string, objectiveId: string, 
 export function markWatched(core: Core, userId: string, objectiveId: string, body: unknown): Promise<Objective> {
   const segmentId = reqStr(asObject(body), "segmentId", { max: 128 });
   return mutateObjective(core, userId, objectiveId, (obj) => {
-    findSegment(resolveFor(core, obj).scenario, segmentId);
+    findSegment(resolveFor(core, userId, obj).scenario, segmentId);
     if (!obj.kickoffWatched.includes(segmentId)) obj.kickoffWatched.push(segmentId);
     if (obj.phase === "brief") obj.phase = "kickoff";
     return obj;
@@ -145,7 +147,7 @@ export function notesCheck(
   const segmentId = reqStr(o, "segmentId", { max: 128 });
   const text = reqStr(o, "text", { max: 5000 });
   return mutateObjective(core, userId, objectiveId, async (obj) => {
-    const { scenario } = resolveFor(core, obj);
+    const { scenario } = resolveFor(core, userId, obj);
     const segment = findSegment(scenario, segmentId);
     if (obj.phase === "pou" || obj.phase === "stages" || obj.phase === "complete") {
       throw conflict("Kickoff notes are closed for this project.");
@@ -171,7 +173,7 @@ export function askKickoff(core: Core, userId: string, objectiveId: string, body
   const segmentId = reqStr(o, "segmentId", { max: 128 });
   const question = reqStr(o, "question", { max: 1000 });
   return mutateObjective(core, userId, objectiveId, async (obj) => {
-    const { scenario, npc, company } = resolveFor(core, obj);
+    const { scenario, npc, company } = resolveFor(core, userId, obj);
     const segment = findSegment(scenario, segmentId);
     const answer = await paidCall(core, userId, "kickoff_question", () =>
       core.ai.answerKickoffQuestion({ scenario, npc, company, segment, question }),
@@ -183,7 +185,7 @@ export function askKickoff(core: Core, userId: string, objectiveId: string, body
 
 export function completeKickoff(core: Core, userId: string, objectiveId: string): Promise<Objective> {
   return mutateObjective(core, userId, objectiveId, (obj) => {
-    const { scenario } = resolveFor(core, obj);
+    const { scenario } = resolveFor(core, userId, obj);
     const missing = scenario.kickoff.segments.filter((s) => obj.noteVerdicts[s.id]?.accepted !== true);
     if (missing.length > 0) {
       throw conflict(`Write an accepted note for every kickoff section first (${missing.length} left).`);
@@ -196,7 +198,7 @@ export function completeKickoff(core: Core, userId: string, objectiveId: string)
 export function startPou(core: Core, userId: string, objectiveId: string): Promise<{ question: PouTurn; objective: Objective }> {
   return mutateObjective(core, userId, objectiveId, (obj) => {
     if (obj.phase !== "pou") throw conflict("Finish the kickoff before the proof of understanding.");
-    const { scenario } = resolveFor(core, obj);
+    const { scenario } = resolveFor(core, userId, obj);
     const current = scenario.pou[obj.pou.questionIndex];
     if (!current) throw conflict("No proof-of-understanding question is pending.");
     obj.pou.status = "in_progress";
@@ -255,7 +257,7 @@ export function answerPou(
     if (obj.phase !== "pou") throw conflict("The proof of understanding is not open.");
     if (obj.pou.status === "not_started") throw conflict("Start the proof of understanding first.");
     if (obj.pou.status === "passed") throw conflict("The proof of understanding is already passed.");
-    const { scenario, npc } = resolveFor(core, obj);
+    const { scenario, npc } = resolveFor(core, userId, obj);
     const question = scenario.pou[obj.pou.questionIndex];
     if (!question) throw conflict("No question is pending.");
 

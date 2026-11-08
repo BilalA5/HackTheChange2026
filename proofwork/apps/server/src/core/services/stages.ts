@@ -43,8 +43,8 @@ function makeChat(role: ChatMessage["role"], text: string): ChatMessage {
   return { id: uid(), role, text, at: nowIso() };
 }
 
-function stageCtx(core: Core, obj: Objective, stageId: string): StageCtx {
-  const { scenario, npc, company } = resolveFor(core, obj);
+function stageCtx(core: Core, userId: string, obj: Objective, stageId: string): StageCtx {
+  const { scenario, npc, company } = resolveFor(core, userId, obj);
   const content = scenario.stages.find((s) => s.id === stageId);
   const progress = obj.stages[stageId];
   if (!content || !progress) throw notFound("Stage not found.");
@@ -62,7 +62,7 @@ function assertStagesPhase(obj: Objective): void {
 export function startStage(core: Core, userId: string, objectiveId: string, stageId: string): Promise<Objective> {
   return mutateObjective(core, userId, objectiveId, (obj) => {
     assertStagesPhase(obj);
-    const ctx = stageCtx(core, obj, stageId);
+    const ctx = stageCtx(core, userId, obj, stageId);
     assertNotLocked(ctx);
     if (ctx.progress.status !== "completed") ctx.progress.status = "in_progress";
     if (!ctx.progress.startedAt) ctx.progress.startedAt = nowIso();
@@ -75,7 +75,7 @@ export function startStage(core: Core, userId: string, objectiveId: string, stag
 export function setStageMode(core: Core, userId: string, objectiveId: string, stageId: string, body: unknown): Promise<Objective> {
   const mode = reqEnum(asObject(body), "mode", STAGE_MODES);
   return mutateObjective(core, userId, objectiveId, (obj) => {
-    const ctx = stageCtx(core, obj, stageId);
+    const ctx = stageCtx(core, userId, obj, stageId);
     assertNotLocked(ctx);
     ctx.progress.mode = mode;
     return obj;
@@ -92,7 +92,7 @@ export function planMessage(
   const message = reqStr(asObject(body), "message", { max: 2000 });
   return mutateObjective(core, userId, objectiveId, async (obj) => {
     assertStagesPhase(obj);
-    const ctx = stageCtx(core, obj, stageId);
+    const ctx = stageCtx(core, userId, obj, stageId);
     assertNotLocked(ctx);
     const learnerName = requireUser(core.db, userId).name;
     const history = [...ctx.progress.planMessages];
@@ -120,7 +120,7 @@ export function learnChat(
 ): Promise<{ reply: ChatMessage; objective: Objective }> {
   const message = reqStr(asObject(body), "message", { max: 2000 });
   return mutateObjective(core, userId, objectiveId, async (obj) => {
-    const ctx = stageCtx(core, obj, stageId);
+    const ctx = stageCtx(core, userId, obj, stageId);
     assertNotLocked(ctx);
     const history = [...ctx.progress.learnMessages];
     const text = await paidCall(core, userId, "learn_chat", () =>
@@ -134,7 +134,7 @@ export function learnChat(
 
 export function completeLearnItem(core: Core, userId: string, objectiveId: string, stageId: string, itemId: string): Promise<Objective> {
   return mutateObjective(core, userId, objectiveId, (obj) => {
-    const ctx = stageCtx(core, obj, stageId);
+    const ctx = stageCtx(core, userId, obj, stageId);
     if (!ctx.content.learn.some((item) => item.id === itemId)) throw notFound("Learn item not found.");
     if (!ctx.progress.learnCompleted.includes(itemId)) ctx.progress.learnCompleted.push(itemId);
     return obj;
@@ -148,7 +148,7 @@ export function setTodos(core: Core, userId: string, objectiveId: string, stageI
     return { id: reqStr(t, "id", { max: 100 }), text: reqStr(t, "text", { max: 500 }), done: reqBool(t, "done") };
   });
   return mutateObjective(core, userId, objectiveId, (obj) => {
-    const ctx = stageCtx(core, obj, stageId);
+    const ctx = stageCtx(core, userId, obj, stageId);
     assertNotLocked(ctx);
     ctx.progress.todos = todos;
     return obj;
@@ -224,7 +224,7 @@ export function submitWork(
   const inputs = raw.map(parseSubmission);
   return mutateObjective(core, userId, objectiveId, async (obj) => {
     assertStagesPhase(obj);
-    const ctx = stageCtx(core, obj, stageId);
+    const ctx = stageCtx(core, userId, obj, stageId);
     assertNotLocked(ctx);
     if (ctx.content.kind !== "work") throw conflict("Use the presentation endpoint for this stage.");
     for (const input of inputs) {
@@ -282,7 +282,7 @@ export function submitPresentation(
   const input = parsePresentation(body);
   return mutateObjective(core, userId, objectiveId, async (obj) => {
     assertStagesPhase(obj);
-    const ctx = stageCtx(core, obj, stageId);
+    const ctx = stageCtx(core, userId, obj, stageId);
     if (ctx.content.kind !== "presentation") throw conflict("This stage is not a presentation.");
     const worksDone = ctx.scenario.stages
       .filter((s) => s.kind === "work")
@@ -315,7 +315,7 @@ export function submitPresentation(
 async function refreshPortfolioCopy(core: Core, userId: string, obj: Objective): Promise<void> {
   try {
     const user = requireUser(core.db, userId);
-    const copy = await core.ai.portfolioBio({ user, projects: [projectFor(core, obj)] });
+    const copy = await core.ai.portfolioBio({ user, projects: [projectFor(core, userId, obj)] });
     savePortfolioCopy(core.db, userId, copy.headline, copy.bio);
   } catch (err) {
     core.log("portfolio copy generation failed", { reason: errorMessage(err) });

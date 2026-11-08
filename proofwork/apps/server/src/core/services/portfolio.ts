@@ -4,6 +4,7 @@ import { one, run, type Db } from "../db.ts";
 import { badRequest } from "../errors.ts";
 import type { Core } from "../types.ts";
 import { asObject, optStr } from "../validate.ts";
+import { contentFor } from "../user-content.ts";
 import { completedObjectives } from "./objective-store.ts";
 import { latestEvaluation } from "./performance.ts";
 import { nowIso } from "../util.ts";
@@ -24,9 +25,10 @@ function ensurePortfolioRow(db: Db, userId: string): PortfolioRow {
   return row;
 }
 
-export function projectFor(core: Core, obj: Objective): PortfolioProject {
-  const scenario = core.content.getScenario(obj.scenarioId);
-  const company = scenario ? core.content.getCompany(scenario.companyId) : undefined;
+export function projectFor(core: Core, userId: string, obj: Objective): PortfolioProject {
+  const content = contentFor(core, userId);
+  const scenario = content.getScenario(obj.scenarioId);
+  const company = scenario ? content.getCompany(scenario.companyId) : undefined;
   const last = latestEvaluation(obj);
   return {
     scenarioId: obj.scenarioId,
@@ -42,9 +44,10 @@ export function projectFor(core: Core, obj: Objective): PortfolioProject {
 export function getPortfolio(core: Core, userId: string): Portfolio {
   const row = ensurePortfolioRow(core.db, userId);
   const completed = completedObjectives(core.db, userId);
+  const content = contentFor(core, userId);
   const skills: string[] = [];
   for (const obj of completed) {
-    for (const skill of core.content.getScenario(obj.scenarioId)?.skills ?? []) {
+    for (const skill of content.getScenario(obj.scenarioId)?.skills ?? []) {
       if (!skills.includes(skill)) skills.push(skill);
     }
   }
@@ -52,7 +55,7 @@ export function getPortfolio(core: Core, userId: string): Portfolio {
     headline: row.headline,
     bio: row.bio,
     skills,
-    projects: completed.map((obj) => projectFor(core, obj)),
+    projects: completed.map((obj) => projectFor(core, userId, obj)),
     shareSlug: row.share_slug,
     unlocked: completed.length >= PORTFOLIO_UNLOCK_SCENARIOS,
   };

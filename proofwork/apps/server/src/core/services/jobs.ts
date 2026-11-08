@@ -5,6 +5,7 @@ import { badRequest, locked, notFound } from "../errors.ts";
 import type { Core } from "../types.ts";
 import { nowIso, uid } from "../util.ts";
 import { asObject, isObject, optStr, reqEnum, type Obj } from "../validate.ts";
+import { contentFor } from "../user-content.ts";
 import { paidCall } from "./credits.ts";
 import { completedObjectives } from "./objective-store.ts";
 import { getPortfolio } from "./portfolio.ts";
@@ -13,11 +14,17 @@ import { requireUser } from "./users.ts";
 const APPLICATION_STATUSES = ["draft", "ready", "submitted"] as const;
 const SUBMITTED_LOG = "Marked as submitted by you. Proofwork never submits applications on your behalf.";
 
+/** Jobs for the learner's current career first, then authored jobs, then jobs from their other generated paths. */
 export function listJobs(core: Core, userId: string): { unlocked: boolean; jobs: Job[] } {
   const user = requireUser(core.db, userId);
+  const content = contentFor(core, userId);
   const unlocked = completedObjectives(core.db, userId).length >= JOB_PORTAL_UNLOCK_SCENARIOS;
-  const isOwnCareer = (job: Job) => job.careerId === user.careerId;
-  const jobs = [...core.content.jobs].sort((a, b) => Number(isOwnCareer(b)) - Number(isOwnCareer(a)));
+  const generatedCareers = new Set(content.careers.filter((c) => c.generated).map((c) => c.id));
+  const rank = (job: Job): number => {
+    if (job.careerId === user.careerId) return 0;
+    return generatedCareers.has(job.careerId) ? 2 : 1;
+  };
+  const jobs = [...content.jobs].sort((a, b) => rank(a) - rank(b));
   return { unlocked, jobs };
 }
 
@@ -43,7 +50,7 @@ function insertApplication(db: Db, userId: string, app: JobApplication): void {
 }
 
 export async function draftApplication(core: Core, userId: string, jobId: string): Promise<JobApplication> {
-  const job = core.content.getJob(jobId);
+  const job = contentFor(core, userId).getJob(jobId);
   if (!job) throw notFound("Job not found.");
   if (completedObjectives(core.db, userId).length < JOB_PORTAL_UNLOCK_SCENARIOS) {
     throw locked("Complete a project to unlock the job portal.");

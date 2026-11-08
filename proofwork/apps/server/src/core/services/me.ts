@@ -6,6 +6,7 @@ import { all, run, tx, USER_OWNED_TABLES } from "../db.ts";
 import { badRequest } from "../errors.ts";
 import type { Core } from "../types.ts";
 import { asObject, optStr, reqStr } from "../validate.ts";
+import { contentFor, invalidateContent } from "../user-content.ts";
 import { addRecommendedTrainings } from "./trainings.ts";
 import { mergeSettings, mergeVision, requireUser, saveUser } from "./users.ts";
 
@@ -23,7 +24,7 @@ export function updateMe(core: Core, userId: string, body: unknown): User {
   }
   if (o.careerId !== undefined) {
     const careerId = reqStr(o, "careerId", { max: 128 });
-    if (!core.content.getCareer(careerId)) throw badRequest("Unknown careerId.");
+    if (!contentFor(core, userId).getCareer(careerId)) throw badRequest("Unknown careerId.");
     if (careerId !== user.careerId) {
       user.careerId = careerId;
       addRecommendedTrainings(core, userId, careerId);
@@ -57,10 +58,11 @@ export function deleteMe(core: Core, userId: string): { ok: true } {
     for (const table of USER_OWNED_TABLES) run(core.db, `DELETE FROM ${table} WHERE user_id = ?`, [userId]);
     run(core.db, "DELETE FROM users WHERE id = ?", [userId]);
   });
+  invalidateContent(core, userId);
   return { ok: true };
 }
 
-const JSON_COLUMNS = ["data", "view", "memory"];
+const JSON_COLUMNS = ["data", "view", "memory", "request"];
 
 export function exportMe(core: Core, userId: string): Record<string, unknown> {
   const user = requireUser(core.db, userId);

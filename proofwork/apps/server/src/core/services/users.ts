@@ -157,7 +157,7 @@ export function mergeSettings(current: UserSettings, patch: unknown): UserSettin
 
 // ───────────────────────────── vision ─────────────────────────────
 
-const VISION_FIELDS = ["targetRole", "level", "industry", "companyType", "location", "timeline", "why", "drawingDataUrl"];
+const VISION_FIELDS = ["targetRole", "level", "industry", "companyType", "location", "timeline", "why", "background", "drawingDataUrl"];
 
 export function emptyVision(): VisionBoard {
   return { targetRole: "", level: "", industry: "", companyType: "", location: "", timeline: "" };
