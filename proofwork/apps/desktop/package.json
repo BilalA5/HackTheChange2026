@@ -1,0 +1,25 @@
+{
+  "name": "@pw/desktop",
+  "productName": "Proofwork",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Proofwork desktop shell",
+  "main": "dist/main.cjs",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "wait-on -t 120000 http-get://127.0.0.1:5173 tcp:127.0.0.1:8787 && node build.mjs && cross-env PW_RENDERER_URL=http://127.0.0.1:5173 electron .",
+    "start": "node build.mjs && electron .",
+    "typecheck": "tsc -p tsconfig.json",
+    "dist": "node build.mjs && electron-builder --mac --dir",
+    "smoke": "node build.mjs && electron . --smoke"
+  },
+  "devDependencies": {
+    "@pw/shared": "*",
+    "cross-env": "^10.1.0",
+    "electron": "^45.2.3",
+    "electron-builder": "^26.18.0",
+    "esbuild": "^0.28.2",
+    "wait-on": "^9.5.1"
+  },
+  "author": "Proofwork"
+}
