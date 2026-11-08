@@ -1,9 +1,5 @@
 import Wordmark from '@/shared/Wordmark.jsx';
-import { IMG, guide } from '../content.js';
-
-export function Star({ className = 'h-[19px] w-[19px]' }) {
-  return <img src={`${IMG}/xp-star.webp`} alt="" className={`${className} object-contain`} />;
-}
+import { guide } from '../content.js';
 
 const RING = '0 0 0 3px rgba(255,255,255,.85), 0 8px 18px -8px rgba(0,0,0,.6)';
 

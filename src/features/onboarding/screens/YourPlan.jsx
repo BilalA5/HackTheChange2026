@@ -108,7 +108,7 @@ function Stat({ value, label }) {
 
 export default function YourPlan() {
   const { user } = useAuth();
-  const { answers, prev, next, finish } = useTour();
+  const { answers, prev, finish } = useTour();
   const plan = useMemo(() => {
     const saved = planStore.peek(user.id);
     return sameAnswers(saved, answers) ? saved : buildPlan(answers);
@@ -175,23 +175,14 @@ export default function YourPlan() {
         <ChevronLeftIcon className="h-4 w-4" />
         Change answers
       </button>
-      <div className="absolute bottom-[20px] right-[22px] z-30 flex gap-3">
-        <button
-          type="button"
-          onClick={next}
-          className="key-dark flex h-11 items-center rounded-full px-5 text-[14px] font-medium text-tx transition hover:-translate-y-0.5"
-        >
-          See how Flint works
-        </button>
-        <button
-          type="button"
-          onClick={() => finish('/app')}
-          className="key-light flex h-11 items-center gap-2 rounded-full pl-5 pr-4 text-[14px] font-medium text-onink transition hover:-translate-y-0.5"
-        >
-          Start my plan
-          <ChevronRightIcon className="h-4 w-4" />
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={() => finish('/app')}
+        className="key-light absolute bottom-[20px] right-[22px] z-30 flex h-11 items-center gap-2 rounded-full pl-5 pr-4 text-[14px] font-medium text-onink transition hover:-translate-y-0.5"
+      >
+        Start my plan
+        <ChevronRightIcon className="h-4 w-4" />
+      </button>
     </div>
   );
 }

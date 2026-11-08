@@ -17,7 +17,7 @@ function useViewport() {
 
 /**
  * Draws every screen on one fixed 1600 x 840 canvas, scaled to fit the window and centred.
- * The canvas is not clipped, so backgrounds marked `.bleed` can run out to the window edges.
+ * The canvas is not clipped, so a background can run past it to the window edges.
  */
 export default function Stage({ children }) {
   const viewport = useViewport();

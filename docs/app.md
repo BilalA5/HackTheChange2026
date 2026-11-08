@@ -5,9 +5,9 @@ Everything behind login: `/app` (the world and the scenario list), `/app/portfol
 
 ## Flow
 
-1. `/login` takes a name and an email. A first-time learner goes to the tour at `/onboarding`; a returning one goes
+1. `/login` takes a name and an email. A first-time learner answers the goal questions at `/onboarding`; a returning one goes
    to `/app`.
-2. Finishing or leaving the tour marks the learner as onboarded and lands on `/app`.
+2. Start my plan marks the learner as onboarded and lands on `/app`.
 3. `/app` shows the world map. Pick a ready scenario and press Start.
 4. In the scenario, switch between the manager and the coach at the top of the chat. Type, or use the "Try saying"
    lines to run the scripted demo.

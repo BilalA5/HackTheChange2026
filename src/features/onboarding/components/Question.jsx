@@ -1,6 +1,6 @@
 import { useTour } from '../tour.js';
 import { Avatar, WordmarkChip } from './brand.jsx';
-import { ContinueButton, SoundControls } from './controls.jsx';
+import { ContinueButton } from './controls.jsx';
 import { ChevronLeftIcon } from './icons.jsx';
 
 const QUESTION_COUNT = 3;
@@ -22,7 +22,7 @@ function Steps({ current }) {
 
 /** The frame shared by the "build your plan" questions: guide, question, answers, back and continue. */
 export default function Question({ step, title, hint, canContinue, onContinue, children }) {
-  const { prev, next } = useTour();
+  const { index, prev, next } = useTour();
 
   return (
     <div className="absolute inset-0 bg-page">
@@ -36,16 +36,17 @@ export default function Question({ step, title, hint, canContinue, onContinue, c
         {hint && <p className="mb-0 mt-[10px] text-[16px] leading-[1.4] text-tx-2">{hint}</p>}
       </div>
       {children}
-      <button
-        type="button"
-        onClick={prev}
-        className="key-dark absolute bottom-[20px] left-[22px] z-30 flex h-11 items-center gap-2 rounded-full pl-4 pr-5 text-[14px] font-medium text-tx transition hover:-translate-y-0.5"
-      >
-        <ChevronLeftIcon className="h-4 w-4" />
-        Back
-      </button>
+      {index > 0 && (
+        <button
+          type="button"
+          onClick={prev}
+          className="key-dark absolute bottom-[20px] left-[22px] z-30 flex h-11 items-center gap-2 rounded-full pl-4 pr-5 text-[14px] font-medium text-tx transition hover:-translate-y-0.5"
+        >
+          <ChevronLeftIcon className="h-4 w-4" />
+          Back
+        </button>
+      )}
       <ContinueButton disabled={!canContinue} onClick={onContinue ?? next} />
-      <SoundControls />
     </div>
   );
 }

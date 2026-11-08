@@ -90,7 +90,7 @@ export const faq = [
   {
     question: 'How do I start?',
     answer:
-      'Hit Start at the bottom of the screen, log in with your name and email, and the tour walks you through it.',
+      'Hit Start at the bottom of the screen, log in with your name and email, and answer three questions to get your plan.',
     keywords: [
       'start',
       'started',

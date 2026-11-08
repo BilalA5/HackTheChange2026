@@ -32,7 +32,6 @@ export default function AccountMenu() {
 
   const items = [
     { label: 'Change my goal', action: () => navigate('/onboarding/role') },
-    { label: 'Replay how Flint works', action: () => navigate('/onboarding/your-world') },
     {
       label: 'Reset my progress',
       action: async () => {
