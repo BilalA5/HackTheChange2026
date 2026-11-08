@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router';
+import { Navigate, createBrowserRouter } from 'react-router';
 import Root from './app/Root.jsx';
 import RequireAuth from './features/auth/RequireAuth.jsx';
 import NotFound from './pages/NotFound.jsx';
@@ -15,7 +15,8 @@ export const router = createBrowserRouter([
         Component: RequireAuth,
         children: [
           { path: '/onboarding/:step?', lazy: page(() => import('./features/onboarding/OnboardingPage.jsx')) },
-          { path: '/workspace', lazy: page(() => import('./features/workspace/WorkspacePage.jsx')) },
+          { path: '/app/scenarios/:scenarioId', lazy: page(() => import('./features/workspace/ScenarioPage.jsx')) },
+          { path: '/workspace', element: <Navigate to="/app/scenarios/shopify-price-recommender" replace /> },
         ],
       },
       { path: '*', Component: NotFound },
