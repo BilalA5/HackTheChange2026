@@ -1,7 +1,7 @@
 // The people and organisations around a generated path: scenario companies, their managers, and job companies.
 import type { Company, Npc } from "@pw/shared";
 import { COMPANY_FIRST_PARTS } from "./industries.ts";
-import { BUILDINGS, CARES, COMPANY_COLORS, FIRST_NAMES, LAST_NAMES, PUSHBACK, TRAITS } from "./names.ts";
+import { BUILDINGS, CARES, COMPANY_COLORS, FIRST_NAMES, FIRST_NAMES_BY_STYLE, LAST_NAMES, PUSHBACK, TRAITS } from "./names.ts";
 import type { CompanyType, Domain, GenCtx, Profile } from "./types.ts";
 import { commas, slugify } from "./util.ts";
 import type { Rng } from "./rng.ts";
@@ -72,9 +72,10 @@ function glyphOf(name: string): string {
   return g.toUpperCase();
 }
 
-export function pickPersonName(rng: Rng, used: Set<string>): string {
+export function pickPersonName(rng: Rng, used: Set<string>, style?: keyof typeof FIRST_NAMES_BY_STYLE): string {
+  const firsts = style ? FIRST_NAMES_BY_STYLE[style] : FIRST_NAMES;
   for (let i = 0; i < 500; i++) {
-    const name = `${rng.pick(FIRST_NAMES)} ${rng.pick(LAST_NAMES)}`;
+    const name = `${rng.pick(firsts)} ${rng.pick(LAST_NAMES)}`;
     if (!used.has(name)) {
       used.add(name);
       return name;
@@ -111,7 +112,8 @@ export function buildNpcs(ctx: GenCtx, companies: Company[], used: Set<string>):
   const ladder = prof.family.managerTitles;
   const level = prof.level.idx;
   return companies.map((company, i) => {
-    const name = pickPersonName(rng, used);
+    const style = rng.chance(0.5) ? ("feminine" as const) : ("masculine" as const);
+    const name = pickPersonName(rng, used, style);
     const first = name.split(" ")[0];
     const titleIdx = i === 1 ? Math.min(level + 1, ladder.length - 1) : level;
     const team = prof.family.teams[i % prof.family.teams.length];
@@ -122,7 +124,7 @@ export function buildNpcs(ctx: GenCtx, companies: Company[], used: Set<string>):
       role: `${ladder[titleIdx]}, ${team}`,
       companyId: company.id,
       personality: `${first} is ${t1}, and ${t2}. ${first} cares most about ${rng.pick(CARES)}, and pushes back when ${rng.pick(PUSHBACK)}.`,
-      voice: { rate: rng.float(0.92, 1.08), pitch: rng.float(0.85, 1.15) },
+      voice: { rate: rng.float(0.92, 1.08), pitch: rng.float(0.85, 1.15), style },
       avatarSeed: slugify(name),
     };
   });

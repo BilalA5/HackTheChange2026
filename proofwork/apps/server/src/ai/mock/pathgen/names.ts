@@ -1,12 +1,20 @@
 // Name pools for people, internal systems and company colours. Diverse by design: no single culture dominates.
 
-export const FIRST_NAMES = [
-  "Amara", "Tomas", "Mei-Lin", "Ravi", "Ingrid", "Kwame", "Sofia", "Hiro", "Fatima", "Lucas",
-  "Nadia", "Diego", "Aisha", "Owen", "Yara", "Samuel", "Chloe", "Jun", "Priyanka", "Marcus",
-  "Leila", "Tobias", "Ngozi", "Mateo", "Hannah", "Arjun", "Elena", "Kofi", "Sana", "Dmitri",
-  "Rosa", "Ethan", "Mariam", "Lars", "Yuki", "Grace", "Felix", "Ana Paula", "Ibrahim", "Hana",
-  "Noah", "Ruby", "Tariq", "Camila", "Sven", "Ifeoma", "Wei", "Beatriz", "Patrick", "Anjali",
-];
+/** First names by the voice the character is cast with, so a manager's name and natural voice match. */
+export const FIRST_NAMES_BY_STYLE = {
+  feminine: [
+    "Amara", "Mei-Lin", "Ingrid", "Sofia", "Fatima", "Nadia", "Aisha", "Yara", "Chloe", "Priyanka",
+    "Leila", "Ngozi", "Hannah", "Elena", "Sana", "Rosa", "Mariam", "Grace", "Ana Paula", "Hana",
+    "Ruby", "Camila", "Ifeoma", "Beatriz", "Anjali",
+  ],
+  masculine: [
+    "Tomas", "Ravi", "Kwame", "Hiro", "Lucas", "Diego", "Owen", "Samuel", "Marcus", "Tobias",
+    "Mateo", "Arjun", "Kofi", "Dmitri", "Ethan", "Lars", "Felix", "Ibrahim", "Noah", "Tariq",
+    "Sven", "Wei", "Patrick", "Jun", "Omar",
+  ],
+} as const;
+
+export const FIRST_NAMES: readonly string[] = [...FIRST_NAMES_BY_STYLE.feminine, ...FIRST_NAMES_BY_STYLE.masculine];
 
 export const LAST_NAMES = [
   "Okafor", "Herrera", "Chen", "Sundaram", "Lund", "Mensah", "Benali", "Tanaka", "Al-Sayed", "Brandt",

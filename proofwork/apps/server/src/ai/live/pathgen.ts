@@ -70,7 +70,7 @@ interface OutlineScenario {
 export interface Outline {
   career: { title: string; tagline: string; description: string; skills: string[]; color: string };
   companies: { name: string; industry: string; tagline: string; color: string; glyph: string; building: Company["building"] }[];
-  npcs: { name: string; role: string; personality: string }[];
+  npcs: { name: string; role: string; personality: string; voice: "feminine" | "masculine" }[];
   scenarios: OutlineScenario[];
 }
 
@@ -124,8 +124,8 @@ const OUTLINE_SCHEMA: JsonSchema = {
     npcs: {
       ...exactly(3, {
         type: "object",
-        properties: { name: STR, role: STR, personality: STR },
-        required: ["name", "role", "personality"],
+        properties: { name: STR, role: STR, personality: STR, voice: { type: "string", enum: ["feminine", "masculine"] } },
+        required: ["name", "role", "personality", "voice"],
       }),
     },
     scenarios: {
@@ -459,7 +459,8 @@ export function validateOutline(raw: unknown): Outline {
   });
   const npcs = arr(o.npcs, 3, "npcs").map((x) => {
     const r = obj(x, "npc");
-    return { name: text(r.name, "npc name", 60), role: text(r.role, "npc role", 80), personality: text(r.personality, "personality", 400) };
+    const voice: "feminine" | "masculine" = r.voice === "masculine" ? "masculine" : "feminine";
+    return { name: text(r.name, "npc name", 60), role: text(r.role, "npc role", 80), personality: text(r.personality, "personality", 400), voice };
   });
   const scenarios = arr(o.scenarios, 3, "scenarios").map((x, idx) => {
     const r = obj(x, "scenario");
@@ -526,7 +527,7 @@ function buildNpc(prefix: string, n: number, m: Outline["npcs"][number], company
     role: m.role,
     companyId,
     personality: m.personality,
-    voice: { rate: Math.round((0.95 + (h % 16) / 100) * 100) / 100, pitch: Math.round((0.9 + ((h >>> 4) % 26) / 100) * 100) / 100 },
+    voice: { rate: Math.round((0.95 + (h % 16) / 100) * 100) / 100, pitch: Math.round((0.9 + ((h >>> 4) % 26) / 100) * 100) / 100, style: m.voice },
     avatarSeed: id,
   };
 }
@@ -706,7 +707,7 @@ Rules:
 - Invent FICTIONAL companies and people. Never use a real company, brand or public figure.
 - career: a role title, a one-line tagline, a 2-3 sentence description, 6-8 skills of 1-4 words each, and a #rrggbb colour.
 - companies: exactly 3, all in the requested industry. Each has a different building (tower, campus, dome, loft, hangar, spire) and a 1-2 letter glyph.
-- npcs: exactly 3 managers, one per company, each a level above the learner. personality is 2 sentences on how they talk and what they check.
+- npcs: exactly 3 managers, one per company, each a level above the learner. personality is 2 sentences on how they talk and what they check. voice is "feminine" or "masculine": the voice the character speaks with, consistent with how you wrote them.
 - scenarios: exactly 3 projects in this order. Project 1 diagnoses a problem. Project 2 builds or improves the role's core artifact. Project 3 launches or scales the work. Difficulty goes beginner, intermediate, advanced.
 - Project i is run by companies[i] and npcs[i].
 - keyFacts: 4-6 concrete numbers, sizes, budgets, deadlines or constraints. The rest of the project must reuse them exactly.
