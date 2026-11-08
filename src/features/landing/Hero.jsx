@@ -18,10 +18,6 @@ function LogoRow({ names, direction }) {
   );
 }
 
-/**
- * The first screen, held while you scroll: the pale city with the Flint mark on it. Scrolling zooms into the
- * mark until its black is the whole screen, and on that black screen the talent network appears.
- */
 export default function Hero() {
   const [ref, p] = useStickyProgress();
   const zoom = ease(range(p, 0.06, 0.5));
