@@ -1,0 +1,27 @@
+@font-face {
+  font-family: 'Google Sans Flex';
+  src: url('/assets/fonts/GoogleSansFlex-wght-ROND.woff2') format('woff2');
+  font-weight: 100 1000;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'STK Bureau Serif';
+  src: url('/assets/fonts/STK_Bureau_Serif/STKBureau-SerifBook.otf') format('opentype');
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'STK Bureau Serif';
+  src: url('/assets/fonts/STK_Bureau_Serif/STKBureau-SerifMedium.otf') format('opentype');
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Supply Mono';
+  src: url('/assets/fonts/Supply-Free/PPSupplyMono-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-display: swap;
+}
