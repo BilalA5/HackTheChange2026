@@ -1,15 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { videos } from '@/data/videos.js';
 import { useAuth } from '@/features/auth/auth-context.js';
 import { clearAllConversations } from '@/services/conversations.js';
 import { resetProgress } from '@/services/progress.js';
 import InitialsAvatar from '@/shared/InitialsAvatar.jsx';
+import VideoModal from '@/shared/VideoModal.jsx';
 import { glass } from './board/glass.js';
 
 export default function AccountMenu() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [playing, setPlaying] = useState(null);
   const menu = useRef(null);
 
   useEffect(() => {
@@ -31,6 +34,8 @@ export default function AccountMenu() {
   };
 
   const items = [
+    { label: 'Watch: Meet Flint', action: () => setPlaying(videos.intro) },
+    { label: 'Watch: How Flint works', action: () => setPlaying(videos.howFlintWorks) },
     { label: 'Change my goal', action: () => navigate('/onboarding/role') },
     {
       label: 'Reset my progress',
@@ -82,6 +87,7 @@ export default function AccountMenu() {
           ))}
         </div>
       )}
+      {playing && <VideoModal video={playing} onClose={() => setPlaying(null)} />}
     </div>
   );
 }
