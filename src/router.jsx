@@ -1,4 +1,9 @@
 import { createBrowserRouter } from 'react-router';
 import NotFound from './pages/NotFound.jsx';
 
-export const router = createBrowserRouter([{ path: '*', Component: NotFound }]);
+const page = (load) => async () => ({ Component: (await load()).default });
+
+export const router = createBrowserRouter([
+  { path: '/', lazy: page(() => import('./features/landing/LandingPage.jsx')) },
+  { path: '*', Component: NotFound },
+]);
