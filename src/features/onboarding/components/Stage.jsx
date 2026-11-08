@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-
-export const CANVAS = { width: 1600, height: 840 };
+import { CANVAS } from '../canvas.js';
 
 function readViewport() {
   return { width: window.innerWidth, height: window.innerHeight };
