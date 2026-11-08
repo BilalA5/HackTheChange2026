@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { clamp, useViewProgress } from './hooks.js';
 import { Logo, Narrator } from './ui.jsx';
 

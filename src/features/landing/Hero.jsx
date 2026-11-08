@@ -1,4 +1,3 @@
-import React from 'react';
 import { ease, range, useStickyProgress } from './hooks.js';
 import { Logo, Mark, Narrator } from './ui.jsx';
 
