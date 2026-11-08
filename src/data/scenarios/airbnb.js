@@ -14,9 +14,9 @@ export default {
   tools: ['Claude', 'Google Sheets', 'ChatGPT'],
 
   manager: {
-    name: 'Rowan',
+    name: 'Jordan',
     role: 'Manager',
-    photo: '/assets/onboarding/guide-face.jpg',
+    photo: '/assets/onboarding/cast-jordan.jpg',
     opening: [
       'Hey. First up: find out why hosts cancel.',
       'The data is in your resources. Send me a draft when ready.',
@@ -111,7 +111,7 @@ export default {
     ],
     fallbacks: [
       "Nice. What's the very next step you can take in ten minutes?",
-      'Write that down as a sentence for Rowan. Clear beats clever.',
+      'Write that down as a sentence for Jordan. Clear beats clever.',
       "You're closer than you think. What's missing?",
     ],
   },

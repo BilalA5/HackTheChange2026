@@ -1,9 +1,8 @@
 import Wordmark from '@/shared/Wordmark.jsx';
-import { guide } from '../content.js';
 
 const RING = '0 0 0 3px rgba(255,255,255,.85), 0 8px 18px -8px rgba(0,0,0,.6)';
 
-export function Avatar({ src = guide.photo, size = 56, ring = true, className = '' }) {
+export function Avatar({ src, size = 56, ring = true, className = '' }) {
   return (
     <span
       className={`relative inline-block flex-none overflow-hidden rounded-full ${className}`}

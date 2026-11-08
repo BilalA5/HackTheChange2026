@@ -1,7 +1,7 @@
 import SoundToggle from '@/shared/SoundToggle.jsx';
 import { play } from '@/shared/sound.js';
 import { useTour } from '../tour.js';
-import { Avatar, WordmarkChip } from './brand.jsx';
+import { WordmarkChip } from './brand.jsx';
 import { ContinueButton } from './controls.jsx';
 import { ChevronLeftIcon } from './icons.jsx';
 
@@ -22,7 +22,7 @@ function Steps({ current }) {
   );
 }
 
-/** The frame shared by the "build your plan" questions: guide, question, answers, back and continue. */
+/** The frame shared by the "build your plan" questions: question, answers, back and continue. */
 export default function Question({ step, title, hint, canContinue, onContinue, children }) {
   const { index, prev, next } = useTour();
 
@@ -31,8 +31,7 @@ export default function Question({ step, title, hint, canContinue, onContinue, c
       <WordmarkChip />
       <Steps current={step} />
       <div className="absolute inset-x-0 top-[72px] flex flex-col items-center text-center">
-        <Avatar size={56} />
-        <h1 className="mb-0 mt-[22px] max-w-[760px] font-serif text-[36px] font-normal leading-[1.1] tracking-[-0.03em] text-tx [text-wrap:balance]">
+        <h1 className="mb-0 mt-[78px] max-w-[760px] font-serif text-[36px] font-normal leading-[1.1] tracking-[-0.03em] text-tx [text-wrap:balance]">
           {title}
         </h1>
         {hint && <p className="mb-0 mt-[10px] text-[16px] leading-[1.4] text-tx-2">{hint}</p>}

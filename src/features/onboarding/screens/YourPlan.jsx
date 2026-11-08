@@ -29,8 +29,7 @@ function Building({ roleTitle }) {
   return (
     <div className="absolute inset-0 flex flex-col items-center bg-page">
       <WordmarkChip />
-      <Avatar size={64} className="mt-[220px]" />
-      <p className="mb-0 mt-[30px] font-serif text-[34px] leading-[1.14] tracking-[-0.03em] text-tx">
+      <p className="mb-0 mt-[300px] font-serif text-[34px] leading-[1.14] tracking-[-0.03em] text-tx">
         Building your plan to become {withArticle(roleTitle)}
       </p>
       <ul className="mt-[40px] flex flex-col gap-[14px]">

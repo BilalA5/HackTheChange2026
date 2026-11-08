@@ -4,9 +4,21 @@ import { createUserStore } from './userStore.js';
 
 const keyFor = (userId) => `plan.${userId}`;
 
+const retired = { name: 'Rowan', photo: '/assets/onboarding/guide-face.jpg' };
+const standIn = { name: 'Jordan', photo: '/assets/onboarding/cast-jordan.jpg' };
+
+/** Plans saved before a cast member left still name them; hand their stops to a current manager. */
+function withCurrentCast(plan) {
+  if (!plan) return plan;
+  const json = JSON.stringify(plan);
+  if (!json.includes(retired.photo)) return plan;
+  return JSON.parse(json.replaceAll(retired.photo, standIn.photo).replaceAll(retired.name, standIn.name));
+}
+
 export const planStore = createUserStore({
   empty: null,
-  load: (userId) => call('query', api.plans.get, { userId }, () => readJSON(keyFor(userId))),
+  load: async (userId) =>
+    withCurrentCast(await call('query', api.plans.get, { userId }, () => readJSON(keyFor(userId)))),
 });
 
 export async function savePlan(userId, plan) {

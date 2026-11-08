@@ -1,5 +1,4 @@
 export const managers = [
-  { name: 'Rowan', photo: '/assets/onboarding/guide-face.jpg', style: 'Direct' },
   { name: 'Avery', photo: '/assets/onboarding/cast-avery.jpg', style: 'Detail-minded' },
   { name: 'Erik Vogt', photo: '/assets/workspace/avatar-erik.png', style: 'Numbers-first' },
   { name: 'Jordan', photo: '/assets/onboarding/cast-jordan.jpg', style: 'Big-picture' },
