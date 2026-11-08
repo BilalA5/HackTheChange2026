@@ -1,4 +1,3 @@
-import { badges } from './content.js';
 import { ChevronLeft, Sparkle } from './icons.jsx';
 
 const badgeGlyphs = {
@@ -17,6 +16,21 @@ const badgeGlyphs = {
   ),
   shield: <path d="M12 2.8l7 2.7v5.6c0 4.6-3 8.5-7 10-4-1.5-7-5.4-7-10V5.5z" fill="currentColor" />,
 };
+
+const badges = [
+  { glyph: 'bulb', skill: 'insight', label: 'Insight' },
+  { glyph: 'star', skill: 'quality', label: 'Quality' },
+  { glyph: 'chat', skill: 'communication', label: 'Communication' },
+  { glyph: 'shield', skill: 'reliability', label: 'Reliability' },
+];
+
+const initialsOf = (name) =>
+  name
+    .split(/\s+/)
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
 
 const RADIUS = 12.2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
@@ -50,7 +64,7 @@ function ProgressBadge({ glyph, progress, label }) {
   );
 }
 
-export default function TopBar({ onBack }) {
+export default function TopBar({ onBack, level = 1, scores = {}, userName = '' }) {
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex h-[54px] items-center justify-between pl-[19px] pr-[16px]">
       <button
@@ -64,17 +78,18 @@ export default function TopBar({ onBack }) {
       <div className="pointer-events-auto flex items-center gap-[7px]">
         <div className="flex h-[31px] items-center gap-[6px] rounded-full border border-[#303030] bg-[var(--chip)] pl-[13px] pr-[15px]">
           <Sparkle />
-          <span className="text-[15px] font-medium text-[#f1f1f1]">L1</span>
+          <span className="text-[15px] font-medium text-[#f1f1f1]">L{level}</span>
         </div>
         <div className="flex h-[33px] items-center gap-[3px] rounded-full bg-gradient-to-b from-[#252525] to-[#292929] pl-[3.5px]">
-          {badges.map((badge) => (
-            <ProgressBadge key={badge.glyph} {...badge} />
+          {badges.map(({ glyph, skill, label }) => (
+            <ProgressBadge key={glyph} glyph={glyph} label={label} progress={scores[skill] ?? 0} />
           ))}
-          <img
-            src="/assets/workspace/avatar-user.png"
-            alt="Your profile"
-            className="ml-[3px] h-[34px] w-[34px] rounded-full object-cover"
-          />
+          <span
+            title={userName}
+            className="ml-[3px] grid h-[34px] w-[34px] place-items-center rounded-full bg-[#3a3a3a] text-[12.5px] font-semibold text-white"
+          >
+            {initialsOf(userName)}
+          </span>
         </div>
       </div>
     </div>
