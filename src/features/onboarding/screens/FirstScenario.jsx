@@ -1,8 +1,8 @@
-import { Link } from 'react-router';
 import Wordmark from '@/shared/Wordmark.jsx';
 import { GuideCursor, TurnHint } from '../components/hints.jsx';
 import { BriefcaseIcon } from '../components/icons.jsx';
 import WorldMap from '../components/WorldMap.jsx';
+import { useTour } from '../tour.js';
 
 const frosted = (blur, tint) => ({
   background: `rgba(14,14,16,${tint})`,
@@ -70,12 +70,15 @@ function LevelBadge() {
 }
 
 export default function FirstScenario() {
+  const { finish } = useTour();
+
   return (
     <WorldMap>
       <Sidebar />
       <LevelBadge />
-      <Link
-        to="/workspace"
+      <button
+        type="button"
+        onClick={() => finish('/app/scenarios/airbnb-host-cancellations')}
         aria-label="Open your first scenario"
         className="absolute left-[847px] top-[453px] h-[168px] w-[166px] rounded-[24px] shadow-[inset_0_0_0_1.5px_rgba(255,255,255,.85)] transition hover:bg-white/10"
       />

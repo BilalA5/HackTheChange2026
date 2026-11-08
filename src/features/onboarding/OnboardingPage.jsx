@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router';
+import { useAuth } from '@/features/auth/auth-context.js';
 import { useAppTheme } from '@/shared/useAppTheme.js';
 import Stage from './components/Stage.jsx';
 import { screens } from './screens/index.js';
@@ -23,14 +24,25 @@ function useArrowKeys({ next, prev }) {
 export default function OnboardingPage() {
   useAppTheme('onboarding');
   const navigate = useNavigate();
+  const { updateUser } = useAuth();
   const { step } = useParams();
   const index = screens.findIndex((screen) => screen.slug === step);
   const isLast = index === screens.length - 1;
 
-  const next = useCallback(() => navigate(isLast ? '/workspace' : pathFor(index + 1)), [navigate, index, isLast]);
+  const finish = useCallback(
+    async (to = '/app') => {
+      await updateUser({ onboarded: true });
+      navigate(to, { replace: true });
+    },
+    [navigate, updateUser],
+  );
+  const next = useCallback(() => (isLast ? finish() : navigate(pathFor(index + 1))), [navigate, finish, index, isLast]);
   const prev = useCallback(() => index > 0 && navigate(pathFor(index - 1)), [navigate, index]);
-  const exit = useCallback(() => navigate('/'), [navigate]);
-  const tour = useMemo(() => ({ index, total: screens.length, next, prev, exit }), [index, next, prev, exit]);
+  const exit = useCallback(() => finish(), [finish]);
+  const tour = useMemo(
+    () => ({ index, total: screens.length, next, prev, exit, finish }),
+    [index, next, prev, exit, finish],
+  );
 
   useArrowKeys(tour);
 
