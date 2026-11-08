@@ -214,6 +214,26 @@ export class GeminiClient implements LlmClient {
     return text;
   }
 
+  /**
+   * Text to speech with a Gemini TTS model. Returns raw 16-bit little-endian mono PCM and its sample rate
+   * (Gemini answers audio/L16 at 24 kHz). Errors are scrubbed like every other call.
+   */
+  async speech(opts: { model: string; text: string; voiceName: string; timeoutMs?: number }): Promise<{ pcm: Buffer; sampleRate: number }> {
+    const body = {
+      contents: [{ role: "user", parts: [{ text: opts.text }] }],
+      generationConfig: {
+        responseModalities: ["AUDIO"],
+        speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: opts.voiceName } } },
+      },
+    };
+    const res = await this.post(opts.model, "generateContent", body, opts.timeoutMs ?? 60_000, false);
+    const data = (await res.json()) as { candidates?: { content?: { parts?: { inlineData?: { mimeType?: string; data?: string } }[] } }[] };
+    const part = data.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data);
+    if (!part?.inlineData?.data) throw new Error("Gemini TTS returned no audio");
+    const rate = Number(/rate=(\d+)/.exec(part.inlineData.mimeType ?? "")?.[1] ?? 24000);
+    return { pcm: Buffer.from(part.inlineData.data, "base64"), sampleRate: rate };
+  }
+
   async json<T>(opts: JsonOpts<T>): Promise<T> {
     const text = await this.complete(opts);
     return opts.validate(parseJsonText(text));
