@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { useAppTheme } from '@/shared/useAppTheme.js';
 import Chat from './Chat.jsx';
 import NotesViewer from './NotesViewer.jsx';
@@ -11,6 +12,7 @@ const FONTS =
 
 export default function WorkspacePage() {
   useAppTheme('workspace');
+  const navigate = useNavigate();
   const [notesOpen, setNotesOpen] = useState(true);
 
   return (
@@ -19,7 +21,7 @@ export default function WorkspacePage() {
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
       <link rel="stylesheet" href={FONTS} precedence="default" />
       <div className="absolute inset-x-0 top-0 h-[2px] bg-black" aria-hidden="true" />
-      <TopBar />
+      <TopBar onBack={() => navigate('/')} />
       <main
         className={`grid gap-y-8 px-4 pb-6 xl:h-full xl:gap-y-0 xl:pb-0 xl:pl-[17px] xl:pr-[14px] ${
           notesOpen ? 'xl:grid-cols-[278px_minmax(0,1fr)_686px]' : 'xl:grid-cols-[278px_minmax(0,1fr)]'
