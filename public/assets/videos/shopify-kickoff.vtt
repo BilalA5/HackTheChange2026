@@ -1,0 +1,21 @@
+WEBVTT
+
+1
+00:00:00.533 --> 00:00:07.000
+Welcome aboard, I'm Erik. Merchants guess their Black Friday prices, and they leave money on the table.
+
+2
+00:00:07.333 --> 00:00:11.867
+Price too low, and they sell out. Too high, and buyers go somewhere else.
+
+3
+00:00:12.467 --> 00:00:15.733
+Your first job is the spec for our price recommender.
+
+4
+00:00:16.133 --> 00:00:25.633
+A price rule. The revenue formula, at three price points. Backup rules for odd products. And an accuracy bar the model has to clear.
+
+5
+00:00:26.367 --> 00:00:32.467
+It has to beat last week's baseline on every slice. Jenna is your coach. Ask me anything.
