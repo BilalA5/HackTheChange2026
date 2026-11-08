@@ -1,8 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react';
-import { Link } from 'react-router';
 import { roles, sections } from '@/data/roles.js';
 import { useStickyProgress } from './hooks.js';
-import { Flame, Narrator, SpeakerIcon, TrendUp } from './ui.jsx';
+import { Flame, TrendUp } from './ui.jsx';
 
 function Tag({ tag }) {
   if (!tag) return null;
@@ -34,63 +33,44 @@ function ToolIcon({ tool }) {
   );
 }
 
-function RoleCard({ role }) {
-  const video = useRef(null);
-  const [flipped, setFlipped] = useState(false);
-  const [muted, setMuted] = useState(true);
+function ChartPoster({ chart }) {
+  const max = Math.max(...chart.points.map(([, value]) => value));
+  return (
+    <figure className="h-full w-full bg-[radial-gradient(120%_90%_at_80%_0%,#3a2410_0%,#151413_55%,#0d0d0d_100%)]">
+      <figcaption className="absolute inset-x-5 top-[62px] text-[11px] font-medium uppercase tracking-[0.14em] text-white/55">
+        {chart.label}
+      </figcaption>
+      <div className="absolute inset-x-5 bottom-[36%] top-[92px] flex items-end gap-3">
+        {chart.points.map(([year, value]) => (
+          <div key={year} className="flex h-full flex-1 flex-col items-center justify-end gap-1.5">
+            <span className="text-[13px] tabular-nums tracking-[-0.01em] text-white">${value.toFixed(2)}</span>
+            <span
+              className="w-full rounded-t-[8px] bg-gradient-to-b from-[#ffb03a] to-[#ff6a1a]"
+              style={{ height: `${(value / max) * 78}%` }}
+            />
+            <span className="text-[12px] tabular-nums text-white/55">{year}</span>
+          </div>
+        ))}
+      </div>
+      <p className="absolute right-5 top-5 text-[10.5px] text-white/40">Source: {chart.source}</p>
+    </figure>
+  );
+}
 
-  const play = () => video.current?.play().catch(() => {});
-  const stop = () => {
-    const v = video.current;
-    if (!v) return;
-    v.pause();
-    v.muted = true;
-    setMuted(true);
-  };
+function RoleCard({ role }) {
+  const [flipped, setFlipped] = useState(false);
 
   return (
-    <li
-      className="w-[clamp(250px,21.2vw,360px)] shrink-0 [perspective:1400px]"
-      onMouseEnter={play}
-      onMouseLeave={stop}
-      onFocus={play}
-    >
+    <li className="w-[clamp(250px,21.2vw,360px)] shrink-0 [perspective:1400px]">
       <div className={`card-flip relative aspect-[360/427] ${flipped ? '[transform:rotateY(180deg)]' : ''}`}>
-        <div className="card-face group absolute inset-0 overflow-hidden rounded-[18px] bg-[#1a1a1a]">
-          {role.film ? (
-            <video
-              ref={video}
-              className="h-full w-full object-cover"
-              poster={role.poster}
-              muted
-              loop
-              playsInline
-              preload="none"
-              aria-hidden="true"
-            >
-              <source src={role.film} type="video/mp4" />
-            </video>
+        <div className="card-face absolute inset-0 overflow-hidden rounded-[18px] bg-[#1a1a1a]">
+          {role.chart ? (
+            <ChartPoster chart={role.chart} />
           ) : (
             <img src={role.poster} alt="" className="h-full w-full object-cover" loading="lazy" />
           )}
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-t from-black/75 via-black/30 to-transparent" />
           <Tag tag={role.tag} />
-          {role.film && (
-            <button
-              type="button"
-              onClick={() => {
-                const v = video.current;
-                if (!v) return;
-                v.muted = !v.muted;
-                setMuted(v.muted);
-                play();
-              }}
-              aria-label={muted ? `Listen to ${role.title}` : `Mute ${role.title}`}
-              className="absolute right-4 top-4 z-10 grid h-9 w-9 place-items-center rounded-full bg-black/45 text-white opacity-0 backdrop-blur transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
-            >
-              <SpeakerIcon muted={muted} />
-            </button>
-          )}
           <button
             type="button"
             onClick={() => setFlipped(true)}
@@ -145,12 +125,6 @@ function RoleCard({ role }) {
               </span>
             ))}
           </div>
-          <Link
-            to="/login"
-            className="mt-4 flex h-11 items-center justify-center rounded-[13px] bg-[#111] text-[15px] text-white hover:bg-black"
-          >
-            Start as {role.title}
-          </Link>
         </div>
       </div>
     </li>
@@ -180,15 +154,25 @@ export default function Roles() {
 
   return (
     <section id="roles" aria-labelledby="roles-title" className="relative text-white">
+      <svg
+        viewBox="0 0 1700 90"
+        preserveAspectRatio="none"
+        className="-mb-px block h-[clamp(40px,5.3vw,90px)] w-full"
+        aria-hidden="true"
+      >
+        <path d="M0 90H1700V42Q850 -38 0 42Z" fill="var(--night)" />
+      </svg>
       <div ref={ref} className="bg-[var(--night)]" style={{ height: `calc(100svh + ${run}px)` }}>
         <div className="sticky top-0 flex h-[100svh] flex-col justify-center overflow-hidden pb-[9svh]">
           <h2
             id="roles-title"
             className="mx-auto max-w-[16em] px-6 text-center text-[length:var(--h2)] font-normal leading-[1.05] tracking-[-0.045em]"
           >
-            We train you for <span className="whitespace-nowrap">the hottest roles.</span>
-            <Narrator clip="roles" size={50} dark className="ml-2 -translate-y-[0.45em]" />
+            Train for <span className="whitespace-nowrap">Alberta’s hottest roles.</span>
           </h2>
+          <p className="mx-auto mt-3 max-w-[34em] px-6 text-center text-[16px] leading-[1.4] tracking-[-0.01em] text-white/60">
+            Energy, AI and data drive Alberta’s economy. Start where the work is.
+          </p>
           <div
             className="no-scrollbar mx-auto mt-[clamp(20px,3svh,34px)] flex max-w-full gap-[clamp(14px,1.6vw,27px)] overflow-x-auto px-6"
             role="group"
