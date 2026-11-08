@@ -1,0 +1,663 @@
+import React, { useLayoutEffect, useRef, useState } from 'react';
+
+/* ------------------------------------------------------------------ icons */
+
+const stroke = { fill: 'none', stroke: 'currentColor', strokeLinecap: 'round', strokeLinejoin: 'round' };
+
+function ChevronLeft({ size = 18, width = 1.8 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke} strokeWidth={width} aria-hidden="true">
+      <path d="M15 5l-7 7 7 7" />
+    </svg>
+  );
+}
+
+function ChevronDown({ open, size = 14 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      {...stroke}
+      strokeWidth={1.8}
+      aria-hidden="true"
+      className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+    >
+      <path d="M5 9l7 7 7-7" />
+    </svg>
+  );
+}
+
+function DocIcon() {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" {...stroke} strokeWidth={1.5} aria-hidden="true">
+      <path d="M14.5 20.5H6.5A1.5 1.5 0 0 1 5 19V5a1.5 1.5 0 0 1 1.5-1.5h11A1.5 1.5 0 0 1 19 5v10.5z" />
+      <path d="M14.5 20.5V17a1.5 1.5 0 0 1 1.5-1.5h3M8.5 8.5h7M8.5 12h4.5" />
+    </svg>
+  );
+}
+
+function PlayIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 3.8v16.4a.8.8 0 0 0 1.2.7l13.4-8.2a.8.8 0 0 0 0-1.4L7.2 3.1A.8.8 0 0 0 6 3.8z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function LinkIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" {...stroke} strokeWidth={1.6} aria-hidden="true">
+      <path d="M10 14a4.5 4.5 0 0 0 6.4 0l3.2-3.2a4.5 4.5 0 0 0-6.4-6.4l-1.1 1.1" />
+      <path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3.2 3.2a4.5 4.5 0 0 0 6.4 6.4l1.1-1.1" />
+    </svg>
+  );
+}
+
+function PinIcon() {
+  return (
+    <svg width="11" height="11" viewBox="0 0 24 24" {...stroke} strokeWidth={2} aria-hidden="true">
+      <path d="M8 3h8M9 3v7l-3 4h12l-3-4V3M12 14v7" />
+    </svg>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <svg width="19" height="19" viewBox="0 0 24 24" {...stroke} strokeWidth={1.6} aria-hidden="true">
+      <path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 20h14" />
+    </svg>
+  );
+}
+
+function ResetIcon() {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" {...stroke} strokeWidth={1.7} aria-hidden="true">
+      <path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3L4.5 9" />
+      <path d="M4.5 4.5V9H9" />
+    </svg>
+  );
+}
+
+function Sparkle() {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true">
+      <defs>
+        <linearGradient id="sparkle" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#ffe08a" />
+          <stop offset="1" stopColor="#e9a531" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M12 1.5c.6 5.6 4.9 9.9 10.5 10.5-5.6.6-9.9 4.9-10.5 10.5-.6-5.6-4.9-9.9-10.5-10.5C7.1 11.4 11.4 7.1 12 1.5z"
+        fill="url(#sparkle)"
+      />
+    </svg>
+  );
+}
+
+const badgeGlyphs = {
+  bulb: (
+    <path
+      d="M12 3.5a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.1v.6h5v-.6c0-.8.4-1.6 1.1-2.1A6 6 0 0 0 12 3.5zM9.8 19h4.4v1.3a1.2 1.2 0 0 1-1.2 1.2h-2a1.2 1.2 0 0 1-1.2-1.2z"
+      fill="currentColor"
+    />
+  ),
+  star: (
+    <path
+      d="M12 3.2l2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.6l-5.2 2.8 1-5.9-4.3-4.1 5.9-.8z"
+      fill="currentColor"
+    />
+  ),
+  chat: (
+    <path
+      d="M5.5 5h13A1.5 1.5 0 0 1 20 6.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.2 3.3c-.3.2-.8 0-.8-.4v-2.9A1.5 1.5 0 0 1 4 15V6.5A1.5 1.5 0 0 1 5.5 5z"
+      fill="currentColor"
+    />
+  ),
+  shield: (
+    <path d="M12 2.8l7 2.7v5.6c0 4.6-3 8.5-7 10-4-1.5-7-5.4-7-10V5.5z" fill="currentColor" />
+  ),
+};
+
+/* --------------------------------------------------------------- top bar */
+
+function ProgressBadge({ glyph, progress, label }) {
+  const r = 12.2;
+  const c = 2 * Math.PI * r;
+  return (
+    <div className="relative h-[27px] w-[27px]" title={`${label}: ${Math.round(progress * 100)}%`}>
+      <svg className="absolute inset-0 -rotate-90" viewBox="0 0 27 27" aria-hidden="true">
+        <circle cx="13.5" cy="13.5" r={r} fill="none" stroke="#262626" strokeWidth="2.4" />
+        <circle
+          cx="13.5"
+          cy="13.5"
+          r={r}
+          fill="none"
+          stroke="var(--ring)"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeDasharray={`${c * progress} ${c}`}
+        />
+      </svg>
+      <div className="badge-face absolute inset-[2px] flex items-center justify-center rounded-full text-[#c8c7c5]">
+        <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
+          {badgeGlyphs[glyph]}
+        </svg>
+      </div>
+      <span className="sr-only">
+        {label}, {Math.round(progress * 100)} percent
+      </span>
+    </div>
+  );
+}
+
+function TopBar() {
+  const badges = [
+    { glyph: 'bulb', progress: 0.3, label: 'Insight' },
+    { glyph: 'star', progress: 0.45, label: 'Quality' },
+    { glyph: 'chat', progress: 0.3, label: 'Communication' },
+    { glyph: 'shield', progress: 0.5, label: 'Reliability' },
+  ];
+  return (
+    <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex h-[54px] items-center justify-between pl-[19px] pr-[16px]">
+      <button
+        type="button"
+        aria-label="Back"
+        className="pointer-events-auto flex h-[26px] w-[26px] items-center justify-center rounded-md text-[#b9b9b9] hover:bg-white/5 hover:text-white"
+      >
+        <ChevronLeft />
+      </button>
+      <div className="pointer-events-auto flex items-center gap-[7px]">
+        <div className="flex h-[31px] items-center gap-[6px] rounded-full border border-[#303030] bg-[var(--chip)] pl-[13px] pr-[15px]">
+          <Sparkle />
+          <span className="text-[15px] font-medium text-[#f1f1f1]">L1</span>
+        </div>
+        <div className="flex h-[33px] items-center gap-[3px] rounded-full bg-gradient-to-b from-[#252525] to-[#292929] pl-[3.5px]">
+          {badges.map((b) => (
+            <ProgressBadge key={b.glyph} {...b} />
+          ))}
+          <img
+            src="/images/avatar-user.png"
+            alt="Your profile"
+            className="ml-[3px] h-[34px] w-[34px] rounded-full object-cover"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* --------------------------------------------------------------- sidebar */
+
+const requirements = [
+  {
+    title: 'A price rule with a set step count',
+    steps: [
+      "Open your Stage 1 price range table with Claude Code, and note each product's min and max price",
+      'Write Rule 1 in the spec file, naming one step count, like 10 evenly spaced prices from min to max',
+      'Run one flagged product through the rule by hand, you should be able to list every price it tries',
+    ],
+  },
+  {
+    title: 'The revenue formula and three revenue points',
+    steps: [
+      'Write revenue as price times the units the model predicts at that price',
+      'Name the three points the merchant sees: last price, expected price and recommended price',
+      'Check the recommended point really is the highest revenue on the price sweep',
+    ],
+  },
+  {
+    title: 'Two backup rules for odd products',
+    steps: [
+      'Sparse products: fall back to the last price and mark the fallback status',
+      'Single-price products: keep the one price seen, since there is nothing to sweep',
+    ],
+  },
+  {
+    title: 'An accuracy bar the model must clear',
+    steps: [
+      'Beat the last-week baseline on every slice of the test weeks',
+      'Price 100% of products with no blanks, every price inside its past range',
+    ],
+  },
+];
+
+function Requirement({ item, open, onToggle, id }) {
+  return (
+    <div className="py-[10.5px] first:pt-0">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        aria-controls={id}
+        className="group flex w-full items-start justify-between gap-3 pl-[2px] text-left"
+      >
+        <span className="max-w-[212px] text-[14.5px] font-medium leading-[19.2px] tracking-[-0.005em] text-[#f3f3f3] group-hover:text-white">
+          {item.title}
+        </span>
+        <span className="mr-[3px] mt-[3px] text-[#8b8b8b] group-hover:text-[#cfcfcf]">
+          <ChevronDown open={open} />
+        </span>
+      </button>
+      <div
+        id={id}
+        className={`grid transition-[grid-template-rows] duration-300 ease-out ${open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
+      >
+        <ul className="task-list min-h-0 overflow-hidden pl-[2px]">
+          {item.steps.map((s, i) => (
+            <li
+              key={s}
+              className={`text-[13.6px] leading-[19.2px] text-[var(--muted)] ${i === 0 ? 'mt-[13px]' : 'mt-[10px]'} ${i === item.steps.length - 1 ? 'mb-[3px]' : ''}`}
+            >
+              {s}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function ResourceSection({ label, children }) {
+  return (
+    <section className="border-t border-[var(--line)] pb-[24px] pt-[19px]">
+      <h3 className="eyebrow leading-[14px]">{label}</h3>
+      <div className="mt-[10px]">{children}</div>
+    </section>
+  );
+}
+
+function ResourceRow({ icon, children, onClick, active }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`-mx-[6px] flex h-[30px] w-[calc(100%+12px)] items-center gap-[10px] rounded-lg pl-[6px] pr-[30px] text-left text-[14px] transition-colors hover:bg-white/[0.04] ${active ? 'text-white' : 'text-[#e6e6e6]'}`}
+    >
+      <span className="flex w-[19px] shrink-0 justify-center pl-[2px] text-[#8e8e8e]">{icon}</span>
+      <span className="truncate">{children}</span>
+    </button>
+  );
+}
+
+function Sidebar({ notesOpen, onOpenNotes }) {
+  const [open, setOpen] = useState({ 0: true });
+  return (
+    <aside className="flex h-full min-h-0 flex-col">
+      <div className="h-[54px] shrink-0" />
+      <div className="mt-[7px] flex shrink-0 items-center gap-[11px] pl-[3px]">
+        <div className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-full border border-[#3a3a3a] bg-[#252525]">
+          <img src="/images/shopify-bag.png" alt="" className="h-[24px] w-[24px]" />
+        </div>
+        <h1 className="text-[15.5px] font-medium leading-[18.5px] text-[#f1f1f1]">
+          Building a Black Friday Price Recommender at Shopify
+        </h1>
+      </div>
+
+      <div className="mt-[22px] flex min-h-0 flex-1 flex-col rounded-[17px] border border-[var(--line)]">
+        <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-[16px] pt-[15px]">
+          <h2 className="text-[19.5px] font-bold leading-[23.5px] tracking-[-0.025em] text-white">
+            Draft the merchant-ready price recommender spec
+          </h2>
+
+          <section className="mt-[17px] border-t border-[var(--line)] pt-[19px]">
+            <h3 className="eyebrow leading-[14px]">Requirements</h3>
+            <div className="mt-[17px] pb-[17px]">
+              {requirements.map((item, i) => (
+                <Requirement
+                  key={item.title}
+                  id={`req-${i}`}
+                  item={item}
+                  open={!!open[i]}
+                  onToggle={() => setOpen((o) => ({ ...o, [i]: !o[i] }))}
+                />
+              ))}
+            </div>
+          </section>
+
+          <ResourceSection label="Project resources">
+            <ResourceRow icon={<DocIcon />} onClick={onOpenNotes} active={notesOpen}>
+              Meeting notes
+            </ResourceRow>
+          </ResourceSection>
+          <ResourceSection label="Task resources">
+            <ResourceRow icon={<DocIcon />}>Pricing Pilot Merchant Feedback</ResourceRow>
+          </ResourceSection>
+          <ResourceSection label="Shared in chat">
+            <ResourceRow icon={<PlayIcon />}>Watch: Draft the merchant-ready price recommender spec</ResourceRow>
+          </ResourceSection>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        className="flex h-[84px] shrink-0 items-center gap-[9px] pl-[4px] pr-[4px] text-[#8f8f8f] hover:text-[#cfcfcf]"
+      >
+        <ChevronDown size={13} />
+        <span className="eyebrow flex-1 text-left text-inherit">Workflows</span>
+        <span className="font-mono-ui text-[12px] font-medium text-[#a8a5a0]">5</span>
+      </button>
+    </aside>
+  );
+}
+
+/* ------------------------------------------------------------------ chat */
+
+function ManagerBubble({ children, pill }) {
+  return (
+    <div
+      className={`max-w-[394px] self-start border border-[var(--bubble-line)] bg-[var(--bubble)] px-[16px] text-[14.5px] leading-[21px] text-[#f4f4f4] ${pill ? 'rounded-[21px] py-[10px]' : 'rounded-[18px] py-[10px] pb-[11px]'}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+function Chat() {
+  const scroller = useRef(null);
+  const writeUp = useRef(null);
+  const [duration, setDuration] = useState(null);
+
+  // Open the conversation where the screenshot shows it: write-up card 742px below the top.
+  useLayoutEffect(() => {
+    const anchor = () => {
+      const el = scroller.current;
+      const card = writeUp.current;
+      if (el && card) el.scrollTop = Math.max(0, card.offsetTop - 742);
+    };
+    anchor();
+    // Web fonts rewrap the bubbles, so anchor again once they have loaded.
+    let live = true;
+    document.fonts?.ready.then(() => live && anchor());
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  const durations = ['30 minutes', '45 minutes', '1 hour', '2 hours'];
+
+  return (
+    <section className="mx-auto flex h-full min-h-0 w-full max-w-[459px] flex-col xl:translate-x-2" aria-label="Chat with Erik Vogt">
+      <header className="flex h-[100px] shrink-0 items-start gap-[12px] pl-[24px] pt-[61px]">
+        <img src="/images/avatar-erik.png" alt="" className="h-[35px] w-[35px] rounded-full" />
+        <div className="-mt-[1px]">
+          <p className="text-[15.5px] font-medium leading-[19px] text-white">Erik Vogt</p>
+          <p className="text-[12.5px] leading-[19px] text-[#8c8c8c]">Manager</p>
+        </div>
+      </header>
+
+      <div ref={scroller} className="chat-fade no-scrollbar relative min-h-0 flex-1 overflow-y-auto">
+        <div className="flex flex-col pb-[96px] pt-[34px]">
+          <div className="max-w-[300px] self-end rounded-[20px] bg-[#333] px-[15px] py-[9px] text-[14.5px] leading-[21px] text-white">
+            How do I decide which products count as sparse?
+          </div>
+
+          <div className="mt-[38px]">
+            <ManagerBubble>
+              <p>
+                Sparse is a cutoff you choose. Count how many weeks of sales each product has, then set a minimum
+                number of weeks, say 8, and any product with fewer weeks of data gets sparse = True. Pick the
+                number yourself and write one sentence in the overview note on why that cutoff makes sense for a
+                model to learn from.
+              </p>
+              <p className="mt-[21px]">What cutoff are you going with, and what is the reason?</p>
+            </ManagerBubble>
+          </div>
+
+          <div className="mt-[38px] self-end rounded-[20px] bg-[#333] px-[15px] py-[9px] text-[14.5px] leading-[21px] text-white">
+            We need to use both Single Price AND Sparse yes?
+          </div>
+
+          <div className="mt-[37px] flex flex-col">
+            <ManagerBubble>
+              <p>
+                Yes. Both flags are columns in the table, and each one is its own true or false per product. A
+                product can be sparse, single-price, both, or neither.
+              </p>
+              <p className="mt-[21px]">Which weeks-of-history number are you going to set as the sparse cutoff?</p>
+            </ManagerBubble>
+          </div>
+
+          <a
+            href="https://github.com/BilalA5/Shopify-Black-Friday-Price-Recommender"
+            target="_blank"
+            rel="noreferrer"
+            className="mr-[8px] mt-[45px] flex h-[45px] max-w-[301px] items-center gap-[9px] self-end rounded-[22px] bg-[#292929] pl-[13px] pr-[18px] text-[14.5px] text-[#d4d4d4] hover:bg-[#2f2f2f]"
+          >
+            <span className="shrink-0 text-[#a9a9a9]">
+              <LinkIcon />
+            </span>
+            <span className="truncate">https://github.com/BilalA5/Shopify-Black-Friday-Price-Recommender</span>
+          </a>
+          <p className="mr-[12px] mt-[13px] self-end text-[14.5px] leading-[20px] text-[#a9a9a9]">Url Sent</p>
+
+          <div className="mt-[51px] flex flex-col">
+            <ManagerBubble pill>got your submission, reviewing it now</ManagerBubble>
+          </div>
+
+          <p className="mt-[35px] pl-[4px] pr-[2px] text-[14.5px] leading-[21px] text-white">
+            before I look at this, tell me what you did and why, and how you got there.
+          </p>
+
+          <article
+            ref={writeUp}
+            className="mt-[23px] rounded-[15px] border border-[var(--raised-line)] border-l-[3px] border-l-[var(--accent)] bg-[var(--raised)] pb-[18px] pl-[16px] pr-[14px] pt-[14px]"
+          >
+            <h4 className="flex items-center gap-[7px] pl-[7px] font-mono-ui text-[9.5px] font-medium uppercase leading-[16px] tracking-[0.17em] text-[#9a9a9a]">
+              <PinIcon />
+              Your write-up
+            </h4>
+            <p className="mt-[10px] font-mono-ui text-[9px] uppercase leading-[14px] tracking-[0.17em] text-[#727272]">
+              What I did and why
+            </p>
+            <p className="mt-[3px] text-[14.5px] leading-[21.3px] tracking-[-0.008em] text-[#ededed]">
+              So basically I took your flag categories such as Sparse is based on what we've seen for a given
+              selected week and how minimal it is. As well as if we've ONLY ever seen 1 price of something that is a
+              single-price flag conditioned to True.
+            </p>
+          </article>
+        </div>
+      </div>
+
+      <div className="grid shrink-0 grid-cols-4 gap-[11px] pb-[25px] pl-[2px] pt-[15px]" role="group" aria-label="How long will this take?">
+        {durations.map((d) => (
+          <button
+            key={d}
+            type="button"
+            aria-pressed={duration === d}
+            onClick={() => setDuration(d)}
+            className={`h-[44px] truncate rounded-full border px-[16px] text-[15px] font-semibold transition-colors ${
+              duration === d
+                ? 'border-[#5d5d5d] bg-[#333] text-white'
+                : 'border-[#333] bg-[var(--raised)] text-[#f1f1f1] hover:border-[#444] hover:bg-[#2c2c2c]'
+            }`}
+          >
+            {d}
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* --------------------------------------------------------- meeting notes */
+
+const notes = [
+  {
+    heading: 'Problem',
+    items: [
+      'Merchants pick prices by gut feel or copy by competitors',
+      'Two ways to lose : priced too low (sold out), priced too high (buy competitors)',
+      'No Merchant Intelligence based on sales history of customers',
+      'Cost to Shopify: merchants sell less, gross merchandise volume drops, and unhappy merchants leave.',
+    ],
+  },
+  {
+    heading: 'Outcome',
+    items: [
+      'Recommended Price XGBoost Demand Model',
+      'Units sold at any price and revenue at 3 prices',
+      'Model makes smaller mistakes than simply guessing',
+      'Train on earlier weeks and test on later ones',
+      'Must beat last week on every slice and 100% of products priced no blanks, Every price inside its past range',
+      'Black Friday price recommender app: a Streamlit app suggesting a price for each product.',
+    ],
+  },
+  {
+    heading: 'Deliverable',
+    items: [
+      'Recommended, Expected and Last PRice',
+      'Fallback status when a model cant product a price',
+      'Revenue at 3 prices',
+      'Price Sweep Graph',
+      'Black Friday price recommender app: a Streamlit app suggesting a price for each product.',
+      'Tests model on unseen weeks and compares prediction error against baseline to prove model value.',
+    ],
+  },
+  {
+    heading: 'Stack',
+    items: [
+      'Python and pandas for units sold and week price ber product',
+      'XGBoost for the demand model',
+      'Streamlit for the merchant app',
+    ],
+  },
+];
+
+const notesTitle = 'Building a Black Friday Price Recommender at Shopify';
+
+function downloadNotes() {
+  const md = [`# ${notesTitle}`, '', '## Meeting notes', '']
+    .concat(...notes.map((s) => [`### ${s.heading}`, ...s.items.map((i) => `- ${i}`), '']))
+    .join('\n');
+  const url = URL.createObjectURL(new Blob([md], { type: 'text/markdown' }));
+  const a = Object.assign(document.createElement('a'), { href: url, download: 'meeting-notes.md' });
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+function NotesDocument() {
+  return (
+    <div className="rounded-t-[12px] bg-white px-[33px] pb-[96px] pt-[33px] text-[#363636]">
+      <div className="flex items-start gap-[29px]">
+        <h2 className="min-w-0 flex-1 xl:max-w-[430px] text-[19.5px] font-bold leading-[30px] text-[#151515]">{notesTitle}</h2>
+        <p className="mt-[5px] w-[64px] shrink-0 text-[9.5px] font-bold uppercase leading-[15px] tracking-[0.2em] text-[#8a8a8a]">
+          Meeting notes
+        </p>
+      </div>
+      <div className="mt-[11px] h-[2px] bg-[#111]" />
+      <h3 className="mt-[4px] text-[29px] font-bold leading-[34px] tracking-[-0.025em] text-[#151515]">Meeting notes</h3>
+      {notes.map((s, i) => (
+        <section key={s.heading} className={i === 0 ? 'mt-[25px]' : 'mt-[26px]'}>
+          <h4 className="text-[10px] font-bold uppercase leading-[14px] tracking-[0.2em] text-[#8a8a8a]">{s.heading}</h4>
+          <ul className="doc-list mt-[13px] space-y-[3.3px]">
+            {s.items.map((item) => (
+              <li key={item} className="text-[13.65px] leading-[21.3px]">
+                {item}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  );
+}
+
+function NotesViewer({ onClose }) {
+  const [zoom, setZoom] = useState(100);
+  const scroller = useRef(null);
+  const change = (d) => setZoom((z) => Math.min(200, Math.max(50, z + d)));
+  return (
+    <section
+      aria-label="Meeting notes"
+      className="relative flex h-full min-h-0 flex-col rounded-[25px] border border-[var(--line)] bg-[var(--page)]"
+    >
+      <header className="flex h-[58px] shrink-0 items-center pl-[26px] pr-[16px]">
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close meeting notes"
+          className="flex h-[24px] w-[24px] items-center justify-center rounded-md text-[#a9a9a9] hover:text-white"
+        >
+          <ChevronLeft size={16} />
+        </button>
+        <p className="ml-[13px] flex-1 font-mono-ui text-[11px] uppercase tracking-[0.18em] text-[#a8a8a8]">
+          Meeting notes
+        </p>
+        <button
+          type="button"
+          onClick={downloadNotes}
+          aria-label="Download meeting notes"
+          className="flex h-[24px] w-[24px] items-center justify-center rounded-md text-[#a9a9a9] hover:text-white"
+        >
+          <DownloadIcon />
+        </button>
+      </header>
+
+      <div
+        ref={scroller}
+        className="doc-fade thin-scrollbar mb-[2px] ml-[28px] mr-[7px] mt-[12px] min-h-0 flex-1 overflow-y-auto pr-[27px]"
+      >
+        <div style={{ zoom: zoom / 100 }}>
+          <NotesDocument />
+        </div>
+      </div>
+
+      <div className="absolute bottom-[14px] left-[14px] right-[13px] flex h-[42px] items-center rounded-[12px] border border-[var(--raised-line)] bg-[var(--raised)] pl-[15px] pr-[10px] shadow-[0_-6px_18px_rgba(0,0,0,0.25)]">
+        <span className="flex-1 text-[13.5px] text-[#7b7b7b]">1 / 1</span>
+        <div className="flex items-center text-[#b5b5b5]">
+          <button type="button" aria-label="Zoom out" onClick={() => change(-10)} className="flex h-[30px] w-[30px] items-center justify-center rounded-md text-[18px] hover:text-white">
+            −
+          </button>
+          <span className="w-[48px] text-center text-[14px] tabular-nums" aria-live="polite">
+            {zoom}%
+          </span>
+          <button type="button" aria-label="Zoom in" onClick={() => change(10)} className="flex h-[30px] w-[30px] items-center justify-center rounded-md text-[18px] hover:text-white">
+            +
+          </button>
+          <button
+            type="button"
+            aria-label="Reset zoom"
+            onClick={() => {
+              setZoom(100);
+              scroller.current?.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="ml-[2px] flex h-[30px] w-[30px] items-center justify-center rounded-md text-[#8f8f8f] hover:text-white"
+          >
+            <ResetIcon />
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------- app */
+
+export default function App() {
+  const [notesOpen, setNotesOpen] = useState(true);
+  return (
+    <div className="relative min-h-full bg-[var(--page)] xl:h-full xl:overflow-hidden">
+      <div className="absolute inset-x-0 top-0 h-[2px] bg-black" aria-hidden="true" />
+      <TopBar />
+      <main
+        className={`grid gap-y-8 px-4 pb-6 xl:h-full xl:gap-y-0 xl:pb-0 xl:pl-[17px] xl:pr-[14px] ${
+          notesOpen ? 'xl:grid-cols-[278px_minmax(0,1fr)_686px]' : 'xl:grid-cols-[278px_minmax(0,1fr)]'
+        }`}
+      >
+        <div className="xl:h-full xl:min-h-0">
+          <Sidebar notesOpen={notesOpen} onOpenNotes={() => setNotesOpen(true)} />
+        </div>
+        <div className="h-[860px] min-h-0 xl:h-full">
+          <Chat />
+        </div>
+        {notesOpen && (
+          <div className="h-[760px] min-h-0 xl:h-full xl:pb-[14px] xl:pt-[122px]">
+            <NotesViewer onClose={() => setNotesOpen(false)} />
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
