@@ -5,6 +5,7 @@ import {
   type RouteBody,
   type RouteQuery,
   type RouteRes,
+  type TtsRequest,
   type UploadResult,
 } from "@pw/shared";
 import { pw } from "./bridge";
@@ -163,6 +164,19 @@ export async function api<R extends ApiRoute>(route: R, opts: ApiOptions<R> = {}
   }
   const res = await send(url, { method, headers, body, signal: opts.signal });
   return readResponse<RouteRes<R>>(res);
+}
+
+/** POST /api/tts: one line of natural speech as a WAV blob, plus the engine that spoke it. Throws ApiError. */
+export async function fetchSpeech(body: TtsRequest, signal?: AbortSignal): Promise<{ blob: Blob; engine: string | null }> {
+  const base = await getServerUrl();
+  const res = await send(`${base}${API_PREFIX}/tts`, {
+    method: "POST",
+    headers: { Accept: "audio/wav", "Content-Type": "application/json", ...bearer() },
+    body: JSON.stringify(body),
+    signal,
+  });
+  if (!res.ok) await readResponse<never>(res);
+  return { blob: await res.blob(), engine: res.headers.get("x-tts-engine") };
 }
 
 /** Multipart upload to POST /api/uploads (field "file", max 25 MB). Not in ApiRoutes, so typed by hand. */
