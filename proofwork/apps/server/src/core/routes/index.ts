@@ -13,6 +13,7 @@ import { registerMeRoutes } from "./me.ts";
 import { registerObjectiveRoutes } from "./objectives.ts";
 import { registerOnboardingRoutes } from "./onboarding.ts";
 import { registerSystemRoutes } from "./system.ts";
+import { registerTtsRoutes } from "./tts.ts";
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -46,5 +47,6 @@ export function registerApiRoutes(api: FastifyInstance, core: Core): void {
   registerEconomyRoutes(api, core);
   registerCareerRoutes(api, core);
   registerAssistRoutes(api, core);
+  registerTtsRoutes(api, core);
 
 }

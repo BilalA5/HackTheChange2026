@@ -6,6 +6,7 @@ export type ErrorCode =
   | "locked"
   | "not_found"
   | "conflict"
+  | "unavailable"
   | "internal";
 
 export class HttpError extends Error {

@@ -9,6 +9,7 @@ import websocket from "@fastify/websocket";
 import { createAiEngine } from "./ai/index.ts";
 import type { AiEngine } from "./contracts.ts";
 import { registerCoworkSocket } from "./ai/cowork.ts";
+import { createTtsService, enginesFromEnv, type TtsService } from "./ai/tts/index.ts";
 import { buildContentIndex, loadDefaultContent, type ContentSource } from "./core/content.ts";
 import { openDatabase } from "./core/db.ts";
 import { HttpError, codeForStatus } from "./core/errors.ts";
@@ -28,6 +29,8 @@ export interface BuildOptions {
   /** SQLite file. Defaults to <dataDir>/proofwork.db (":memory:" is allowed). */
   dbPath?: string;
   ai?: AiEngine;
+  /** Speech engines. Defaults to the ones the environment allows, without preloading any model. */
+  tts?: TtsService;
   content?: ContentSource;
   /** Root for uploads and screenshots. Defaults to apps/server/data, or the dbPath folder when only dbPath is given. */
   dataDir?: string;
@@ -49,11 +52,13 @@ export async function buildServer(opts: BuildOptions = {}): Promise<FastifyInsta
   const app = Fastify({ logger: opts.logger ?? false, bodyLimit: 12 * 1024 * 1024, connectionTimeout: 200_000, requestTimeout: 200_000 });
   const content = buildContentIndex(opts.content ?? (await loadDefaultContent()));
   const ai = opts.ai ?? createAiEngine();
+  const tts = opts.tts ?? createTtsService({ engines: enginesFromEnv(dataDir), cacheDir: join(dataDir, "tts-cache") });
   const db = openDatabase(dbPath);
   const core: Core = {
     db,
     content,
     ai,
+    tts,
     paths,
     jwtSecret: jwtSecretFromEnv(),
     hub: new Hub(),
@@ -91,7 +96,11 @@ export async function buildServer(opts: BuildOptions = {}): Promise<FastifyInsta
     }
   });
 
-  await app.register(cors, { origin: true, methods: ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"] });
+  await app.register(cors, {
+    origin: true,
+    methods: ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    exposedHeaders: ["x-tts-engine"],
+  });
   await app.register(multipart, { limits: { fileSize: MAX_UPLOAD_BYTES, files: 1 } });
   await app.register(websocket);
   app.decorateRequest("userId", "");
