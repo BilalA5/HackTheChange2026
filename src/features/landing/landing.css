@@ -62,7 +62,6 @@
     0 30px 60px -28px rgba(15, 15, 15, 0.45);
 }
 
-/* Narrator button: Navid's face with a speaker badge and a ring while he talks. */
 @keyframes nv-ring {
   from {
     transform: scale(1);

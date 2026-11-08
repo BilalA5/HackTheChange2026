@@ -15,7 +15,7 @@ function playClip(key) {
     return;
   }
   if (current) current.audio.pause();
-  const audio = new Audio(`/assets/voice/navid-${key}.m4a`);
+  const audio = new Audio(`/assets/voice/guide-${key}.m4a`);
   current = { key, audio };
   const done = () => {
     if (current?.audio === audio) {
@@ -29,7 +29,7 @@ function playClip(key) {
   notify();
 }
 
-/** Navid's face with a speaker badge. Pressing it plays his line for that part of the page. */
+/** The guide's face with a speaker badge. Pressing it plays the guide's line for that part of the page. */
 export function Narrator({ clip, size = 52, dark = false, className = '' }) {
   const [playing, setPlaying] = useState(null);
   useEffect(() => {
@@ -42,14 +42,14 @@ export function Narrator({ clip, size = 52, dark = false, className = '' }) {
       type="button"
       onClick={() => playClip(clip)}
       aria-pressed={on}
-      aria-label={on ? 'Stop Navid' : 'Hear Navid'}
-      title="Navid"
+      aria-label={on ? 'Stop the guide' : 'Hear the guide'}
+      title="Your guide"
       className={`relative inline-flex shrink-0 align-middle transition-transform duration-300 hover:scale-105 ${className}`}
       style={{ width: size, height: size }}
     >
       {on && <span className="nv-ring absolute inset-0 rounded-full border-2 border-[var(--wave)]" aria-hidden="true" />}
       <img
-        src="/assets/cast/navi-sq.webp"
+        src="/assets/cast/guide-sq.webp"
         alt=""
         className={`h-full w-full rounded-full object-cover ${dark ? 'ring-1 ring-white/15' : 'ring-1 ring-black/5'}`}
         draggable="false"
