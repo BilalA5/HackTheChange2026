@@ -8,12 +8,13 @@ export interface StepProps {
   send(turn: FtuxTurn): void;
 }
 
+/** Server order: draw → chat → why → recommend → roadmap → claim. */
 export const FTUX_STEPS: { id: Exclude<FtuxStep, "done">; label: string }[] = [
   { id: "draw", label: "Draw" },
   { id: "chat", label: "Chat" },
+  { id: "why", label: "Why" },
   { id: "recommend", label: "Match" },
   { id: "roadmap", label: "Roadmap" },
-  { id: "why", label: "Why" },
   { id: "claim", label: "Claim" },
 ];
 

@@ -12,6 +12,11 @@ import { VisionBoardCard } from "./VisionBoardCard";
 const GUIDE_NAME = "Proofwork guide";
 const GUIDE_SEED = "guide";
 
+/** The role question takes any job title, so the input says so. Other questions get a plain prompt. */
+export function chatPlaceholder(prompt: string): string {
+  return /\b(role|job|title|career|position)\b/i.test(prompt) ? "Type any job title…" : "Type your answer…";
+}
+
 export function ChatStep({ view, busy, send }: StepProps) {
   const [text, setText] = useState("");
   const logRef = useRef<HTMLDivElement | null>(null);
@@ -93,33 +98,37 @@ export function ChatStep({ view, busy, send }: StepProps) {
         </div>
 
         {chips.length > 0 && (
-          <div className="flex flex-wrap gap-2 px-5 pb-3" role="group" aria-label="Quick replies">
-            {chips.map((chip) => (
-              <button
-                key={chip}
-                type="button"
-                disabled={busy}
-                onClick={() => submit(chip)}
-                className="rounded-full border border-line bg-white/8 px-3.5 py-1.5 text-[13px] text-fg transition-colors hover:bg-white/14 focus-visible:outline-2 focus-visible:outline-accent disabled:opacity-45"
-              >
-                {chip}
-              </button>
-            ))}
+          <div className="flex flex-col gap-2 px-5 pb-3">
+            <MonoLabel>Suggestions</MonoLabel>
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Suggested answers">
+              {chips.map((chip) => (
+                <button
+                  key={chip}
+                  type="button"
+                  disabled={busy}
+                  onClick={() => submit(chip)}
+                  className="rounded-full border border-line bg-white/8 px-3.5 py-1.5 text-[13px] text-fg transition-colors hover:bg-white/14 focus-visible:outline-2 focus-visible:outline-accent disabled:opacity-45"
+                >
+                  {chip}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
-        <form onSubmit={onSubmit} className="flex items-center gap-2 border-t border-line px-5 py-4">
+        <form onSubmit={onSubmit} className="flex items-center gap-3 border-t border-line px-5 py-4">
           <div className="min-w-0 flex-1">
             <Input
-              aria-label="Message the guide"
-              placeholder="Type your answer and press Enter"
+              aria-label="Your answer"
+              placeholder={chatPlaceholder(view.prompt)}
               value={text}
               disabled={busy}
               onChange={(e) => setText(e.target.value)}
               autoComplete="off"
+              className="h-12 text-[15px]"
             />
           </div>
-          <Button type="submit" variant="primary" size="md" disabled={busy || text.trim().length === 0} icon={<Send size={15} aria-hidden="true" />}>
+          <Button type="submit" variant="primary" size="lg" disabled={busy || text.trim().length === 0} icon={<Send size={16} aria-hidden="true" />}>
             Send
           </Button>
         </form>

@@ -36,16 +36,20 @@ export function WhyStep({ view, busy, send }: StepProps) {
       </h1>
 
       <form onSubmit={onSubmit} className="glass flex w-full max-w-[640px] flex-col gap-4 rounded-glass p-5">
-        <Textarea
-          aria-label="Your answer"
-          placeholder="In your own words, a few sentences is plenty."
-          value={text}
-          disabled={busy}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={onKeyDown}
-          rows={3}
-          maxRows={8}
-        />
+        <div className="flex flex-col gap-1.5">
+          <MonoLabel>Motivation and background</MonoLabel>
+          <Textarea
+            aria-label="Your motivation and background"
+            placeholder="Why this work matters to you, and what you already know: studies, a current job, projects, skills. A few sentences is plenty."
+            value={text}
+            disabled={busy}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={onKeyDown}
+            rows={7}
+            maxRows={14}
+            className="min-h-[170px] text-[15px] leading-relaxed"
+          />
+        </div>
 
         {chips.length > 0 && (
           <div className="flex flex-col gap-2">
