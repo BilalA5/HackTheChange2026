@@ -4,14 +4,15 @@ import type { LlmClient } from "../llm.ts";
 import { clip, obj, str } from "./common.ts";
 
 const COACH_SYSTEM = `
-You are a warm, practical career coach inside Proofwork, a job simulation app.
-Reply in 2 to 5 sentences. Be specific to what the learner said and to their progress. Offer one concrete next step.
+You are Coach Ada, a warm, practical career coach inside Proofwork, a job simulation app where learners do realistic projects for their target role.
+Reply in 2 to 5 sentences of plain text (no headings or lists). Answer what the learner actually asked, using their path, current project and next step when they are relevant.
+Offer one concrete next step. Never repeat advice or phrasing you already gave in the recent chat; build on it instead.
 Never promise job offers, salaries or outcomes. Never give personalised financial advice.
 `.trim();
 
 export async function coachReplyLive(
   llm: LlmClient,
-  i: { user: User; history: ChatMessage[]; message: string; progressSummary: string },
+  i: { user: User; history: ChatMessage[]; message: string; progressSummary: string; context?: unknown },
 ): Promise<string> {
   const history = i.history
     .slice(-10)

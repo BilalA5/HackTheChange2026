@@ -9,6 +9,10 @@ import { nowIso, uid } from "../util.ts";
 import { asObject, optStr, reqEnum, reqStr } from "../validate.ts";
 import { paidCall } from "./credits.ts";
 import { notify } from "./notifications.ts";
+import type { CoachContext } from "../../contracts.ts";
+import { contentFor } from "../user-content.ts";
+import { scenarioCards } from "./catalog.ts";
+import { listUserObjectives } from "./objectives.ts";
 import { computeProgress } from "./progress.ts";
 import { requireUser } from "./users.ts";
 
@@ -38,17 +42,55 @@ function chatMessage(role: ChatMessage["role"], text: string): ChatMessage {
   return { id: uid(), role, text, at: nowIso() };
 }
 
-function progressSummary(core: Core, userId: string): string {
+/** The learner's career, current project and next step, so the coach can be specific. */
+export function coachContext(core: Core, userId: string): CoachContext {
+  const user = requireUser(core.db, userId);
   const p = computeProgress(core, userId);
-  return `Level ${p.level} with ${p.xp} XP, ${p.completedScenarios} project(s) completed, ${p.streak.current}-day streak.`;
+  const content = contentFor(core, userId);
+  const career = user.careerId ? content.getCareer(user.careerId) : undefined;
+  const cards = career ? scenarioCards(core, userId, career.id) : [];
+  const current = cards.find((c) => c.status === "in_progress") ?? cards.find((c) => c.status === "available") ?? null;
+  let nextStep: string | null = null;
+  if (current) {
+    const objective = listUserObjectives(core, userId).find((o) => o.scenarioId === current.id);
+    const scenario = content.getScenario(current.id);
+    if (!objective || objective.phase === "brief") nextStep = `read the brief for "${current.title}" and join the kickoff with ${current.npc.name}`;
+    else if (objective.phase === "kickoff") nextStep = `finish the kickoff meeting with ${current.npc.name} and write the Problem, Outcome and Process notes`;
+    else if (objective.phase === "pou") nextStep = `pass the Proof of Understanding questions from ${current.npc.name}`;
+    else if (objective.phase === "stages") {
+      const stage = scenario?.stages.find((s) => objective.stages[s.id]?.status !== "completed") ?? null;
+      nextStep = stage ? `work on the stage "${stage.title}"${stage.kind === "presentation" ? ", the final presentation" : ""}` : "submit the last stage";
+    }
+  }
+  return {
+    careerTitle: career?.title ?? user.vision?.targetRole ?? null,
+    project: current ? { title: current.title, company: current.company.name, manager: current.npc.name } : null,
+    nextStep,
+    completedProjects: cards.filter((c) => c.status === "completed").length,
+    totalProjects: cards.length,
+    level: p.level,
+    xp: p.xp,
+    streak: p.streak.current,
+  };
+}
+
+function progressSummary(c: CoachContext): string {
+  const parts = [
+    c.careerTitle ? `Path: ${c.careerTitle}.` : "",
+    `Level ${c.level} with ${c.xp} XP, ${c.completedProjects} of ${c.totalProjects} project(s) completed, ${c.streak}-day streak.`,
+    c.project ? `Current project: "${c.project.title}" at ${c.project.company}, manager ${c.project.manager}.` : "",
+    c.nextStep ? `Next step: ${c.nextStep}.` : "",
+  ];
+  return parts.filter(Boolean).join(" ");
 }
 
 export async function coachChat(core: Core, userId: string, body: unknown): Promise<{ reply: ChatMessage; history: ChatMessage[] }> {
   const message = reqStr(asObject(body), "message", { max: 2000 });
   const user = requireUser(core.db, userId);
   const history = listChat(core.db, userId, "coach");
+  const context = coachContext(core, userId);
   const text = await paidCall(core, userId, "coach_chat", () =>
-    core.ai.coachReply({ user, history, message, progressSummary: progressSummary(core, userId) }),
+    core.ai.coachReply({ user, history, message, progressSummary: progressSummary(context), context }),
   );
   const learnerMessage = chatMessage("learner", message);
   const reply = chatMessage("npc", text);
