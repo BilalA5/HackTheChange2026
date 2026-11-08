@@ -51,7 +51,7 @@ export default function LoginPage() {
     <main className="relative grid min-h-svh place-items-center overflow-hidden bg-[#0e0e10] px-4 py-10 text-white">
       <title>Log in · Flint</title>
       <img
-        src="/assets/onboarding/si-city.webp"
+        src="/assets/board/campus.jpg"
         alt=""
         className="absolute inset-0 h-full w-full scale-105 object-cover brightness-[.55]"
       />
@@ -79,7 +79,7 @@ export default function LoginPage() {
           label="Your name"
           name="name"
           autoComplete="name"
-          placeholder="Sanjay Chauhan"
+          placeholder="Your name"
           defaultValue={values.name}
           required
         />

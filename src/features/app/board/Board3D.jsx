@@ -1,11 +1,13 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import Wordmark from '@/shared/Wordmark.jsx';
-import { CORNER, boardGeometry, facing, nearestTurn } from './geometry.js';
+import { useLayoutEffect, useRef, useState } from 'react';
+import { companies } from '@/data/companies.js';
+import { CORNER, boardGeometry } from './geometry.js';
 import { CheckGlyph, LockGlyph } from './glyphs.jsx';
 import { usePawnWalk } from './usePawnWalk.js';
 
 const TILT = 54;
 const FOCUS_PULL = 0.5;
+const LEAN = { left: -10, right: 10, top: 0, bottom: 0 };
+const CAMPUS = { src: '/assets/board/campus.jpg', ratio: 1671 / 941 };
 
 function useSize(ref) {
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -20,39 +22,50 @@ function useSize(ref) {
   return size;
 }
 
-function useCamera(geometry, focusSlot, overview) {
-  const [spin, setSpin] = useState(() => (focusSlot ? facing[focusSlot.side] * -1 : 0));
-  const target = overview || !focusSlot || focusSlot.side === 'corner' ? null : -facing[focusSlot.side];
-
-  useEffect(() => {
-    if (target !== null) setSpin((current) => nearestTurn(current, target));
-  }, [target]);
-
+/** The camera glides toward the selected tile and leans a little toward its side of the board. */
+function cameraFor(geometry, focusSlot, overview) {
   const center = { x: geometry.width / 2, y: geometry.height / 2 };
   const pull = overview || !focusSlot ? 0 : FOCUS_PULL;
   return {
-    spin,
+    spin: overview || !focusSlot ? 0 : (LEAN[focusSlot.side] ?? 0),
     focus: {
       x: center.x + ((focusSlot?.cx ?? center.x) - center.x) * pull,
       y: center.y + ((focusSlot?.cy ?? center.y) - center.y) * pull,
     },
-    zoom: overview ? 0.8 : 1.08,
+    zoom: overview ? 0.86 : 1.12,
   };
 }
 
-/** Text printed on the board stays readable: it turns against the camera so it always faces the player. */
-function Upright({ spin, className = '', children }) {
+/** The campus image covers the middle of the board; `at` places a point given in percent of the image. */
+function campusLayout(geometry) {
+  const area = { width: geometry.width - 2 * CORNER, height: geometry.height - 2 * CORNER };
+  const width = Math.max(area.width, area.height * CAMPUS.ratio);
+  const height = width / CAMPUS.ratio;
+  const left = (area.width - width) / 2;
+  const top = (area.height - height) / 2;
+  return {
+    area,
+    image: { left, top, width, height },
+    at: ({ x, y }) => ({ x: CORNER + left + (x / 100) * width, y: CORNER + top + (y / 100) * height }),
+  };
+}
+
+/** Something standing up off the board, turned to face the camera wherever it moves. */
+function Standee({ x, y, spin, ground, className = '', children }) {
   return (
-    <div className={`board-ease absolute inset-0 ${className}`} style={{ transform: `rotate(${-spin}deg)` }}>
-      {children}
-    </div>
+    <span className={`board-standee absolute ${className}`} style={{ left: x, top: y }}>
+      {ground}
+      <span
+        className="board-ease board-standee-face"
+        style={{ transform: `rotateZ(${-spin}deg) rotateX(${-TILT}deg)` }}
+      >
+        {children}
+      </span>
+    </span>
   );
 }
 
 function Tile({ slot, stop, number, status, selected, onSelect }) {
-  const sideways = slot.side === 'left' || slot.side === 'right';
-  const width = sideways ? slot.h : slot.w;
-  const height = sideways ? slot.w : slot.h;
   const locked = status === 'locked';
 
   return (
@@ -64,10 +77,7 @@ function Tile({ slot, stop, number, status, selected, onSelect }) {
       className={`board-tile absolute ${selected ? 'is-selected' : ''} ${locked ? 'is-locked' : ''}`}
       style={{ left: slot.x, top: slot.y, width: slot.w, height: slot.h }}
     >
-      <span
-        className="absolute left-1/2 top-1/2 flex flex-col text-left"
-        style={{ width, height, transform: `translate(-50%, -50%) rotate(${facing[slot.side]}deg)` }}
-      >
+      <span className="absolute inset-0 flex flex-col text-left">
         <span
           className="flex h-[34px] shrink-0 items-center justify-between px-3 font-mono text-[11px] tabular-nums tracking-[0.12em] text-black/60"
           style={{ background: stop.color }}
@@ -93,7 +103,7 @@ function Tile({ slot, stop, number, status, selected, onSelect }) {
   );
 }
 
-function Corner({ slot, spin, label, onClick, children }) {
+function Corner({ slot, label, onClick, children }) {
   const Element = onClick ? 'button' : 'div';
   return (
     <Element
@@ -101,26 +111,17 @@ function Corner({ slot, spin, label, onClick, children }) {
       className="board-tile board-corner absolute"
       style={{ left: slot.x, top: slot.y, width: slot.w, height: slot.h }}
     >
-      <Upright spin={spin} className="flex flex-col items-center justify-center gap-1 text-center">
+      <span className="absolute inset-0 flex flex-col items-center justify-center gap-1 text-center">
         <span className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-ink-3">{label}</span>
         {children}
-      </Upright>
+      </span>
     </Element>
   );
 }
 
 function House({ slot, color }) {
-  const inward = { top: [0, 1], bottom: [0, -1], left: [1, 0], right: [-1, 0] }[slot.side];
-  const reach = CORNER / 2 - 22;
   return (
-    <span
-      className="board-house absolute"
-      style={{
-        left: slot.cx + inward[0] * reach,
-        top: slot.cy + inward[1] * reach,
-        '--house': color,
-      }}
-    >
+    <span className="board-house absolute" style={{ left: slot.x + slot.w - 26, top: slot.y + 17, '--house': color }}>
       <i className="face top" />
       <i className="face front" />
       <i className="face back" />
@@ -130,41 +131,49 @@ function House({ slot, color }) {
   );
 }
 
-/** Where the pawn stands on a tile: its lower-right corner as the tile reads, clear of the title. */
-function standingSpot(slot) {
-  if (slot.side === 'corner') return { x: slot.cx, y: slot.cy };
-  const angle = (facing[slot.side] * Math.PI) / 180;
-  const [right, down] = [44, 40];
-  return {
-    x: slot.cx + right * Math.cos(angle) - down * Math.sin(angle),
-    y: slot.cy + right * Math.sin(angle) + down * Math.cos(angle),
-  };
+function Pawn({ slot, spin, hop, initials }) {
+  const corner = slot.side === 'corner';
+  return (
+    <Standee
+      x={corner ? slot.cx : slot.x + slot.w - 34}
+      y={corner ? slot.cy + 30 : slot.y + slot.h - 30}
+      spin={spin}
+      ground={<i className="board-pawn-shadow" key={`shadow-${hop}`} />}
+      className="board-pawn"
+    >
+      <span className="board-pawn-hop" key={hop}>
+        <span className="board-pawn-label">{initials}</span>
+        <svg viewBox="0 0 48 76" className="h-[76px] w-[48px] drop-shadow-[0_8px_10px_rgba(0,0,0,.35)]">
+          <defs>
+            <linearGradient id="pawn" x1="0" x2="1">
+              <stop offset="0" stopColor="#2E9A48" />
+              <stop offset="0.45" stopColor="#7BE08F" />
+              <stop offset="1" stopColor="#1F7A37" />
+            </linearGradient>
+          </defs>
+          <circle cx="24" cy="14" r="11" fill="url(#pawn)" />
+          <path d="M15 27h18l-3 6c6 6 9 18 11 33H7c2-15 5-27 11-33z" fill="url(#pawn)" />
+          <rect x="4" y="64" width="40" height="10" rx="5" fill="url(#pawn)" />
+        </svg>
+      </span>
+    </Standee>
+  );
 }
 
-function Pawn({ slot, spin, hop, initials }) {
-  if (!slot) return null;
-  const spot = standingSpot(slot);
+function CampusPin({ stop, at, spin }) {
+  const map = companies[stop.companyId]?.map;
+  if (!map) return null;
+  const point = at(map);
   return (
-    <span className="board-pawn absolute" style={{ left: spot.x, top: spot.y }}>
-      <i className="board-pawn-shadow" key={`shadow-${hop}`} />
-      <span className="board-ease board-pawn-stand" style={{ transform: `rotateZ(${-spin}deg) rotateX(${-TILT}deg)` }}>
-        <span className="board-pawn-hop" key={hop}>
-          <span className="board-pawn-label">{initials}</span>
-          <svg viewBox="0 0 48 76" className="h-[76px] w-[48px] drop-shadow-[0_8px_10px_rgba(0,0,0,.35)]">
-            <defs>
-              <linearGradient id="pawn" x1="0" x2="1">
-                <stop offset="0" stopColor="#2E9A48" />
-                <stop offset="0.45" stopColor="#7BE08F" />
-                <stop offset="1" stopColor="#1F7A37" />
-              </linearGradient>
-            </defs>
-            <circle cx="24" cy="14" r="11" fill="url(#pawn)" />
-            <path d="M15 27h18l-3 6c6 6 9 18 11 33H7c2-15 5-27 11-33z" fill="url(#pawn)" />
-            <rect x="4" y="64" width="40" height="10" rx="5" fill="url(#pawn)" />
-          </svg>
+    <Standee x={point.x} y={point.y} spin={spin} className="board-pin">
+      <span className="board-pin-body" key={stop.companyId}>
+        <span className="flex items-center gap-2 whitespace-nowrap rounded-full bg-white py-[6px] pl-[8px] pr-[14px] text-[15px] font-semibold text-[#141416] shadow-[0_10px_24px_-8px_rgba(0,0,0,.6)]">
+          <img src={stop.logo} alt="" className="h-[18px] w-[18px] object-contain brightness-0" />
+          {stop.company}
         </span>
+        <i className="board-pin-stem" />
       </span>
-    </span>
+    </Standee>
   );
 }
 
@@ -180,25 +189,16 @@ function Slab({ width, height }) {
   );
 }
 
-export default function Board3D({
-  plan,
-  standing,
-  selectedId,
-  onSelect,
-  overview,
-  initials,
-  corners,
-  centerTitle,
-  centerLine,
-}) {
+export default function Board3D({ plan, standing, selectedId, onSelect, overview, initials, corners }) {
   const scene = useRef(null);
   const size = useSize(scene);
   const geometry = boardGeometry(plan.stops.length);
-  const slotOf = (stopId) => geometry.slots[plan.stops.findIndex((stop) => stop.id === stopId)];
+  const selectedIndex = plan.stops.findIndex((stop) => stop.id === selectedId);
   const currentIndex = standing.current ? plan.stops.indexOf(standing.current) : plan.stops.length - 1;
   const { at: pawnIndex, hop } = usePawnWalk(plan.createdAt, currentIndex);
   const pawnSlot = pawnIndex < 0 ? geometry.corners.start : geometry.slots[pawnIndex];
-  const camera = useCamera(geometry, slotOf(selectedId), overview);
+  const camera = cameraFor(geometry, geometry.slots[selectedIndex], overview);
+  const campus = campusLayout(geometry);
 
   const span = Math.max(geometry.width, geometry.height);
   const fit = Math.min(size.width / span, size.height / (span * 0.68));
@@ -219,23 +219,10 @@ export default function Board3D({
           <div className="board-top absolute inset-0" />
 
           <div
-            className="board-print-area absolute"
-            style={{
-              left: CORNER,
-              top: CORNER,
-              width: geometry.width - 2 * CORNER,
-              height: geometry.height - 2 * CORNER,
-            }}
+            className="board-campus absolute overflow-hidden"
+            style={{ left: CORNER, top: CORNER, width: campus.area.width, height: campus.area.height }}
           >
-            <Upright spin={camera.spin} className="flex flex-col items-center justify-center gap-3 text-center">
-              <span className="board-print">
-                <Wordmark size={46} tone="dark" />
-              </span>
-              <span className="max-w-[78%] font-serif text-[30px] leading-[1.05] tracking-[-0.03em] text-ink">
-                {centerTitle}
-              </span>
-              <span className="text-[14px] text-ink-3">{centerLine}</span>
-            </Upright>
+            <img src={CAMPUS.src} alt="" className="absolute max-w-none" style={campus.image} />
           </div>
 
           {plan.stops.map((stop, i) => (
@@ -245,7 +232,7 @@ export default function Board3D({
               stop={stop}
               number={i + 1}
               status={standing.statusOf(stop)}
-              selected={stop.id === selectedId}
+              selected={i === selectedIndex}
               onSelect={onSelect}
             />
           ))}
@@ -258,13 +245,7 @@ export default function Board3D({
           ))}
 
           {Object.entries(corners).map(([key, corner]) => (
-            <Corner
-              key={key}
-              slot={geometry.corners[key]}
-              spin={camera.spin}
-              label={corner.label}
-              onClick={corner.onClick}
-            >
+            <Corner key={key} slot={geometry.corners[key]} label={corner.label} onClick={corner.onClick}>
               {corner.children}
             </Corner>
           ))}
@@ -274,6 +255,9 @@ export default function Board3D({
               standing.statusOf(stop) === 'done' && <House key={stop.id} slot={geometry.slots[i]} color={stop.color} />,
           )}
 
+          {!overview && selectedIndex >= 0 && (
+            <CampusPin stop={plan.stops[selectedIndex]} at={campus.at} spin={camera.spin} />
+          )}
           <Pawn slot={pawnSlot} spin={camera.spin} hop={hop} initials={initials} />
         </div>
       )}

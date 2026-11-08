@@ -150,13 +150,6 @@ function Board({ plan, progress, user }) {
 
   return (
     <div className="board-room relative flex min-h-svh flex-col lg:block lg:h-svh lg:overflow-hidden">
-      <img
-        src="/assets/board/backdrop.jpg"
-        alt=""
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-70"
-        onError={(event) => event.currentTarget.remove()}
-      />
-
       <header className="relative z-20 flex items-start justify-between gap-4 px-5 pt-5 lg:absolute lg:inset-x-0 lg:top-0">
         <div>
           <Link to="/app" aria-label="Flint home" className="inline-flex">
@@ -190,12 +183,6 @@ function Board({ plan, progress, user }) {
           overview={overview}
           initials={initialsOf(user.name)}
           corners={corners}
-          centerTitle={plan.roleTitle}
-          centerLine={
-            standing.complete
-              ? `All ${plan.stops.length} stops done`
-              : `Week ${standing.week} of ${plan.totalWeeks} · ${standing.doneCount} of ${plan.stops.length} done`
-          }
         />
       </div>
 

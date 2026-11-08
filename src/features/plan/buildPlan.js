@@ -39,7 +39,7 @@ export function resolveRole({ roleId, customRole }) {
     title,
     section: 'technology',
     custom: true,
-    poster: '/assets/onboarding/city.jpg',
+    poster: '/assets/board/campus.jpg',
     projects: customProjects,
     tools: [
       { name: 'Claude', src: '/assets/roles/tools/anthropic.svg' },
