@@ -171,7 +171,7 @@ const user: User = {
       product: true,
       osDelivery: false,
     },
-    voice: { stt: "typed", ttsEnabled: false, ttsRate: 1 },
+    voice: { stt: "typed", ttsEnabled: false, ttsRate: 1, ttsNatural: false },
     aiModel: "fast",
     devices: {},
     privacy: { shareAnalytics: false, storeRecordings: false },

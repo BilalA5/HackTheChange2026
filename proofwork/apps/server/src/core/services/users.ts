@@ -28,7 +28,7 @@ export function defaultSettings(): UserSettings {
     theme: "system",
     sounds: { enabled: true, volume: 0.6 },
     notifications: { ...notifications, osDelivery: true },
-    voice: { stt: "apple", ttsEnabled: true, ttsRate: 1 },
+    voice: { stt: "apple", ttsEnabled: true, ttsRate: 1, ttsNatural: true },
     aiModel: "quality",
     devices: { cameraId: "", micId: "", speakerId: "" },
     privacy: { shareAnalytics: false, storeRecordings: true },
