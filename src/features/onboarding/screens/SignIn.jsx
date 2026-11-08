@@ -19,15 +19,18 @@ export default function SignIn() {
   const [agreed, setAgreed] = useState(true);
 
   return (
-    <div
-      className="absolute inset-0 overflow-hidden"
-      style={{ background: 'linear-gradient(180deg,#22364a,#16222f 60%,#101820)' }}
-    >
-      <img
-        src={`${IMG}/si-city.webp`}
-        alt="Aerial view of Flint's city of company buildings"
-        className="animate-drift absolute inset-0 h-full w-full object-cover"
-      />
+    <div className="absolute inset-0">
+      <div
+        className="bleed overflow-hidden"
+        style={{ background: 'linear-gradient(180deg,#22364a,#16222f 60%,#101820)' }}
+      >
+        <img
+          src={`${IMG}/si-city.webp`}
+          alt="Aerial view of Flint's city of company buildings"
+          className="animate-drift absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="pointer-events-none absolute inset-0" style={{ background: vignette }} />
+      </div>
       {clouds.map((cloud) => (
         <img
           key={cloud.left}
@@ -37,7 +40,6 @@ export default function SignIn() {
           style={{ left: cloud.left, top: cloud.top, width: cloud.width, opacity: cloud.opacity }}
         />
       ))}
-      <div className="pointer-events-none absolute inset-0" style={{ background: vignette }} />
       <div className="absolute left-[34px] top-[30px] drop-shadow-[0_2px_10px_rgba(0,0,0,.35)]">
         <Wordmark size={26} />
       </div>
